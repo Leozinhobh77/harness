@@ -41,6 +41,29 @@
 
 ---
 
-## Candidatos (visto em 1 projeto — aguardando o segundo)
+### P003 — `.hidden` não existe em SVGElement, só em HTMLElement
+- **Visto em:** skill /harness (2026-07-26)
+- **Nível da solução:** 3 (teste Playwright pegou antes de publicar)
+- **Solução:** trocar `svg.hidden = bool` por `svg.setAttribute('hidden','')` /
+  `svg.removeAttribute('hidden')`. A propriedade IDL `hidden` é definida só na interface
+  `HTMLElement`; em `<svg>` inline (SVGElement) o assign vira um expando silencioso — não
+  lança erro, não reflete no atributo, e o elemento continua escondido/visível do jeito errado.
+- **Detalhe:** achado testando o botão de tema (ícone sol/lua) do manual — o clique mudava
+  `data-theme` corretamente mas o ícone não trocava. Sem teste automatizado, passaria batido
+  (visualmente sutil, fácil de não notar num clique rápido).
+- **Promovido ao template:** não é template de projeto — é conhecimento de front-end da própria
+  skill (páginas que ela gera). Registrado aqui para a próxima página HTML nascer sem o bug.
 
-_Nenhum ainda._
+### P004 — Scroll-spy por "primeira seção interceptando" escolhe a seção errada
+- **Visto em:** skill /harness (2026-07-26)
+- **Nível da solução:** 3 (teste Playwright pegou antes de publicar)
+- **Solução:** trocar `IntersectionObserver` + "primeira em ordem de documento que está
+  intersectando" por uma varredura em `scroll`+`requestAnimationFrame` que caminha as seções em
+  ordem e marca ativa a **última** cujo topo já cruzou a linha de leitura (topo da tela + um
+  offset). Sections são sequenciais, então o loop pode parar no primeiro que ainda não chegou.
+- **Detalhe:** em página longa, ao pular direto para uma seção (clique de link, não scroll
+  incremental), a seção anterior pode sobrar com poucos pixels ainda visíveis no topo da tela —
+  e como ela aparece primeiro no array (ordem do documento), o algoritmo antigo a escolhia em
+  vez da seção que realmente ocupa a tela. Confirmado com debug script: navegação para "§7.1 O
+  flywheel" marcava "§6 Os arquivos" como ativa.
+- **Promovido ao template:** não é template de projeto — mesmo motivo do P003.

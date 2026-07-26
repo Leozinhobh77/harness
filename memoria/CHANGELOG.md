@@ -8,6 +8,41 @@
 
 ---
 
+## v1.1.1 — 2026-07-26
+
+**Manual mobile: gaveta deslizante + leitura maior.**
+
+### Procedência
+Usuário testou o manual publicado no celular: o menu virou uma tira horizontal espremida junto
+com o conteúdo, e o texto ficou pequeno. Pediu um padrão mais moderno — gaveta que abre/fecha,
+campo de leitura maior, fontes mais legíveis.
+
+### Entra
+- Topbar fixa no mobile: hambúrguer · marca · **rótulo da seção atual** (sempre visível, mesmo
+  com a gaveta fechada) · tema
+- Gaveta deslizante com backdrop, fecha por Escape / toque fora / clique num link, trava de foco
+  (Tab não escapa) e trava o scroll do fundo enquanto aberta
+- Tipografia do mobile sobe (raiz 17.5px, `line-height` 1.72) — todo o resto do sistema de
+  medidas em `rem` escala junto, sem precisar tocar cada regra
+- Desktop ganha botão de recolher o menu (mesma ideia, sem overlay) para quem quiser o campo de
+  leitura inteiro
+
+### Dois bugs achados pelos próprios testes (Playwright), não por revisão manual
+Registrados em `memoria/PADROES.md` como **P003** e **P004**:
+1. `svg.hidden = bool` é um no-op silencioso — a propriedade `hidden` só existe em
+   `HTMLElement`, não em `SVGElement`. Corrigido com `setAttribute`/`removeAttribute`.
+2. O scroll-spy antigo (`IntersectionObserver`, pega a primeira seção "visível" em ordem de
+   documento) escolhia a seção errada quando duas ficavam simultaneamente intersectando a tela
+   após um salto de âncora. Trocado por varredura `scroll`+`rAF` que pega a última seção cujo
+   topo já cruzou a linha de leitura — mais simples e correto.
+
+Nenhum dos dois foi visual o bastante para saltar aos olhos num clique rápido — só apareceram
+porque havia teste automatizado checando o estado real (atributo, texto, classe), não só a
+captura de tela. Ver Lei 2 (`CONSTITUICAO.md`): o teste é a guarda mecânica; a correção manual
+teria sido o "texto pedindo por favor" de nível 5.
+
+---
+
 ## v1.1.0 — 2026-07-26
 
 **Manual completo em 4 camadas + publicação.**

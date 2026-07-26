@@ -1,6 +1,6 @@
 # 📖 MANUAL `/harness`
 
-> **Versão 1.1.0** · gerado em **26/07/2026**
+> **Versão 1.1.1** · gerado em **26/07/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -1071,5 +1071,6 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| 1.1.1 | 2026-07-26 | Só apresentação (`docs/index.html`): gaveta deslizante no mobile, leitura maior, colapso de menu no desktop. Conteúdo deste arquivo não mudou. |
 | 1.1.0 | 2026-07-26 | Manual completo em 4 camadas + glossário + evidências; comando `--exportar` |
 | 1.0.0 | 2026-07-26 | Primeira versão (só referência) |
