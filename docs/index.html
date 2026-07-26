@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<!-- Sem esta tag, o celular renderiza a página a ~980px e encolhe tudo:
+     letra minúscula, zoom com os dedos, e NENHUMA media query de mobile dispara. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
 <title>Manual /harness</title>
 
 <style>
@@ -181,41 +189,50 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .nav-group { display: flex; flex-direction: column; gap: .3rem; }
+  .nav-group { display: flex; flex-direction: column; gap: .25rem; }
   .nav-label {
     font-family: var(--mono);
-    font-size: .655rem;
+    font-size: .68rem;
     font-weight: 600;
     letter-spacing: .14em;
     text-transform: uppercase;
     color: var(--ink-3);
-    padding-bottom: .3rem;
-    margin-bottom: .15rem;
+    padding: 0 .65rem .35rem;
+    margin-bottom: .1rem;
     border-bottom: 1px solid var(--rule-soft);
   }
+  /* linhas do menu como botões: alvo de toque generoso, fundo no hover/ativo */
   .nav a {
     display: flex;
-    gap: .6rem;
-    align-items: baseline;
+    gap: .7rem;
+    align-items: center;
     text-decoration: none;
     color: var(--ink-2);
-    font-size: .875rem;
-    line-height: 1.35;
-    padding: .3rem 0;
-    transition: color .15s ease;
+    font-size: .92rem;
+    font-weight: 500;
+    line-height: 1.3;
+    padding: .5rem .65rem;
+    border-radius: 8px;
+    transition: color .15s ease, background .15s ease;
   }
   .nav a .n {
     font-family: var(--mono);
     font-size: .72rem;
+    font-weight: 600;
     color: var(--ink-3);
     font-variant-numeric: tabular-nums;
-    min-width: 1.9em;
-    transition: color .15s ease;
+    min-width: 2.1em;
+    text-align: center;
+    padding: .18rem .1rem;
+    border-radius: 5px;
+    background: var(--surface-2);
+    transition: color .15s ease, background .15s ease;
+    flex-shrink: 0;
   }
-  .nav a:hover { color: var(--ink); }
+  .nav a:hover { color: var(--ink); background: var(--surface-2); }
   .nav a:hover .n { color: var(--brass); }
-  .nav a.active { color: var(--brass); font-weight: 600; }
-  .nav a.active .n { color: var(--brass); }
+  .nav a.active { color: var(--brass); font-weight: 650; background: var(--brass-tint); }
+  .nav a.active .n { color: var(--paper); background: var(--brass); }
 
   .nav .theme-btn { margin-top: auto; align-self: flex-start; }
   .theme-btn .i-moon { color: var(--steel); }
@@ -502,13 +519,17 @@
   /* nav-scroll é sempre coluna vertical — a rolagem horizontal virou gaveta */
   .nav-scroll { display: flex; flex-direction: column; gap: 1.35rem; }
 
-  /* ============ MOBILE — gaveta deslizante + leitura maior ============ */
+  /* ============ MOBILE — gaveta deslizante + leitura GRANDE ============ */
   @media (max-width: 880px) {
-    html { font-size: 17.5px; scroll-padding-top: 4.25rem; }
-    body { line-height: 1.72; }
-    section { scroll-margin-top: 4.25rem; }
+    /* base 19px: os tamanhos em rem do site inteiro escalam junto */
+    html { font-size: 19px; scroll-padding-top: 4.5rem; }
+    body { line-height: 1.75; }
+    section { scroll-margin-top: 4.5rem; }
 
     .collapse-btn { display: none; }
+
+    .icon-btn { width: 2.7rem; height: 2.7rem; border-radius: 10px; }
+    .icon-btn svg { width: 1.35rem; height: 1.35rem; }
 
     /* topbar fixa: hambúrguer · seção atual · tema */
     .topbar {
@@ -519,25 +540,23 @@
       position: sticky;
       top: 0;
       z-index: 40;
-      padding: .65rem clamp(1rem, 4vw, 2rem);
-      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      padding: .6rem clamp(.9rem, 4vw, 2rem);
       background: var(--surface);
-      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--rule);
     }
     .topbar-left { display: flex; align-items: center; gap: .8rem; min-width: 0; }
-    .topbar-id { display: flex; flex-direction: column; gap: .05rem; min-width: 0; }
+    .topbar-id { display: flex; flex-direction: column; gap: .08rem; min-width: 0; }
     .topbar-brand {
       font-family: var(--mono);
       font-weight: 700;
-      font-size: .92rem;
+      font-size: 1rem;
       color: var(--ink);
       white-space: nowrap;
     }
     .topbar-brand span { color: var(--brass); }
     .topbar-section {
       font-family: var(--mono);
-      font-size: .68rem;
+      font-size: .72rem;
       color: var(--ink-3);
       white-space: nowrap;
       overflow: hidden;
@@ -549,7 +568,7 @@
       display: block;
       position: fixed;
       inset: 0;
-      background: rgba(10, 9, 8, .5);
+      background: rgba(10, 9, 8, .55);
       opacity: 0;
       pointer-events: none;
       transition: opacity .28s ease;
@@ -557,43 +576,62 @@
     }
     .backdrop.show { opacity: 1; pointer-events: auto; }
 
-    /* a gaveta em si */
+    /* a gaveta: quase a tela toda, botões grandes de tocar */
     .shell { display: block; padding: 0; max-width: none; }
     .nav {
       position: fixed;
       top: 0; left: 0;
-      width: min(85vw, 336px);
+      width: min(87vw, 390px);
       height: 100dvh;
       background: var(--surface);
       border-right: 1px solid var(--rule);
       box-shadow: var(--shadow);
-      padding: 1.35rem 1.35rem 2rem;
-      gap: 1.6rem;
-      transform: translateX(-102%);
+      padding: 1.2rem 1.1rem 2.5rem;
+      gap: 1.4rem;
+      transform: translateX(-103%);
       transition: transform .32s cubic-bezier(.22, .8, .28, 1);
       z-index: 60;
+      overscroll-behavior: contain;
     }
     .nav.open { transform: translateX(0); }
 
     .nav-close { display: inline-flex; }
     .nav .theme-btn { display: none; } /* a versão da topbar já cobre o tema no mobile */
 
+    /* linhas do menu no dedão: altura de botão de verdade (~48px) */
+    .nav a {
+      font-size: 1.02rem;
+      padding: .68rem .75rem;
+      border-radius: 10px;
+    }
+    .nav a .n { font-size: .8rem; min-width: 2.3em; padding: .22rem .15rem; }
+    .nav-label { font-size: .72rem; padding-bottom: .45rem; }
+    .nav-group { gap: .3rem; }
+
+    /* conteúdo: coluna cheia, títulos e código maiores */
     main {
-      padding: 1.85rem clamp(1rem, 4vw, 2rem) 5.5rem;
+      padding: 1.7rem clamp(.95rem, 4.5vw, 2rem) 5.5rem;
       max-width: none;
     }
-    .lede { font-size: 1.2rem; }
-    h1 { letter-spacing: -.03em; }
-    h2 { font-size: 1.55rem; }
-    h3 { font-size: 1.12rem; }
-    .t-wrap table { font-size: .92rem; }
-    pre { font-size: .87rem; }
-    section + section { margin-top: 3.5rem; }
+    h1 { font-size: 2.15rem; letter-spacing: -.03em; }
+    .lede { font-size: 1.18rem; }
+    h2 { font-size: 1.6rem; }
+    h3 { font-size: 1.18rem; }
+    .t-wrap table { font-size: .95rem; }
+    th, td { padding: .62rem .75rem; }
+    pre { font-size: .9rem; padding: .95rem 1rem; }
+    blockquote { font-size: 1.08rem; }
+    .note, .recipe { font-size: .98rem; }
+    .recipe { padding: 1.15rem 1.1rem; }
+    section + section { margin-top: 3.25rem; }
+    .sec-head { margin-bottom: 1.3rem; }
   }
 
   /* trava de rolagem do fundo enquanto a gaveta está aberta */
   html.drawer-open, html.drawer-open body { overflow: hidden; height: 100%; }
 </style>
+</head>
+<body>
 
 <header class="topbar">
   <div class="topbar-left">
@@ -619,7 +657,7 @@
     <div class="nav-top">
       <div class="brand">
         <div class="brand-mark">/<span>harness</span></div>
-        <div class="brand-meta">Manual · v1.1.1 · 26.07.2026</div>
+        <div class="brand-meta">Manual · v1.1.2 · 26.07.2026</div>
       </div>
       <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
@@ -1500,7 +1538,7 @@ Desce por desuso (não se provou)</code></pre>
     </section>
 
     <div class="foot">
-      MANUAL /HARNESS · V1.1.1 · 26.07.2026<br>
+      MANUAL /HARNESS · V1.1.2 · 26.07.2026<br>
       FONTE ÚNICA: manual/MANUAL.md · <a href="https://github.com/Leozinhobh77/harness">github.com/Leozinhobh77/harness</a><br>
       ATUALIZE COM /harness manual --exportar
     </div>
@@ -1657,3 +1695,5 @@ Desce por desuso (não se provou)</code></pre>
     agendar();
   })();
 </script>
+</body>
+</html>

@@ -49,10 +49,15 @@ exemplo do flywheel no manual está **generalizado de propósito** — mantenha 
 
 Cópia privada no claude.ai, útil para rascunho antes de publicar.
 
-1. Publique `docs/index.html` com a ferramenta `Artifact`.
-2. **Passe a URL existente no parâmetro `url`** para manter o mesmo link — sem isso, uma conversa
-   nova cria outro artifact.
-3. Mantenha o favicon ⚙️ — o usuário acha a aba pelo ícone. Use `label` com a versão.
+⚠️ **`docs/index.html` é um documento HTML completo** (doctype + head + viewport) porque o
+GitHub Pages serve o arquivo cru — ver P005 em `memoria/PADROES.md`. O publicador de Artifacts
+embrulha o arquivo em outro esqueleto, o que criaria documento aninhado. Se precisar do destino
+artifact, gere uma variante **sem** doctype/html/head/body num arquivo separado do scratchpad —
+nunca degrade o `docs/index.html` para fragmento, senão o celular volta a renderizar a ~980px.
+
+1. Publique a variante-fragmento com a ferramenta `Artifact`.
+2. **Passe a URL existente no parâmetro `url`** para manter o mesmo link.
+3. Mantenha o favicon ⚙️. Use `label` com a versão.
 
 ## Destino `notion`
 

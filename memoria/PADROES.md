@@ -54,6 +54,23 @@
 - **Promovido ao template:** não é template de projeto — é conhecimento de front-end da própria
   skill (páginas que ela gera). Registrado aqui para a próxima página HTML nascer sem o bug.
 
+### P005 — Página sem `<meta viewport>` renderiza a ~980px no celular: TODO o CSS mobile morre
+- **Visto em:** skill /harness (2026-07-26)
+- **Nível da solução:** 5 → devia ter sido 3 (o usuário pegou, não um teste)
+- **Solução:** toda página destinada ao GitHub Pages (ou qualquer servidor que sirva o arquivo
+  cru) tem que ser um **documento HTML completo**: `<!doctype html>`, `<html lang>`, `<head>`
+  com `<meta charset>` e `<meta name="viewport" content="width=device-width, initial-scale=1">`.
+- **Detalhe:** a página nasceu como *fragmento* (o publicador de Artifacts embrulha em
+  doctype/head/viewport na hora de servir). Ao mover o mesmo arquivo para o GitHub Pages, ele
+  foi servido cru: sem viewport, o navegador do celular renderiza a ~980px e encolhe tudo —
+  letra minúscula, zoom manual, e **nenhuma media query de mobile dispara**. O usuário viu o
+  site desktop espremido. Os testes Playwright não pegaram porque emulam o viewport
+  diretamente (`viewport={...}`), pulando exatamente o mecanismo que estava quebrado.
+- **Moral dupla:** (1) fragmento e documento são artefatos diferentes — mudar o canal de
+  publicação exige reconferir o invólucro; (2) teste que emula o ambiente não cobre o que o
+  ambiente real infere sozinho.
+- **Promovido ao template:** conhecimento da própria skill (páginas que ela publica), como P003/P004.
+
 ### P004 — Scroll-spy por "primeira seção interceptando" escolhe a seção errada
 - **Visto em:** skill /harness (2026-07-26)
 - **Nível da solução:** 3 (teste Playwright pegou antes de publicar)

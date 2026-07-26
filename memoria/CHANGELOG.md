@@ -8,6 +8,34 @@
 
 ---
 
+## v1.1.2 — 2026-07-26
+
+**A correção que importava: viewport. + remodelagem mobile de verdade.**
+
+### Procedência
+Mesmo depois da gaveta (v1.1.1), o usuário reportou: letra minúscula no celular, nada
+responsivo, precisando esticar com os dedos. **Causa raiz encontrada:** a página não tinha
+`<meta name="viewport">` — nasceu como fragmento para o publicador de Artifacts (que embrulha
+com viewport na hora de servir) e foi movida crua para o GitHub Pages. Sem a tag, o celular
+renderiza a ~980px e encolhe tudo, e nenhuma media query mobile dispara. O usuário estava
+vendo o site desktop espremido; a v1.1.1 inteira nunca chegou a rodar no aparelho dele.
+Registrado como **P005** em `memoria/PADROES.md`.
+
+### Entra
+- Documento HTML completo: `<!doctype html>`, `<html lang="pt-BR">`, `<meta charset>`,
+  `<meta viewport>`, `<meta color-scheme>`
+- Base tipográfica do mobile sobe para **19px** com line-height 1.75
+- Menu remodelado como **botões**: linhas com ~48px de altura de toque, número em chip,
+  item ativo com fundo em destaque — no desktop e na gaveta
+- Gaveta mais larga (87vw, teto 390px) com `overscroll-behavior: contain`
+- Títulos, tabelas, código e callouts maiores no mobile
+
+### Lição de teste
+Os testes Playwright emulam o viewport diretamente — por isso passaram enquanto o aparelho
+real quebrava. Teste que emula o ambiente não cobre o que o ambiente real infere sozinho.
+
+---
+
 ## v1.1.1 — 2026-07-26
 
 **Manual mobile: gaveta deslizante + leitura maior.**
