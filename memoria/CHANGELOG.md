@@ -30,6 +30,18 @@ quando mudar comando, tier, lei ou orçamento.
 Cópias dos blocos do Notion salvas em disco. Seriam a terceira cópia do mesmo conteúdo — Lei 3,
 fonte única. Os blocos são gerados sob demanda a partir do `MANUAL.md`.
 
+### Publicação (mesma versão, adendo)
+A skill virou repositório público **[Leozinhobh77/harness](https://github.com/Leozinhobh77/harness)**,
+com o manual servido por GitHub Pages em **https://leozinhobh77.github.io/harness/**.
+Motivo: até aqui a skill existia **em um único disco** — sem backup, sem histórico. O repositório
+resolve backup, versionamento (cada `evolve` vira commit) e publicação de uma vez, e substitui o
+plano do Notion.
+
+Como o repositório é público, o exemplo do flywheel foi **generalizado**: saíram o nome do negócio
+real e o número exato de contatos, ficaram "um projeto real" e "mais de mil clientes". A didática
+é idêntica. Mesma limpeza aplicada aos exemplos de `learn.md`, `evolve.md` e ao changelog.
+`comandos/exportar.md` passou a exigir varredura de conteúdo sensível antes de qualquer push.
+
 ### Nota de escopo
 Os orçamentos de `criterios/ORCAMENTOS.md` **não se aplicam ao `MANUAL.md`**. Orçamento existe
 para o que carrega em **toda sessão** (`SKILL.md`, `AGENTS.md`); documento que um humano lê sob

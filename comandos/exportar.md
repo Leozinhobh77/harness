@@ -6,10 +6,14 @@
 > para evitar.
 
 ```
-/harness manual --exportar          # pergunta o destino
-/harness manual --exportar web      # regenera e republica a página
+/harness manual --exportar          # faz o destino padrão: github
+/harness manual --exportar github   # regenera docs/index.html, commita e dá push
+/harness manual --exportar artifact # republica a cópia privada no claude.ai
 /harness manual --exportar notion   # envia ou entrega os blocos para colar
 ```
+
+**Destino padrão: `github`.** É o que o usuário lê no celular.
+🌐 https://leozinhobh77.github.io/harness/
 
 ## Antes de qualquer destino
 
@@ -22,17 +26,33 @@
 
 ---
 
-## Destino `web`
+## Destino `github` (padrão)
 
-**Arquivo:** `manual/web/manual.html`
+**Arquivo:** `docs/index.html` · repo `Leozinhobh77/harness` · Pages serve de `/docs` na `main`.
 
-1. Regenere o HTML a partir do `MANUAL.md` atual, preservando o desenho existente (tokens de cor,
-   navegação, scroll-spy, tema claro/escuro). **Não redesenhe a cada exportação** — só atualize o
-   conteúdo e o carimbo.
-2. Republique com a ferramenta `Artifact` **no mesmo caminho de arquivo**, para manter a URL.
-   - Se a conversa atual não foi quem publicou, passe a URL no parâmetro `url`.
-   - Mantenha o mesmo favicon (⚙️) — o usuário acha a aba pelo ícone.
-3. Use `label` com a versão: `v1.2.0-manual`.
+1. Regenere o HTML a partir do `MANUAL.md` atual, **preservando o desenho existente** — tokens de
+   cor, navegação com scroll-spy, tema claro/escuro, favicon. Não redesenhe a cada exportação:
+   atualize só o conteúdo e o carimbo.
+2. Confira que o rodapé e o cabeçalho trazem a versão certa.
+3. Commite e dê push:
+   ```
+   git add -A && git commit -m "docs: manual v<versão>" && git push
+   ```
+4. O build do Pages leva ~30s. Confirme com `curl -s -o /dev/null -w "%{http_code}"` na URL antes
+   de dizer ao usuário que está no ar. **Nunca afirme que publicou sem ter conferido.**
+
+⚠️ **Repositório é público.** Antes de qualquer push, varra o conteúdo novo por nome de cliente,
+nome de negócio, número exato de registro, caminho com dado pessoal, token ou credencial. O
+exemplo do flywheel no manual está **generalizado de propósito** — mantenha assim.
+
+## Destino `artifact`
+
+Cópia privada no claude.ai, útil para rascunho antes de publicar.
+
+1. Publique `docs/index.html` com a ferramenta `Artifact`.
+2. **Passe a URL existente no parâmetro `url`** para manter o mesmo link — sem isso, uma conversa
+   nova cria outro artifact.
+3. Mantenha o favicon ⚙️ — o usuário acha a aba pelo ícone. Use `label` com a versão.
 
 ## Destino `notion`
 

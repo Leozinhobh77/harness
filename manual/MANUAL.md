@@ -2,8 +2,11 @@
 
 > **Versão 1.1.0** · gerado em **26/07/2026**
 >
-> 📌 **Este arquivo é a fonte única do manual.** A página web e o Notion são cópias publicadas —
-> nunca edite lá. Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
+> 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
+> Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
+>
+> 🌐 Publicado em **https://leozinhobh77.github.io/harness/**
+> 📦 Repositório: **https://github.com/Leozinhobh77/harness**
 
 ---
 
