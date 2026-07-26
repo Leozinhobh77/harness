@@ -657,7 +657,7 @@
     <div class="nav-top">
       <div class="brand">
         <div class="brand-mark">/<span>harness</span></div>
-        <div class="brand-meta">Manual · v1.1.2 · 26.07.2026</div>
+        <div class="brand-meta">Manual · v1.2.1 · 26.07.2026</div>
       </div>
       <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
@@ -738,7 +738,8 @@
 /harness learn "..."  erro real → guarda permanente        ← o mais valioso
 /harness evolve       a skill melhora a si mesma           ← a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
-/manual-harness       este manual
+/manual-harness       este manual — ENSINA, não executa
+/menu-harness         lista os comandos com último uso — ESCOLHE e já EXECUTA
 
 Rotina saudável:
   ao criar projeto ......... init
@@ -1447,6 +1448,7 @@ Desce por desuso (não se provou)</code></pre>
           <tr><td>Preciso rodar isso toda hora?</td><td>Não. <code>learn</code> quando a IA errar, <code>doctor</code> de vez em quando.</td></tr>
           <tr><td>E se eu editei os arquivos à mão?</td><td>Sua edição vence. O <code>upgrade</code> nunca sobrescreve customização.</td></tr>
           <tr><td>Serve pra projeto que já existe?</td><td>Serve. O <code>init</code> detecta e vira modo adoção.</td></tr>
+          <tr><td>Diferença entre <code>/manual-harness</code> e <code>/menu-harness</code>?</td><td>O manual <strong>ensina</strong> — você escolhe um tópico e ele explica. O menu <strong>lança</strong> — mostra os 9 comandos com último uso e já executa o que você escolher.</td></tr>
           <tr><td>Por que ela insiste em ser pequena?</td><td>Acima de ~150 linhas o custo sobe 20–23% sem ganho, e regra genérica chega a piorar o resultado.</td></tr>
           <tr><td>Como eu apago tudo?</td><td>Apague <code>.harness/</code> e os documentos. Nada fica escondido no sistema.</td></tr>
           <tr><td>Funciona com outras IAs?</td><td>Os documentos sim — <code>AGENTS.md</code> é padrão aberto. Os hooks são do Claude Code.</td></tr>
@@ -1538,7 +1540,7 @@ Desce por desuso (não se provou)</code></pre>
     </section>
 
     <div class="foot">
-      MANUAL /HARNESS · V1.1.2 · 26.07.2026<br>
+      MANUAL /HARNESS · V1.2.1 · 26.07.2026<br>
       FONTE ÚNICA: manual/MANUAL.md · <a href="https://github.com/Leozinhobh77/harness">github.com/Leozinhobh77/harness</a><br>
       ATUALIZE COM /harness manual --exportar
     </div>

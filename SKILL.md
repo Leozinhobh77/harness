@@ -32,8 +32,19 @@ description: Cria, audita, mantém e evolui o harness de governança de qualquer
 | "atualizar este projeto", `upgrade` | `comandos/upgrade.md` | Traz melhorias da skill pro projeto |
 | "manual", "ajuda", "como usa" | `comandos/manual.md` | Manual navegável por número |
 | "exportar o manual", "publicar", `--exportar` | `comandos/exportar.md` | Publica o manual (web / Notion) |
+| "menu", "menu harness", "quais comandos existem" | `comandos/menu.md` | Lançador com último uso de cada comando |
 
 **Não carregue mais de um comando por vez.** Se o pedido couber em dois, pergunte qual.
+
+## Registrar uso (toda vez que um comando roda — não só pelo menu)
+
+Depois de carregar qualquer `comandos/<nome>.md` desta tabela **e terminar de executá-lo**,
+atualize `memoria/uso.json`: `{"<nome>": {"data": "<hoje, AAAA-MM-DD>", "projeto": "<nome do
+projeto atual, ou null>"}}`. Isso alimenta o `/menu-harness` — sem esse passo, o menu mostra
+"nunca usado" pra tudo, mesmo em comando que acabou de rodar. **Exceção: não registre o próprio
+`menu`** — ele é o painel que exibe os outros, registrar ele mesmo seria autorreferente e sem
+sinal nenhum (a data seria sempre "agora"). `status` é registrado normalmente como qualquer
+outro comando.
 
 ## As 3 regras que você nunca quebra
 
@@ -56,7 +67,7 @@ harness/
 ├── templates/            T1-leve · T2-padrao · T3-completo · comum
 ├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1
 ├── manual/               MANUAL.md (fonte única) · web/manual.html (saída)
-└── memoria/              REGISTRO · PADROES · CHANGELOG
+└── memoria/              REGISTRO · PADROES · CHANGELOG · uso.json (p/ /menu-harness)
 ```
 
 ## Uma regra sobre o manual

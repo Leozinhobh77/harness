@@ -1,0 +1,3 @@
+{
+  "_leia": "Registro de última data de uso de cada comando, por SKILL.md (secao 'Registrar uso'). Lido pelo /menu-harness. Formato: { \"<comando>\": { \"data\": \"AAAA-MM-DD\", \"projeto\": \"<nome ou null>\" } }. Comando ausente daqui = nunca usado."
+}

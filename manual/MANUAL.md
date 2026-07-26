@@ -1,6 +1,6 @@
 # 📖 MANUAL `/harness`
 
-> **Versão 1.1.2** · gerado em **26/07/2026**
+> **Versão 1.2.1** · gerado em **26/07/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -21,7 +21,8 @@
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
-/manual-harness       este manual
+/manual-harness       este manual — ENSINA, não executa
+/menu-harness         lista os comandos com último uso — ESCOLHE e já EXECUTA
 
 Rotina saudável:
   ao criar projeto ......... init
@@ -949,6 +950,11 @@ Sua edição vence. O `upgrade` nunca sobrescreve customização — mostra o la
 **Serve pra projeto que já existe?**
 Serve. O `init` detecta e vira modo adoção: audita o que tem e propõe melhoria por melhoria.
 
+**Qual a diferença entre `/manual-harness` e `/menu-harness`?**
+O manual **ensina** — você escolhe um tópico e ele explica a fundo, com exemplo. O menu
+**lança** — mostra os 9 comandos com descrição curta e a data do último uso de cada um, e
+escolher um número já executa aquele comando. Use o manual pra entender; o menu pra agir.
+
 **Por que ela insiste tanto em ser pequena?**
 Acima de ~150 linhas o custo sobe 20–23% sem ganho medido, e regra genérica chega a **piorar** o
 resultado. Enxuto não é estética, é performance.
@@ -1071,6 +1077,8 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| 1.2.1 | 2026-07-26 | Só o hook `guarda.ps1` (template T2+): não bloqueia mais comando proibido quando o `cd` do comando aponta pra fora do projeto — achado ao vivo (P006). Conteúdo deste arquivo não mudou. |
+| 1.2.0 | 2026-07-26 | Comando novo `/menu-harness` — lançador com descrição + último uso de cada comando. Roteador (`SKILL.md`) ganha o passo "Registrar uso", central pra qualquer jeito de invocar um comando. |
 | 1.1.1 | 2026-07-26 | Só apresentação (`docs/index.html`): gaveta deslizante no mobile, leitura maior, colapso de menu no desktop. Conteúdo deste arquivo não mudou. |
 | 1.1.0 | 2026-07-26 | Manual completo em 4 camadas + glossário + evidências; comando `--exportar` |
 | 1.0.0 | 2026-07-26 | Primeira versão (só referência) |

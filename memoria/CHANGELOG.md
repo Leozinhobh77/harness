@@ -8,6 +8,64 @@
 
 ---
 
+## v1.2.1 — 2026-07-26
+
+**Correção no `guarda.ps1` (T2+): comando proibido só bloqueia dentro do próprio projeto.**
+
+### Procedência
+Achado ao vivo, minutos depois de publicar a v1.2.0: a guarda `sem-push` de Financas bloqueou
+`cd ...\harness && git push`, um push **já autorizado** num repositório totalmente diferente,
+só porque o texto do comando continha "git push". A guarda nunca teve esse defeito na intenção
+— só na implementação, que checava o texto sem saber que o `cd` levava pra fora do projeto.
+
+### Entra
+- `templates/T2-padrao/.claude/hooks/guarda.ps1` — resolve o diretório efetivo do comando antes
+  de aplicar `comandos_proibidos`; se o `cd` aponta fora da raiz do projeto, pula a checagem
+- **Segunda volta no mesmo bug, minutos depois:** o primeiro fix só entendia caminho estilo
+  Windows (`C:\Users\...`); o `Bash` deste ambiente é Git Bash e produz `/c/Users/...`, que o
+  `Resolve-Path` do PowerShell não reconhece — falhava em silêncio e a guarda voltava a
+  bloquear tudo. Só apareceu porque a mensagem de commit descrevendo o próprio bug continha o
+  texto "git push", e a guarda se autoaplicou. Corrigido convertendo `/<letra>/...` para
+  `<LETRA>:\...` antes de resolver.
+- Testado nos 4 cenários (com caminho no formato real do Bash): push dentro do projeto (continua
+  bloqueando), push em outro repo via `cd` posix (agora libera, mesmo com "git push" no texto
+  da mensagem de commit), `reset --hard` dentro do projeto (continua bloqueando)
+- P006 em `memoria/PADROES.md`
+- Propagado manualmente para o `.claude/hooks/guarda.ps1` já instalado em Financas (projeto
+  existente — `/harness upgrade` levaria isso automaticamente da próxima vez)
+
+---
+
+## v1.2.0 — 2026-07-26
+
+**Comando novo: `/menu-harness` — lançador com último uso.**
+
+### Procedência
+Usuário pediu um menu que lista todos os comandos com descrição curta e a data do último
+acesso de cada um, pra não precisar lembrar nomes. Proposta apresentada com duas opções pra
+registrar "último uso": (A) passo central no roteador, mantido pelo agente; (B) hook mecânico
+dedicado por projeto. Optou pela recomendação — opção A — com o argumento de que a Lei 2
+("mecânico vence escrito") existe pra **guardas que evitam erro**, e isto é telemetria de
+conveniência, não uma guarda; um hook a mais em todo projeto novo seria custo sem benefício de
+segurança correspondente.
+
+### Entra
+- `comandos/menu.md` — menu em 2 grupos (comandos do projeto atual vs. comandos da skill),
+  com descrição de uma linha e último uso por comando; escolher um número **executa**, não só
+  explica (diferença deliberada em relação ao `/manual-harness`, que ensina)
+- `memoria/uso.json` — registro central, `{comando: {data, projeto}}`
+- `SKILL.md` ganha a seção "Registrar uso": todo comando carregado da tabela de roteamento
+  grava sua própria execução — cobre tanto `/harness <comando>` direto quanto via o menu.
+  Exceção: o próprio `menu` não se autorregistra (seria sempre "agora", sem sinal nenhum)
+- `~/.claude/skills/menu-harness/` — atalho, mesmo padrão do `manual-harness`
+- Manual (fonte + página publicada): colinha, FAQ e histórico atualizados
+
+### O que ficou de fora, de propósito
+Contagem de vezes usado (não só a última data) e hook mecânico de instrumentação (opção B) —
+nenhum dos dois foi pedido; ambos ficam registrados aqui como candidatos, não implementados.
+
+---
+
 ## v1.1.2 — 2026-07-26
 
 **A correção que importava: viewport. + remodelagem mobile de verdade.**

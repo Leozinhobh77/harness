@@ -54,6 +54,30 @@
 - **Promovido ao template:** não é template de projeto — é conhecimento de front-end da própria
   skill (páginas que ela gera). Registrado aqui para a próxima página HTML nascer sem o bug.
 
+### P006 — Guarda de comando bloqueia por TEXTO, sem saber se o `cd` leva pra fora do projeto
+- **Visto em:** skill /harness, projeto Financas (2026-07-26)
+- **Nível da solução:** 2 (o hook já era nível 2 — o bug era o escopo, não o nível)
+- **Solução:** `guarda.ps1` agora resolve o diretório efetivo do comando (detecta um `cd <caminho>
+  && ...`/`; ...` no início do texto) antes de aplicar `comandos_proibidos`. Se o `cd` aponta pra
+  fora da raiz do projeto (`$env:CLAUDE_PROJECT_DIR`), a checagem de comando proibido é pulada —
+  o comando não mexe neste projeto, não é trabalho desta guarda impedir.
+- **Detalhe:** achado ao vivo — a guarda `sem-push` de Financas bloqueou
+  `cd ...\harness && git push`, um push **legítimo e já autorizado** num repositório sem
+  nenhuma relação com Financas, só porque o texto continha "git push". A guarda funcionava
+  perfeitamente bem *dentro* do próprio projeto (continua bloqueando `git push`/`reset --hard`
+  ali) — o problema era só a ausência de consciência de diretório.
+- **Promovido ao template:** sim, direto — corrigido em
+  `templates/T2-padrao/.claude/hooks/guarda.ps1` (T2+ herda). Propagado manualmente pra
+  Financas (projeto já existente, fora do fluxo automático de `/harness upgrade`).
+- **Segunda camada do mesmo bug, achada minutos depois:** o primeiro fix resolvia caminho
+  estilo Windows (`C:\Users\...`) mas o `Bash` deste ambiente é Git Bash — o `cd` real vem
+  como `/c/Users/...`. `Resolve-Path` do PowerShell não entende esse formato, falha em
+  silêncio, e a guarda voltava a tratar tudo como "dentro do projeto". Só apareceu porque a
+  própria mensagem de commit descrevendo o bug continha o texto "git push" — a guarda pegou a
+  si mesma. Corrigido convertendo `/<letra>/...` para `<LETRA>:\...` antes de resolver.
+  **Moral:** testar só com o formato de caminho que eu digitei à mão não basta — tinha que
+  testar com o formato que a ferramenta real produz.
+
 ### P005 — Página sem `<meta viewport>` renderiza a ~980px no celular: TODO o CSS mobile morre
 - **Visto em:** skill /harness (2026-07-26)
 - **Nível da solução:** 5 → devia ter sido 3 (o usuário pegou, não um teste)
