@@ -1,0 +1,32 @@
+# ============================================================
+# Guardas de dado — a primeira coisa que nasce num harness.
+# Perder dado ou vazar dado não tem desfazer, por isso estas
+# linhas entram preventivamente (única exceção da Lei 1).
+# ============================================================
+{{DADOS_PROTEGIDOS}}
+
+# Instrumentação do harness (local, não versionar)
+.harness/log-guardas.jsonl
+.harness/abatidos/
+.harness/hibernado/
+
+# Lock files do Excel (arquivo aberto)
+~$*.xlsx
+**/~$*.xlsx
+
+# Dependências e build
+node_modules/
+dist/
+build/
+__pycache__/
+*.pyc
+
+# Ambiente e segredos — NUNCA versionar
+.env
+.env.*
+*.key
+*.pem
+
+# Sistema operacional
+Thumbs.db
+.DS_Store

@@ -1,0 +1,1408 @@
+<title>Manual /harness</title>
+
+<style>
+  /* ============ TOKENS ============ */
+  :root {
+    --paper:      #F5F4F1;
+    --surface:    #FFFFFF;
+    --surface-2:  #EBE8E2;
+    --ink:        #1B1D20;
+    --ink-2:      #494D51;
+    --ink-3:      #74797D;
+    --rule:       #DCD9D2;
+    --rule-soft:  #E8E5DE;
+    --brass:      #8A5714;
+    --brass-tint: #F1E6D3;
+    --steel:      #4B616C;
+    --sev-red:    #97372A;
+    --sev-amber:  #8A5714;
+    --sev-blue:   #2F5D79;
+    --code-bg:    #EDEAE4;
+    --code-ink:   #26292C;
+    --shadow:     0 1px 2px rgba(27,29,32,.05), 0 8px 24px -12px rgba(27,29,32,.18);
+
+    --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+
+    --measure: 68ch;
+    --nav-w: 268px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:      #131518;
+      --surface:    #191C20;
+      --surface-2:  #20242A;
+      --ink:        #E7E4DE;
+      --ink-2:      #ADB2B6;
+      --ink-3:      #7C8288;
+      --rule:       #2B3037;
+      --rule-soft:  #23272D;
+      --brass:      #D6A45C;
+      --brass-tint: #2A2318;
+      --steel:      #8AA3AF;
+      --sev-red:    #DC8878;
+      --sev-amber:  #D6A45C;
+      --sev-blue:   #85B4D0;
+      --code-bg:    #1E2228;
+      --code-ink:   #D8D5CF;
+      --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#131518; --surface:#191C20; --surface-2:#20242A;
+    --ink:#E7E4DE; --ink-2:#ADB2B6; --ink-3:#7C8288;
+    --rule:#2B3037; --rule-soft:#23272D;
+    --brass:#D6A45C; --brass-tint:#2A2318; --steel:#8AA3AF;
+    --sev-red:#DC8878; --sev-amber:#D6A45C; --sev-blue:#85B4D0;
+    --code-bg:#1E2228; --code-ink:#D8D5CF;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+  :root[data-theme="light"] {
+    --paper:#F5F4F1; --surface:#FFFFFF; --surface-2:#EBE8E2;
+    --ink:#1B1D20; --ink-2:#494D51; --ink-3:#74797D;
+    --rule:#DCD9D2; --rule-soft:#E8E5DE;
+    --brass:#8A5714; --brass-tint:#F1E6D3; --steel:#4B616C;
+    --sev-red:#97372A; --sev-amber:#8A5714; --sev-blue:#2F5D79;
+    --code-bg:#EDEAE4; --code-ink:#26292C;
+    --shadow:0 1px 2px rgba(27,29,32,.05), 0 8px 24px -12px rgba(27,29,32,.18);
+  }
+
+  /* ============ BASE ============ */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--brass); color: var(--paper); }
+  :focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; border-radius: 2px; }
+
+  /* ============ SHELL ============ */
+  .shell {
+    display: grid;
+    grid-template-columns: var(--nav-w) minmax(0, 1fr);
+    gap: 0;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 2.5rem);
+  }
+
+  /* ============ NAV ============ */
+  .nav {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 2.5rem 1.75rem 3rem 0;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .brand { display: flex; flex-direction: column; gap: .45rem; }
+  .brand-mark {
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  .brand-mark span { color: var(--brass); }
+  .brand-meta {
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nav-group { display: flex; flex-direction: column; gap: .3rem; }
+  .nav-label {
+    font-family: var(--mono);
+    font-size: .655rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-bottom: .3rem;
+    margin-bottom: .15rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .nav a {
+    display: flex;
+    gap: .6rem;
+    align-items: baseline;
+    text-decoration: none;
+    color: var(--ink-2);
+    font-size: .875rem;
+    line-height: 1.35;
+    padding: .3rem 0;
+    transition: color .15s ease;
+  }
+  .nav a .n {
+    font-family: var(--mono);
+    font-size: .72rem;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+    min-width: 1.9em;
+    transition: color .15s ease;
+  }
+  .nav a:hover { color: var(--ink); }
+  .nav a:hover .n { color: var(--brass); }
+  .nav a.active { color: var(--brass); font-weight: 600; }
+  .nav a.active .n { color: var(--brass); }
+
+  .theme-btn {
+    margin-top: auto;
+    align-self: flex-start;
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: .4rem .7rem;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
+  }
+  .theme-btn:hover { color: var(--brass); border-color: var(--brass); }
+
+  /* ============ CONTENT ============ */
+  main {
+    padding: 3.5rem 0 8rem clamp(1.5rem, 4vw, 3.5rem);
+    min-width: 0;
+    max-width: var(--measure);
+  }
+
+  /* masthead */
+  .masthead { margin-bottom: 3.5rem; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin: 0 0 .9rem;
+  }
+  h1 {
+    font-size: clamp(2.1rem, 5.5vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -.035em;
+    font-weight: 800;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: 1.115rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin: 0 0 1.75rem;
+    text-wrap: pretty;
+  }
+
+  .source-note {
+    display: flex;
+    gap: .85rem;
+    align-items: flex-start;
+    padding: .9rem 1.1rem;
+    background: var(--brass-tint);
+    border-left: 2px solid var(--brass);
+    font-size: .875rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .source-note strong { color: var(--ink); }
+
+  /* headings */
+  h2 {
+    font-size: 1.75rem;
+    line-height: 1.15;
+    letter-spacing: -.025em;
+    font-weight: 800;
+    margin: 0 0 .35rem;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 1.14rem;
+    line-height: 1.3;
+    letter-spacing: -.012em;
+    font-weight: 700;
+    margin: 2.4rem 0 .7rem;
+    text-wrap: balance;
+  }
+  h4 {
+    font-family: var(--mono);
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin: 2rem 0 .6rem;
+  }
+
+  section { scroll-margin-top: 1.5rem; }
+  section + section { margin-top: 4.5rem; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: .9rem;
+    padding-bottom: .9rem;
+    margin-bottom: 1.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sec-num {
+    font-family: var(--mono);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--brass);
+    font-variant-numeric: tabular-nums;
+    padding-top: .35rem;
+    flex-shrink: 0;
+  }
+
+  p { margin: 0 0 1.1rem; text-wrap: pretty; }
+  a { color: var(--brass); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  strong { font-weight: 650; color: var(--ink); }
+  em { font-style: italic; color: var(--ink-2); }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+
+  ul, ol { margin: 0 0 1.2rem; padding-left: 1.35rem; }
+  li { margin-bottom: .45rem; }
+  li::marker { color: var(--ink-3); }
+
+  /* pull quote */
+  blockquote {
+    margin: 1.6rem 0;
+    padding: 0 0 0 1.15rem;
+    border-left: 2px solid var(--brass);
+    font-size: 1.055rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  blockquote cite {
+    display: block;
+    margin-top: .5rem;
+    font-family: var(--mono);
+    font-size: .72rem;
+    font-style: normal;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* code */
+  code {
+    font-family: var(--mono);
+    font-size: .855em;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: .12em .38em;
+    border-radius: 3px;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border: 1px solid var(--rule-soft);
+    border-radius: 4px;
+    padding: 1.05rem 1.15rem;
+    overflow-x: auto;
+    margin: 0 0 1.35rem;
+    font-size: .815rem;
+    line-height: 1.6;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  /* tables */
+  .t-wrap { overflow-x: auto; margin: 0 0 1.5rem; border: 1px solid var(--rule); border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: .885rem; }
+  th {
+    font-family: var(--mono);
+    font-size: .685rem;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    text-align: left;
+    padding: .7rem .95rem;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  td {
+    padding: .68rem .95rem;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: 0; }
+  td code { font-size: .8em; }
+
+  /* callout */
+  .note {
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--steel);
+    background: var(--surface);
+    padding: .95rem 1.15rem;
+    margin: 0 0 1.4rem;
+    font-size: .92rem;
+    line-height: 1.6;
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note.warn { border-left-color: var(--sev-red); }
+  .note.key  { border-left-color: var(--brass); background: var(--brass-tint); }
+  .note-tag {
+    display: block;
+    font-family: var(--mono);
+    font-size: .665rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: .4rem;
+  }
+  .note.warn .note-tag { color: var(--sev-red); }
+  .note.key  .note-tag { color: var(--brass); }
+
+  /* severity chips */
+  .sev {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-family: var(--mono);
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .sev::before { content: ""; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .sev.r { color: var(--sev-red); }   .sev.r::before { background: var(--sev-red); }
+  .sev.a { color: var(--sev-amber); } .sev.a::before { background: var(--sev-amber); }
+  .sev.b { color: var(--sev-blue); }  .sev.b::before { background: var(--sev-blue); }
+
+  /* recipe cards */
+  .recipe {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--surface);
+    padding: 1.3rem 1.4rem;
+    margin: 0 0 1.35rem;
+    box-shadow: var(--shadow);
+  }
+  .recipe h3 { margin: 0 0 .75rem; font-size: 1.045rem; }
+  .recipe > :last-child { margin-bottom: 0; }
+  .recipe pre { background: var(--code-bg); }
+
+  /* flywheel diagram */
+  .flywheel {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.6rem;
+    align-items: center;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--surface);
+    padding: 1.5rem;
+    margin: 0 0 1.5rem;
+  }
+  .flywheel svg { display: block; }
+  .fw-ring { animation: spin 26s linear infinite; transform-origin: 60px 60px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .fw-ring { animation: none; } }
+  .fw-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .55rem; }
+  .fw-steps li { display: flex; gap: .75rem; margin: 0; font-size: .89rem; line-height: 1.45; }
+  .fw-steps .k {
+    font-family: var(--mono);
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--brass);
+    padding-top: .12rem;
+    flex-shrink: 0;
+  }
+  @media (max-width: 620px) { .flywheel { grid-template-columns: 1fr; justify-items: center; } }
+
+  /* ladder */
+  .ladder { display: flex; flex-direction: column; gap: 0; margin: 0 0 1.5rem; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .rung { display: grid; grid-template-columns: 2.4rem 1fr; gap: .9rem; padding: .7rem .95rem; border-bottom: 1px solid var(--rule-soft); background: var(--surface); align-items: baseline; }
+  .rung:last-child { border-bottom: 0; }
+  .rung .lv { font-family: var(--mono); font-size: .78rem; font-weight: 700; color: var(--brass); font-variant-numeric: tabular-nums; }
+  .rung.last { background: var(--surface-2); }
+  .rung.last .lv { color: var(--ink-3); }
+  .rung .txt { font-size: .9rem; line-height: 1.45; }
+  .rung .txt b { font-weight: 650; }
+
+  /* footer */
+  .foot {
+    margin-top: 5rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: .72rem;
+    line-height: 1.7;
+    letter-spacing: .04em;
+    color: var(--ink-3);
+  }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; }
+    .nav {
+      position: static;
+      height: auto;
+      overflow: visible;
+      border-right: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: 1.75rem 0 1.25rem;
+      gap: 1rem;
+    }
+    .nav-scroll { display: flex; gap: 1.75rem; overflow-x: auto; padding-bottom: .5rem; }
+    .nav-group { min-width: max-content; }
+    .theme-btn { margin-top: 0; }
+    main { padding: 2.5rem 0 5rem; }
+  }
+  @media (min-width: 861px) {
+    .nav-scroll { display: flex; flex-direction: column; gap: 1.35rem; }
+  }
+</style>
+
+<div class="shell">
+
+  <nav class="nav" aria-label="Sumário do manual">
+    <div class="brand">
+      <div class="brand-mark">/<span>harness</span></div>
+      <div class="brand-meta">Manual · v1.1.0 · 26.07.2026</div>
+    </div>
+
+    <div class="nav-scroll">
+      <div class="nav-group">
+        <div class="nav-label">Começando</div>
+        <a href="#s1"><span class="n">1</span> Visão geral</a>
+        <a href="#s2"><span class="n">2</span> Primeiro projeto</a>
+        <a href="#s3"><span class="n">3</span> Glossário</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Referência</div>
+        <a href="#s4"><span class="n">4</span> Os sete comandos</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Receitas</div>
+        <a href="#s5"><span class="n">5</span> Seis situações</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Anatomia</div>
+        <a href="#s6"><span class="n">6</span> Os arquivos</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Conceitos</div>
+        <a href="#s7"><span class="n">7.1</span> O flywheel</a>
+        <a href="#s72"><span class="n">7.2</span> As 5 leis</a>
+        <a href="#s73"><span class="n">7.3</span> Tiers e escada</a>
+        <a href="#s74"><span class="n">7.4</span> Hooks</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Socorro</div>
+        <a href="#s8"><span class="n">8</span> FAQ e problemas</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Evidências</div>
+        <a href="#s9"><span class="n">9</span> Números e fontes</a>
+      </div>
+    </div>
+
+    <button class="theme-btn" id="themeBtn" type="button">Tema</button>
+  </nav>
+
+  <main>
+    <header class="masthead">
+      <p class="eyebrow">Skill de governança de projetos</p>
+      <h1>Manual <code style="font-size:.82em;background:none;padding:0;color:var(--brass)">/harness</code></h1>
+      <p class="lede">
+        Cria, audita e evolui o esqueleto de governança de qualquer projeto — e aprende com cada
+        erro real, para que ele não se repita.
+      </p>
+      <div class="source-note">
+        <div>
+          <strong>Esta é uma cópia publicada.</strong> A fonte única é
+          <code>~/.claude/skills/harness/manual/MANUAL.md</code>. Mudou algo? Edite lá e rode
+          <code>/harness manual --exportar</code> — nunca edite esta página.
+        </div>
+      </div>
+    </header>
+
+    <h4>Colinha</h4>
+    <pre><code>/harness              onde estamos (10 linhas, barato)
+/harness init         criar/adotar a estrutura
+/harness doctor       auditar · NUNCA escreve · rode sem medo
+/harness fix          corrigir o que o doctor achou
+/harness fix --limpar abater o que não se provou útil
+/harness learn "..."  erro real → guarda permanente        ← o mais valioso
+/harness evolve       a skill melhora a si mesma           ← a cada ~2 semanas
+/harness upgrade      trazer melhorias da skill pro projeto
+/manual-harness       este manual
+
+Rotina saudável:
+  ao criar projeto ......... init
+  quando a IA errar ........ learn        ← o hábito que mais paga
+  toda semana .............. doctor
+  a cada ~2 semanas ........ evolve</code></pre>
+
+    <!-- ===================== 1 ===================== -->
+    <section id="s1">
+      <div class="sec-head"><span class="sec-num">01</span><h2>Visão geral</h2></div>
+
+      <h3>O que é um harness</h3>
+      <p>
+        <strong>Harness</strong> é o esqueleto que faz uma IA trabalhar bem no seu projeto.
+        Na prática: um documento que ela lê ao entrar, planos com baixa obrigatória, decisões
+        registradas, e <strong>guardas mecânicas que impedem erro de acontecer</strong> — não
+        pedem, impedem.
+      </p>
+
+      <blockquote>
+        <p>Um modelo mediano com um bom harness ganha de um modelo ótimo com harness ruim.</p>
+        <cite>Addy Osmani · Google</cite>
+      </blockquote>
+
+      <p>
+        O mesmo modelo produz resultados muito diferentes dependendo do sistema em volta. Você não
+        controla o modelo — controla o harness. É lá que o retorno está.
+      </p>
+
+      <h3>O que esta skill faz</h3>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Faz</th><th>Não faz</th></tr></thead>
+        <tbody>
+          <tr><td>Cria a estrutura <strong>dimensionada ao projeto</strong></td><td>Despeja o mesmo pacote em todo mundo</td></tr>
+          <tr><td>Audita se está saudável</td><td>Muda nada sem você aprovar</td></tr>
+          <tr><td>Aprende com cada erro real</td><td>Escreve regra genérica bonita</td></tr>
+          <tr><td>Melhora a si mesma entre projetos</td><td>Cresce sozinha sem limite</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="note key">
+        <span class="note-tag">A tese central</span>
+        <p>
+          Harness não morre de falta de regra. <strong>Morre de excesso.</strong> Um documento de
+          400 linhas que ninguém lê é pior que um de 80 que todo mundo lê — e isso é medido, não é
+          opinião (ver <a href="#s9">Evidências</a>). Por isso metade desta skill existe para
+          impedir ela mesma de crescer à toa.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 2 ===================== -->
+    <section id="s2">
+      <div class="sec-head"><span class="sec-num">02</span><h2>Meu primeiro projeto</h2></div>
+
+      <pre><code>1. /harness init          → investiga a pasta, propõe um tier, pergunta 3 coisas, monta
+2. você trabalha normal   → os hooks já estão vigiando em silêncio
+3. a IA erra alguma coisa → /harness learn "o que ela fez de errado"     ← o hábito que paga
+4. de vez em quando       → /harness doctor  (audita, nunca estraga)
+5. a cada ~2 semanas      → /harness evolve  (a skill fica mais esperta)</code></pre>
+
+      <h3>O que esperar do passo 1</h3>
+      <p>Ele não vai te encher de pergunta. Olha a pasta primeiro e te diz o que achou:</p>
+      <pre><code>Vejo: pasta vazia · sem git · sem AGENTS.md
+
+Proponho T2 · Padrão.
+Por quê: app que você vai usar por meses, com dado financeiro seu, uso solo.
+Custo: ~2.500 tokens por sessão.
+Dá pra subir depois com um comando — o gatilho aparece sozinho.
+
+Posso rodar git init? (o harness todo se apoia nele para checkpoint e rollback)</code></pre>
+
+      <div class="note warn">
+        <span class="note-tag">A pegadinha</span>
+        <p>
+          <strong>O passo 3 é o que todo mundo pula</strong> — e é o único que faz o harness ficar
+          bom de verdade. Sem ele você tem um template bonito que envelhece. Com ele, um sistema
+          que aprende.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 3 ===================== -->
+    <section id="s3">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Glossário</h2></div>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Termo</th><th>O que significa aqui</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Harness</strong></td><td>o esqueleto de governança: documentos + planos + guardas</td></tr>
+          <tr><td><strong>Tier</strong></td><td>o tamanho do harness (T1 leve · T2 padrão · T3 completo)</td></tr>
+          <tr><td><strong>Guarda</strong></td><td>bloqueio mecânico (hook) que impede uma ação errada</td></tr>
+          <tr><td><strong>Hook</strong></td><td>script que o Claude Code roda sozinho em certos momentos</td></tr>
+          <tr><td><strong>Procedência</strong></td><td>o erro real que justifica a existência de uma regra</td></tr>
+          <tr><td><strong>Deriva</strong></td><td>quando o documento diz uma coisa e o disco diz outra</td></tr>
+          <tr><td><strong>Abate</strong></td><td>remover uma regra ou guarda que não se provou útil</td></tr>
+          <tr><td><strong>Dar baixa</strong></td><td>atualizar o plano após entregar parte dele</td></tr>
+          <tr><td><strong>Flywheel</strong></td><td>corrigir o documento faz parte da tarefa que errou</td></tr>
+          <tr><td><strong>Catraca</strong></td><td>o mesmo princípio, com ênfase em “não destrava”</td></tr>
+          <tr><td><strong>Escada</strong></td><td>a subida e descida de tier conforme o projeto muda</td></tr>
+          <tr><td><strong>Porta</strong></td><td>um dos 4 momentos de checagem do fluxo de trabalho</td></tr>
+          <tr><td><strong>DoR / DoD</strong></td><td>checklists de entrada e de saída de um plano</td></tr>
+          <tr><td><strong>Orçamento</strong></td><td>o teto de linhas de cada documento</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ===================== 4 ===================== -->
+    <section id="s4">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Os sete comandos</h2></div>
+
+      <h3><code>/harness</code> — status</h3>
+      <p>O “bom dia” da skill. Máximo 10 linhas, barato, não roda auditoria completa.</p>
+      <pre><code>📁 Finanças · tier T2 · harness v1.1.0 · criado 26/07/2026
+
+Estado: 1 plano ativo (0003 — dashboard de filtros, 6/14 tarefas)
+Último commit: há 2 dias — "feat: filtro por período customizado"
+Saúde: 0 vermelho · 2 amarelo     → /harness doctor  para ver</code></pre>
+
+      <h3><code>/harness init</code> — criar ou adotar</h3>
+      <pre><code>1. INVESTIGA   → git? quantos arquivos? linguagem? já tem AGENTS.md?
+2. CLASSIFICA  → propõe UM tier e justifica, com o custo em tokens
+3. PERGUNTA    → no máximo 3 coisas, em português normal
+4. GERA        → só o que aquele tier pede, tudo preenchido de verdade
+5. REGISTRA    → anota na memória da skill e roda o doctor no que criou</code></pre>
+      <p>
+        Existe uma pergunta que ele faz <strong>sempre</strong>, em qualquer tier:
+        <em>“o que neste projeto nunca pode ser tocado ou commitado?”</em> É a única exceção da
+        Lei 1 — guarda de dado entra preventivamente, porque vazar dado não tem desfazer.
+      </p>
+      <p>
+        <strong>Projeto que já existe não é sobrescrito.</strong> Ele vira modo adoção: roda o
+        doctor, mostra um diff, propõe uma mudança por vez. Estrutura que você fez à mão tem
+        valor — ele acrescenta a espinha mecânica, não substitui seu trabalho.
+      </p>
+      <div class="note">
+        <span class="note-tag">A pegadinha</span>
+        <p>
+          Ele sempre propõe o <strong>menor tier defensável</strong>. Se parecer pouco, é de
+          propósito — subir depois é um comando; descer depois de inchar é sofrimento.
+        </p>
+      </div>
+
+      <h3><code>/harness doctor</code> — auditar</h3>
+      <div class="note warn">
+        <span class="note-tag">Regra número um</span>
+        <p>
+          <strong>Nunca escreve. Nem um espaço em branco.</strong> É isso que te permite rodar a
+          qualquer hora, sem medo. No segundo em que ele começasse a escrever, você pararia de rodar.
+        </p>
+      </div>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Família</th><th>O que caça</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Integridade</strong></td><td>link quebrado · plano fantasma · número duplicado · JSON inválido</td></tr>
+          <tr><td><strong>Deriva</strong></td><td>índice ≠ disco · plano parado há 30 dias · <code>SPEC</code> que não bate com o código</td></tr>
+          <tr><td><strong>Inchaço</strong></td><td>documento acima do teto · 15+ decisões · custo alto demais</td></tr>
+          <tr><td><strong>Procedência</strong></td><td>regra que não previne erro nenhum · regra genérica · regras que se contradizem</td></tr>
+          <tr><td><strong>Mecânica</strong></td><td>hooks configurados? rodam? alguma guarda nunca disparou?</td></tr>
+          <tr><td><strong>Escada</strong></td><td>o projeto cruzou um gatilho de tier e não subiu?</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        <strong>Deriva</strong> é o modo de falha mais comum e o mais silencioso: a IA passa meses
+        trabalhando com um mapa errado. <strong>Procedência</strong> quase nenhum sistema confere —
+        o teste é uma pergunta só:
+      </p>
+      <blockquote><p>Se eu apagar esta linha, que erro concreto volta a acontecer?</p></blockquote>
+      <pre><code>DOCTOR — Finanças · tier T2 · harness v1.1.0 · 26/07/2026
+
+VERMELHO (1)
+  • Planos/INDICE.md:19 aponta para o plano 0003, que não existe
+    → /harness fix
+
+AMARELO (1)
+  • AGENTS.md tem 134 linhas (teto 120)
+    → /harness fix  (migra o excedente para docs/SPEC.md)
+
+AZUL (1)
+  • Guarda "bloquear-env" nunca disparou em 90 dias
+    → /harness fix --limpar
+
+Custo do harness: ~2.700 tokens/sessão (alvo T2: 2.500)
+34 checks passaram</code></pre>
+      <p>
+        <span class="sev r">Quebrado</span> &nbsp;
+        <span class="sev a">Deriva</span> &nbsp;
+        <span class="sev b">Oportunidade</span>
+      </p>
+      <p><strong>Tudo verde = uma linha.</strong> Ele não lista os 34 checks que passaram para parecer que trabalhou.</p>
+
+      <h3><code>/harness fix</code> — corrigir</h3>
+      <p>O braço; o cérebro é o doctor. Se ele descobrir um problema novo durante o conserto, ele <strong>para e reporta</strong>.</p>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Faz sozinho</th><th>Sempre pergunta</th></tr></thead>
+        <tbody>
+          <tr><td>regenerar <code>ESTADO.md</code></td><td><strong>abater qualquer regra ou guarda</strong></td></tr>
+          <tr><td>sincronizar <code>INDICE.md</code> com o disco</td><td>onde migrar conteúdo de doc inchado</td></tr>
+          <tr><td>arquivar plano concluído</td><td>apagar documento órfão</td></tr>
+          <tr><td>consertar link com alvo inequívoco</td><td><code>SPEC</code> × código divergem: qual está certo?</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        <code>--limpar</code> é o modo de abate: um candidato por vez, com disparos e dias na tela.
+        <strong>Nada some de verdade</strong> — vai para <code>.harness/abatidos/</code>.
+      </p>
+      <div class="note warn">
+        <span class="note-tag">A pegadinha mais importante</span>
+        <p>
+          <strong>Guarda de segurança de dado nunca é candidata a abate</strong>, mesmo com zero
+          disparos. Um <code>.gitignore</code> que nunca disparou está funcionando perfeitamente —
+          zero disparos é o sucesso dela, não o fracasso.
+        </p>
+      </div>
+
+      <h3><code>/harness learn</code> — o mais valioso</h3>
+      <pre><code>/harness learn "a IA marcou o plano como concluído sem rodar o teste"</code></pre>
+      <p>Antes de escrever qualquer coisa, ele pergunta — em voz alta, pra você:</p>
+      <blockquote><p>Dá para impedir isso mecanicamente?</p></blockquote>
+      <p>E sobe o máximo que conseguir nesta escada:</p>
+      <div class="ladder">
+        <div class="rung"><span class="lv">1</span><span class="txt"><b>Impossível de fazer errado</b> — arquivo derivado em vez de escrito à mão</span></div>
+        <div class="rung"><span class="lv">2</span><span class="txt"><b>Bloqueia na hora</b> — hook que impede editar dado bruto</span></div>
+        <div class="rung"><span class="lv">3</span><span class="txt"><b>Detecta na hora</b> — valida após cada escrita e devolve o erro</span></div>
+        <div class="rung"><span class="lv">4</span><span class="txt"><b>Detecta no fim</b> — recusa terminar o turno sem baixa</span></div>
+        <div class="rung last"><span class="lv">5</span><span class="txt"><b>Texto pedindo por favor</b> — derrota aceita, não escolha</span></div>
+      </div>
+      <div class="note warn">
+        <span class="note-tag">Se já existia guarda e ela falhou</span>
+        <p>
+          <strong>Ele conserta aquela. Não empilha outra.</strong> Empilhar é como um harness vira
+          monstro: em 6 meses existem quatro regras dizendo a mesma coisa, e o modelo obedece
+          <em>pior</em>, não melhor, porque instrução redundante compete por atenção.
+        </p>
+      </div>
+
+      <h3><code>/harness evolve</code> — a skill se melhora</h3>
+      <pre><code>CICLO 1 — dentro da sessão    ms       hook falha → o modelo se corrige na hora
+CICLO 2 — o projeto aprende   tarefa   /harness learn → guarda naquele projeto
+CICLO 3 — a SKILL aprende     semanas  /harness evolve → todo projeto futuro nasce sabendo</code></pre>
+      <p>
+        Varre os projetos, cruza aprendizados, roda o <strong>próprio doctor em si mesma</strong>, e
+        promove ao template o que apareceu em dois ou mais projetos independentes.
+      </p>
+      <blockquote><p>Um caso é acaso. Dois é padrão.</p></blockquote>
+      <div class="note key">
+        <span class="note-tag">A regra que impede o monstro</span>
+        <p>
+          Toda rodada é <strong>obrigada a olhar para remoção</strong>, não só adição. Se depois de
+          5 evoluções ela só cresceu, algo está errado no julgamento — não no mundo.
+          <strong>A skill tem que poder encolher.</strong>
+        </p>
+      </div>
+
+      <h3><code>/harness upgrade</code> — trazer melhorias pro projeto</h3>
+      <p>
+        <code>evolve</code> melhora a skill; <code>upgrade</code> leva isso para <strong>um</strong>
+        projeto. Separados de propósito: projeto estável não muda sozinho porque a skill mudou.
+        Também é como você sobe ou desce a escada.
+      </p>
+      <div class="note warn">
+        <span class="note-tag">A regra deste comando</span>
+        <p>
+          <strong>Customização sua sempre vence o template.</strong> Editou o
+          <code>AGENTS.md</code> à mão? Ele nunca sobrescreve — mostra o lado a lado e pergunta.
+          Um harness que apaga o trabalho do dono no update é um harness que ninguém atualiza
+          nunca mais.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 5 ===================== -->
+    <section id="s5">
+      <div class="sec-head"><span class="sec-num">05</span><h2>Receitas</h2></div>
+      <p>Situação real → o que fazer. A camada que quase nenhum manual tem.</p>
+
+      <div class="recipe">
+        <h3>Começando um app do zero</h3>
+        <pre><code>1. crie a pasta vazia
+2. /harness init
+3. responda as 3 perguntas · autorize o git init
+4. peça o PRD:  "vamos escrever o docs/PRD.md"
+5. peça a SPEC: "agora a arquitetura, docs/SPEC.md"
+6. primeiro plano: "cria o plano 0001 pra <primeira funcionalidade>"
+7. aprove o plano → só então o código começa</code></pre>
+        <p>
+          O <code>init</code> monta a casa vazia; PRD e SPEC decidem o quê e como; o plano decide o
+          passo a passo. Código antes disso é chute caro. <strong>Não pule o passo 7</strong> —
+          plano aprovado é o que ativa a Porta 1 e os hooks de baixa.
+        </p>
+      </div>
+
+      <div class="recipe">
+        <h3>Herdei um projeto bagunçado</h3>
+        <pre><code>1. /harness init          → detecta que já existe algo e vira modo ADOÇÃO
+2. leia o diff — não aceite tudo de uma vez
+3. aceite primeiro só as GUARDAS DE DADO (.gitignore, bloqueios)
+4. depois AGENTS.md + ESTADO.md
+5. planos e docs por último, conforme a necessidade aparecer</code></pre>
+        <p>
+          A ordem importa: guarda de dado primeiro, porque é a única irreversível se der errado.
+          Documento você escreve depois com calma; dado vazado não volta.
+        </p>
+      </div>
+
+      <div class="recipe">
+        <h3>A IA vive errando a mesma coisa</h3>
+        <pre><code>/harness learn "descreva o erro exatamente como aconteceu"</code></pre>
+        <div class="t-wrap"><table>
+          <thead><tr><th>Não diga</th><th>Diga</th></tr></thead>
+          <tbody>
+            <tr><td>“põe uma regra pra sempre rodar teste”</td><td>“ela marcou o plano concluído sem rodar o teste”</td></tr>
+            <tr><td>“ela precisa ser mais cuidadosa com dados”</td><td>“ela editou o contacts.csv que é fonte bruta”</td></tr>
+          </tbody>
+        </table></div>
+        <p>
+          Se você já entrega a regra pronta, ele vai direto pro nível 5 (texto). Se entrega o
+          <strong>comportamento</strong>, ele consegue subir a escada e virar hook — que funciona
+          mesmo quando o modelo está distraído.
+        </p>
+      </div>
+
+      <div class="recipe">
+        <h3>Meu projeto cresceu, e agora?</h3>
+        <pre><code>1. /harness doctor
+2. procure a seção AZUL (oportunidade)
+3. se citar um gatilho de tier cruzado → /harness upgrade --tier N
+4. aprove só o delta que fizer sentido</code></pre>
+        <p>
+          <strong>Não suba de tier por sensação.</strong> Ele só propõe com gatilho objetivo
+          cruzado. Sinal clássico de que passou da hora: você explicou a mesma coisa duas vezes
+          pra IA em sessões diferentes.
+        </p>
+      </div>
+
+      <div class="recipe">
+        <h3>Voltei depois de 2 meses parado</h3>
+        <pre><code>1. /harness                 → 10 linhas: onde parou, último commit, plano ativo
+2. leia o ESTADO.md         → é gerado, então não mente
+3. /harness doctor          → o que apodreceu enquanto você não estava
+4. /harness fix             → sincroniza o que dá pra sincronizar sozinho
+5. /harness upgrade         → traz o que a skill aprendeu nesse tempo</code></pre>
+        <p>
+          O passo 2 mata a pergunta “onde eu estava mesmo?”. Como o <code>ESTADO.md</code> é
+          derivado dos planos e do git, é impossível estar desatualizado — ele não é fonte de nada,
+          é uma vista.
+        </p>
+      </div>
+
+      <div class="recipe">
+        <h3>Quanto esse harness está me custando?</h3>
+        <pre><code>/harness doctor    → a última linha traz o custo por sessão</code></pre>
+        <div class="t-wrap"><table>
+          <thead><tr><th>Tier</th><th>Alvo</th><th>Alerta</th></tr></thead>
+          <tbody>
+            <tr><td>T1</td><td>~500</td><td>&gt; 900</td></tr>
+            <tr><td>T2</td><td>~2.500</td><td>&gt; 4.000</td></tr>
+            <tr><td>T3</td><td>~5.000</td><td>&gt; 8.000</td></tr>
+          </tbody>
+        </table></div>
+        <p>
+          Estourou? São só duas causas, e o doctor diz qual: o projeto subiu de tier sem gatilho, ou
+          algum documento inchou.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 6 ===================== -->
+    <section id="s6">
+      <div class="sec-head"><span class="sec-num">06</span><h2>Anatomia</h2></div>
+      <p>O que o <code>init</code> cria, arquivo por arquivo — exemplo em tier T2.</p>
+
+      <pre><code>MeuProjeto/
+├── AGENTS.md              canônico · lido por QUALQUER IA · teto 120 linhas
+├── CLAUDE.md              camada fina do Claude Code · teto 40 linhas
+├── ESTADO.md              GERADO · onde o projeto está agora
+├── .gitignore             guardas de dado
+├── .claude/
+│   ├── settings.json      configuração dos hooks
+│   └── hooks/
+│       ├── guarda.ps1        bloqueia ANTES
+│       ├── pos-edicao.ps1    valida DEPOIS de cada escrita
+│       └── porta-saida.ps1   não deixa ENCERRAR sem baixa
+├── docs/
+│   ├── GOVERNANCA.md      as 4 portas · permissões · rollback · flywheel
+│   ├── PRD.md             o quê e por quê
+│   ├── SPEC.md            o como (técnico)
+│   └── DECISOES.md        memória: por que as coisas são assim
+├── Planos/
+│   ├── MANUAL.md          como planejar e dar baixa
+│   ├── MODELO-DE-PLANO.md template pra copiar
+│   ├── INDICE.md          registro de todos os planos
+│   └── Concluídos/        histórico (nunca apagar)
+└── .harness/
+    ├── manifesto.json     identidade do harness (tier, versão, arquivos)
+    ├── guardas.json       as guardas como DADO, não como código
+    └── log-guardas.jsonl  registro de cada disparo</code></pre>
+
+      <h3>Os três documentos de topo</h3>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Arquivo</th><th>Pra quem</th><th>Muda quando</th></tr></thead>
+        <tbody>
+          <tr><td><code>AGENTS.md</code></td><td><strong>qualquer IA</strong> — Cursor, Copilot, Gemini, Codex, Claude</td><td>raramente</td></tr>
+          <tr><td><code>CLAUDE.md</code></td><td>só o Claude Code — notas de ferramenta</td><td>raramente</td></tr>
+          <tr><td><code>ESTADO.md</code></td><td>qualquer IA, ao entrar</td><td><strong>toda semana</strong></td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        Informação que muda toda hora dentro de arquivo estático é anti-padrão nomeado — ela
+        desatualiza e você paga o token dela em toda sessão. Por isso o estado saiu para um arquivo
+        próprio, <strong>e esse arquivo é gerado</strong>.
+      </p>
+
+      <h3>Por que o <code>ESTADO.md</code> é gerado</h3>
+      <p>Ele é montado a partir dos <code>Planos/</code> + <code>git log</code>. Isso mata a deriva na raiz:</p>
+      <blockquote><p>Ele não é fonte de nada — é uma vista. Logo, é impossível divergir da realidade.</p></blockquote>
+      <p>Por isso existe uma guarda que bloqueia editá-lo à mão. Para atualizar: <code>/harness fix</code>.</p>
+
+      <h3><code>guardas.json</code> — a peça mais elegante</h3>
+      <pre><code>{
+  "comandos_proibidos": [
+    {
+      "nome": "sem-push",
+      "padrao": "git\\s+push",
+      "motivo": "Repositório local e privado.",
+      "procedencia": "regra de nascimento — dado não vai pra remoto sem autorização"
+    }
+  ]
+}</code></pre>
+      <p>
+        <strong>Guarda nova entra sem ninguém editar script.</strong> O <code>learn</code>
+        acrescenta uma entrada aqui e ela já está valendo. O campo <code>procedencia</code> é
+        obrigatório — é ele que o doctor confere.
+      </p>
+
+      <h3><code>log-guardas.jsonl</code> — a instrumentação</h3>
+      <pre><code>{"data":"2026-07-26T02:15:27","guarda":"sem-push","acao":"bloqueou","detalhe":"git push origin main"}</code></pre>
+      <p>
+        É isso que transforma <em>“acho que dá pra limpar”</em> em <strong>dado</strong>. Guarda com
+        zero disparos em 90 dias vira candidata objetiva a abate. Sem esse arquivo, limpeza seria chute.
+      </p>
+    </section>
+
+    <!-- ===================== 7.1 ===================== -->
+    <section id="s7">
+      <div class="sec-head"><span class="sec-num">07.1</span><h2>O efeito flywheel</h2></div>
+
+      <p>
+        <strong>Flywheel</strong> é o volante de inércia: custa muito pra começar a girar, mas
+        depois que gira, cada volta guarda energia e facilita a próxima.
+      </p>
+
+      <blockquote>
+        <p>Cada erro corrigido torna aquela classe de erro menos provável — para sempre, em todas as sessões futuras.</p>
+      </blockquote>
+
+      <p>O segredo está numa pergunta só: <strong>onde a correção mora?</strong></p>
+
+      <div class="flywheel">
+        <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Diagrama do ciclo do flywheel">
+          <circle cx="60" cy="60" r="46" fill="none" stroke="var(--rule)" stroke-width="1"/>
+          <g class="fw-ring">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="var(--brass)" stroke-width="2"
+                    stroke-dasharray="52 20" stroke-linecap="round" opacity=".85"/>
+            <circle cx="60" cy="14" r="4.5" fill="var(--brass)"/>
+          </g>
+          <circle cx="60" cy="60" r="15" fill="none" stroke="var(--steel)" stroke-width="1.5"/>
+          <circle cx="60" cy="60" r="3" fill="var(--steel)"/>
+        </svg>
+        <ol class="fw-steps">
+          <li><span class="k">01</span><span>A IA erra</span></li>
+          <li><span class="k">02</span><span>O erro foi da IA, ou o harness não dizia?</span></li>
+          <li><span class="k">03</span><span><strong>Corrigir o documento faz parte da mesma tarefa</strong></span></li>
+          <li><span class="k">04</span><span>Registrar o ocorrido em <code>DECISOES.md</code></span></li>
+        </ol>
+      </div>
+
+      <p>
+        O passo 3 é a regra inteira. Não é “anota que depois a gente arruma”. É
+        <strong>na mesma tarefa</strong>, junto com a entrega, ou não conta.
+      </p>
+
+      <h3>Por que é a peça mais inteligente</h3>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Sem flywheel</th><th>Com flywheel</th></tr></thead>
+        <tbody>
+          <tr><td>Correção fica no <strong>chat</strong></td><td>Correção vira <strong>documento no repositório</strong></td></tr>
+          <tr><td>A sessão acaba, o contexto morre</td><td>Próxima sessão lê e já sabe</td></tr>
+          <tr><td>Você repete a mesma correção semana que vem</td><td>Você <strong>nunca mais</strong> repete</td></tr>
+          <tr><td>Erro nº 40 tão provável quanto o nº 1</td><td>Classes inteiras já eliminadas</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        Sem flywheel, <strong>você</strong> é a memória do projeto — e memória humana não escala.
+        Daqui a 3 meses você mesmo não vai lembrar por que decidiu aquilo. Com flywheel, o projeto
+        carrega a própria memória.
+      </p>
+
+      <h3>Um exemplo real</h3>
+      <p>De um projeto real, decisão D011:</p>
+      <blockquote>
+        <p>
+          Ao testar um plano, um arquivo com dados de cliente foi parar num caminho dentro do
+          repositório que o <code>.gitignore</code> não cobria. Apareceria como untracked e podia
+          entrar num commit — vazando o telefone de mais de mil clientes.
+        </p>
+      </blockquote>
+      <p>
+        O que aconteceu: não esperou o usuário pedir · corrigiu o <code>.gitignore</code>
+        <strong>na mesma tarefa</strong>, antes de qualquer <code>git add</code> · registrou a
+        decisão explicando o gap · nenhum dado chegou a ser commitado.
+      </p>
+      <p><strong>O harness pegou uma falha do próprio harness e se consertou.</strong> É o volante girando.</p>
+
+      <h3>O nome no mercado</h3>
+      <blockquote>
+        <p>Trate toda falha do agente como sinal permanente. Cada restrição deve rastrear até algo específico que deu errado.</p>
+        <cite>Addy Osmani · Ratchet Principle</cite>
+      </blockquote>
+      <p>
+        Catraca acrescenta uma propriedade que “flywheel” não tem: <strong>não destrava</strong>.
+        Subiu um dente, não desce. Flywheel acumula energia; catraca não perde o que ganhou.
+      </p>
+
+      <h3>Onde o flywheel clássico para</h3>
+      <p>O flywheel tradicional <strong>só produz texto</strong>:</p>
+      <pre><code>erro → parágrafo novo no AGENTS.md → torcer pra IA ler e obedecer</code></pre>
+      <p>
+        Melhor que nada, mas depende do modelo ler, lembrar e obedecer — nas três, sempre. Às vezes
+        não obedece, e o volante gira em falso. Pior: cada erro vira parágrafo, e em 6 meses o
+        documento tem 300 linhas competindo por atenção. <strong>O flywheel começa a atrapalhar a
+        si mesmo.</strong>
+      </p>
+
+      <h3>Como o <code>learn</code> conserta isso</h3>
+      <pre><code>erro → "dá pra impedir mecanicamente?"
+         │
+         ├─ SIM → vira HOOK. Funciona mesmo se o modelo não ler.
+         │        E o AGENTS.md não engorda uma linha.
+         │
+         └─ NÃO → vira texto, com procedência anexada.
+                  (derrota aceita, não escolha)</code></pre>
+      <div class="note key">
+        <span class="note-tag">Aconteceu ao vivo</span>
+        <p>
+          Na construção desta skill, um <code>.ps1</code> foi escrito com erro de sintaxe e acento.
+          Um hook barrou em milissegundos, sem revisão humana. Virou o padrão P001 — e note o que
+          <strong>não</strong> aconteceu: nenhuma regra escrita dizendo “lembre-se de usar ASCII”.
+          Virou um check automático. O flywheel girou <strong>sem custar uma linha de documento</strong>.
+        </p>
+      </div>
+
+      <h3>O freio</h3>
+      <p>
+        Flywheel sem freio é bola de neve. Cada erro vira regra, nenhuma sai nunca, e em um ano
+        ninguém lê o documento inteiro. Foi o que começou a acontecer no projeto que serviu de
+        diagnóstico: <strong>18 decisões, nenhuma jamais podada.</strong>
+      </p>
+      <pre><code>Flywheel  = sobe por erro real       (a energia entra)
+Abate     = desce por desuso         (o freio, via log-guardas.jsonl)</code></pre>
+      <blockquote>
+        <p>
+          Flywheel é a regra de que <strong>a correção mora no repositório</strong>, não na sua
+          cabeça nem no chat. A <code>/harness</code> acrescenta duas coisas: tenta virar guarda
+          mecânica antes de virar texto, e poda o que não se provou útil.
+        </p>
+      </blockquote>
+    </section>
+
+    <!-- ===================== 7.2 ===================== -->
+    <section id="s72">
+      <div class="sec-head"><span class="sec-num">07.2</span><h2>As 5 leis anti-inchaço</h2></div>
+      <div class="t-wrap"><table>
+        <thead><tr><th>#</th><th>Lei</th><th>Em uma frase</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><strong>Procedência obrigatória</strong></td><td>regra sem erro real que a justifique não entra</td></tr>
+          <tr><td>2</td><td><strong>Mecânico vence escrito</strong></td><td>dá pra ser hook? então não é texto</td></tr>
+          <tr><td>3</td><td><strong>Orçamento é lei</strong></td><td>cada doc tem teto de linhas, e estourar reprova</td></tr>
+          <tr><td>4</td><td><strong>Pressão de abate</strong></td><td>pra entrar regra, avalie se tirar outra não é melhor</td></tr>
+          <tr><td>5</td><td><strong>O menor tier que serve</strong></td><td>na dúvida entre dois, é o menor</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Lei 1 — por que é tão dura</h3>
+      <p>
+        Regra genérica <strong>não é neutra</strong>. Mediu-se em 2026: <code>AGENTS.md</code>
+        gerado por LLM — cheio de regra plausível tipo “escreva código limpo” — piorou a taxa de
+        sucesso em <strong>5 de 8 cenários</strong>, somando 2,45 a 3,92 passos extras por tarefa.
+      </p>
+      <p>
+        O modelo já sabe escrever código limpo. Dizer isso só ocupa a atenção que ele usaria pra
+        entender o que é específico do <em>seu</em> projeto.
+      </p>
+
+      <h3>Lei 2 — a razão é velocidade</h3>
+      <pre><code>PostToolUse (ms) > pre-commit (s) > CI (min) > você percebendo (∞)</code></pre>
+
+      <h3>Lei 3 — o número</h3>
+      <p>
+        Arquivo de instrução acima de ~150 linhas aumenta o custo de inferência em
+        <strong>20–23% sem ganho nenhum</strong>. Documento que passa do orçamento não está
+        informando — está cobrando pedágio.
+      </p>
+      <p>
+        <strong>Estourou não significa cortar informação.</strong> Significa mudar de lugar: migra
+        pro documento de profundidade e deixa um ponteiro.
+      </p>
+
+      <h3>Lei 4 — o critério é objetivo</h3>
+      <p>
+        Nunca é chute: guarda que nunca disparou em 90 dias · regra sem procedência · decisão
+        superada por outra · documento que nenhum outro referencia.
+      </p>
+
+      <h3>Lei 5 — por que conservador</h3>
+      <p>
+        O jeito mais fácil de estragar um projeto pequeno é dar a ele governança de projeto grande.
+        Governança que não serve é atrito puro — e atrito faz você abandonar o processo inteiro.
+      </p>
+    </section>
+
+    <!-- ===================== 7.3 ===================== -->
+    <section id="s73">
+      <div class="sec-head"><span class="sec-num">07.3</span><h2>Tiers e a escada</h2></div>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Tier</th><th>Quando</th><th>Custo/sessão</th></tr></thead>
+        <tbody>
+          <tr><td><strong>T1 · Leve</strong></td><td>script, protótipo, POC</td><td>~500</td></tr>
+          <tr><td><strong>T2 · Padrão</strong></td><td>app pessoal real</td><td>~2.500</td></tr>
+          <tr><td><strong>T2+</strong></td><td>…que mexe com dinheiro ou dado sensível</td><td>+variável</td></tr>
+          <tr><td><strong>T3 · Completo</strong></td><td>multi-módulo, mais de uma pessoa</td><td>~5.000</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Os gatilhos de subida</h3>
+      <p>A estrutura não sobe por tempo nem por vontade. <strong>Sobe por evento real.</strong></p>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Subida</th><th>Gatilho — qualquer um basta</th></tr></thead>
+        <tbody>
+          <tr><td>T1 → T2</td><td>primeiro plano criado · 3+ arquivos de código · você disse “continua de onde parou”</td></tr>
+          <tr><td>T2 → T2+</td><td>primeiro bug real que chegou ao uso · dado sensível entrou · regra que, se quebrar, você só descobre tarde</td></tr>
+          <tr><td>T2+ → T3</td><td>virou multi-módulo · outra pessoa passou a mexer · 15+ decisões registradas</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>A descida — o que quase nenhum sistema tem</h3>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Descida</th><th>Critério objetivo</th></tr></thead>
+        <tbody>
+          <tr><td>Guarda abatida</td><td>zero disparos em 90 dias</td></tr>
+          <tr><td>Regra abatida</td><td>sem procedência</td></tr>
+          <tr><td>Decisão arquivada</td><td>superada por outra</td></tr>
+          <tr><td>Documento abatido</td><td>nenhum outro aponta pra ele</td></tr>
+        </tbody>
+      </table></div>
+      <pre><code>Sobe por gatilho (evento aconteceu)
+Desce por desuso (não se provou)</code></pre>
+      <p>
+        <strong>Sem a descida, é questão de tempo até virar monstro.</strong> Quem propõe: doctor.
+        Quem aplica: <code>fix --limpar</code>. Quem decide: você, sempre.
+      </p>
+    </section>
+
+    <!-- ===================== 7.4 ===================== -->
+    <section id="s74">
+      <div class="sec-head"><span class="sec-num">07.4</span><h2>Hooks</h2></div>
+      <p>A espinha mecânica. Três, todos testados funcionando.</p>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Hook</th><th>Evento</th><th>O que faz</th></tr></thead>
+        <tbody>
+          <tr><td><code>guarda</code></td><td>PreToolUse</td><td><strong>bloqueia</strong> o proibido, antes de acontecer</td></tr>
+          <tr><td><code>pos-edicao</code></td><td>PostToolUse</td><td>valida e <strong>devolve o erro pro modelo</strong></td></tr>
+          <tr><td><code>porta-saida</code></td><td>Stop</td><td><strong>não deixa fechar</strong> com plano sem baixa</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        <code>pos-edicao</code> é o retorno mais rápido que existe: roda depois de cada escrita e
+        devolve o problema, que o modelo corrige antes de seguir. Hoje confere JSON válido, sintaxe
+        e ASCII em <code>.ps1</code>, e orçamento de linhas em markdown.
+      </p>
+      <div class="note">
+        <span class="note-tag">Conservador de propósito</span>
+        <p>
+          O <code>porta-saida</code> só segura com evidência clara: existe plano em andamento
+          <strong>e</strong> código foi alterado depois da última baixa. Um Stop hook que dispara à
+          toa é insuportável — e aí você desliga o harness inteiro.
+        </p>
+      </div>
+      <div class="note warn">
+        <span class="note-tag">A pegadinha</span>
+        <p>
+          Se um hook te barrar, <strong>ele provavelmente está certo</strong>. Na construção desta
+          skill a armadura barrou duas vezes — e nas duas o problema era o código, não a guarda.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 8 ===================== -->
+    <section id="s8">
+      <div class="sec-head"><span class="sec-num">08</span><h2>Socorro</h2></div>
+
+      <h3>Perguntas frequentes</h3>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Pergunta</th><th>Resposta</th></tr></thead>
+        <tbody>
+          <tr><td>O doctor pode estragar meu projeto?</td><td>Não. Ele nunca escreve. Nem um espaço em branco.</td></tr>
+          <tr><td>Preciso rodar isso toda hora?</td><td>Não. <code>learn</code> quando a IA errar, <code>doctor</code> de vez em quando.</td></tr>
+          <tr><td>E se eu editei os arquivos à mão?</td><td>Sua edição vence. O <code>upgrade</code> nunca sobrescreve customização.</td></tr>
+          <tr><td>Serve pra projeto que já existe?</td><td>Serve. O <code>init</code> detecta e vira modo adoção.</td></tr>
+          <tr><td>Por que ela insiste em ser pequena?</td><td>Acima de ~150 linhas o custo sobe 20–23% sem ganho, e regra genérica chega a piorar o resultado.</td></tr>
+          <tr><td>Como eu apago tudo?</td><td>Apague <code>.harness/</code> e os documentos. Nada fica escondido no sistema.</td></tr>
+          <tr><td>Funciona com outras IAs?</td><td>Os documentos sim — <code>AGENTS.md</code> é padrão aberto. Os hooks são do Claude Code.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Um hook me barrou e eu acho que ele está errado</h3>
+      <pre><code>1. LEIA a mensagem — ela diz qual guarda e qual o motivo
+2. Se a guarda estiver errada mesmo:
+   /harness learn "a guarda X barrou <situação legítima>"
+   → ele conserta a guarda, não empilha outra
+3. Emergência: edite .harness/guardas.json e remova a entrada</code></pre>
+      <p>Antes de contornar, considere que ele pode estar certo. É o caso mais comum.</p>
+
+      <h3>O doctor acusa deriva e eu não entendo</h3>
+      <p>
+        Deriva = o documento diz uma coisa, o disco diz outra. Peça:
+        <em>“me explica essa deriva e me mostra os dois lados”</em>. Ele mostra o que o documento
+        afirma e o que o código faz. <strong>Você</strong> decide qual está certo.
+      </p>
+
+      <h3>Quero desligar um hook temporariamente</h3>
+      <p>Edite <code>.claude/settings.json</code> e remova a entrada dele. Mas:</p>
+      <blockquote>
+        <p>
+          Se você está desligando o mesmo hook toda semana, <strong>o hook está errado</strong> —
+          não o seu comportamento. Rode <code>/harness learn</code> e conserte de vez.
+        </p>
+      </blockquote>
+
+      <h3>Meu <code>ESTADO.md</code> está errado</h3>
+      <p>
+        Não edite à mão — a guarda vai barrar, e com razão. Rode <code>/harness fix</code>, que
+        regenera a partir dos planos e do git. Se ainda estiver errado, o problema está nos planos:
+        provavelmente algum sem baixa.
+      </p>
+
+      <h3>Quero desinstalar</h3>
+      <p>
+        Apague <code>.harness/</code>, <code>.claude/hooks/</code> e os documentos que não quiser
+        manter. <strong>O <code>AGENTS.md</code> vale a pena manter mesmo sem a skill</strong> — é
+        padrão aberto e qualquer IA lê.
+      </p>
+    </section>
+
+    <!-- ===================== 9 ===================== -->
+    <section id="s9">
+      <div class="sec-head"><span class="sec-num">09</span><h2>Evidências</h2></div>
+      <p>Por que confiar nas regras em vez de decorar. Levantamento de julho de 2026.</p>
+
+      <div class="t-wrap"><table>
+        <thead><tr><th>Achado</th><th>Consequência no desenho</th></tr></thead>
+        <tbody>
+          <tr><td>Arquivo de instrução <strong>&gt; ~150 linhas</strong>: custo <strong>+20–23%</strong>, sem ganho de performance</td><td>Lei 3 — orçamento por documento</td></tr>
+          <tr><td><code>AGENTS.md</code> gerado por LLM: piora a taxa de sucesso em <strong>5 de 8 cenários</strong>, +2,45–3,92 passos</td><td>Lei 1 — procedência obrigatória</td></tr>
+          <tr><td><em>“Prompting instead of enforcing”</em> é o <strong>anti-padrão nº 1</strong></td><td>Lei 2 — mecânico vence escrito</td></tr>
+          <tr><td>Retorno: PostToolUse (ms) &gt; pre-commit (s) &gt; CI (min) &gt; humano (∞)</td><td>os 3 hooks, com ênfase no <code>pos-edicao</code></td></tr>
+          <tr><td>Agentes <strong>dão nota boa ao próprio trabalho</strong></td><td>auditor separado no tier T3</td></tr>
+          <tr><td>Memória escala com <strong>progressive disclosure</strong></td><td><code>DECISOES.md</code> com índice; quebra aos 15</td></tr>
+          <tr><td><strong>Prosa apodrece; teste não</strong></td><td>T2+ com regra de negócio virando teste</td></tr>
+        </tbody>
+      </table></div>
+
+      <blockquote>
+        <p>
+          Os melhores harnesses não são frameworks baixados de um fornecedor — são moldados pelo seu
+          histórico específico de falhas.
+        </p>
+      </blockquote>
+      <p>
+        Essa frase é o motivo de o <code>learn</code> existir, e de esta skill nascer
+        <strong>enxuta</strong> em vez de completa: ela deve crescer a partir dos <em>seus</em>
+        erros, não de palpites.
+      </p>
+
+      <h3>Fontes</h3>
+      <ul>
+        <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Agent Harness Engineering — Addy Osmani</a></li>
+        <li><a href="https://nyosegawa.com/en/posts/harness-engineering-best-practices-2026/">Harness Engineering Best Practices 2026 — Sakasegawa</a></li>
+        <li><a href="https://agentic-engineering.swmansion.com/becoming-productive/harness-engineering/">Harness Engineering — Software Mansion</a></li>
+        <li><a href="https://www.betterclaw.io/blog/agents-md-best-practices">AGENTS.md Best Practices 2026 — Betterclaw</a></li>
+        <li><a href="https://sourcegraph.com/blog/context-engineering">Context Engineering — Sourcegraph</a></li>
+        <li><a href="https://www.harness.io/blog/the-agent-native-repo-why-agents-md-is-the-new-standard">The Agent-Native Repo — Harness.io</a></li>
+        <li><a href="https://github.com/github/spec-kit">GitHub Spec-Kit</a></li>
+        <li><a href="https://mem0.ai/blog/state-of-ai-agent-memory-2026">State of AI Agent Memory 2026 — Mem0</a></li>
+        <li><a href="https://www.totalum.app/blog/claude-code-hooks-totalum">Claude Code Hooks: Production Playbook — Totalum</a></li>
+        <li><a href="https://codex.danielvaughan.com/2026/03/26/agents-md-advanced-patterns/">AGENTS.md Advanced Patterns — Nested Hierarchies</a></li>
+      </ul>
+    </section>
+
+    <div class="foot">
+      MANUAL /HARNESS · V1.1.0 · 26.07.2026<br>
+      FONTE ÚNICA: ~/.claude/skills/harness/manual/MANUAL.md<br>
+      ATUALIZE COM /harness manual --exportar
+    </div>
+  </main>
+</div>
+
+<script>
+  // tema
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    var root = document.documentElement;
+    btn.addEventListener('click', function () {
+      var atual = root.getAttribute('data-theme');
+      if (!atual) {
+        atual = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      root.setAttribute('data-theme', atual === 'dark' ? 'light' : 'dark');
+    });
+  })();
+
+  // scroll-spy
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('.nav a[href^="#"]'));
+    var mapa = {};
+    var alvos = [];
+    links.forEach(function (a) {
+      var el = document.getElementById(a.getAttribute('href').slice(1));
+      if (el) { mapa[el.id] = a; alvos.push(el); }
+    });
+    if (!('IntersectionObserver' in window) || !alvos.length) return;
+
+    var visiveis = new Set();
+    var obs = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (e) {
+        if (e.isIntersecting) { visiveis.add(e.target.id); }
+        else { visiveis.delete(e.target.id); }
+      });
+      var primeiro = null;
+      for (var i = 0; i < alvos.length; i++) {
+        if (visiveis.has(alvos[i].id)) { primeiro = alvos[i].id; break; }
+      }
+      links.forEach(function (a) { a.classList.remove('active'); });
+      if (primeiro && mapa[primeiro]) { mapa[primeiro].classList.add('active'); }
+    }, { rootMargin: '0px 0px -65% 0px', threshold: 0 });
+
+    alvos.forEach(function (el) { obs.observe(el); });
+  })();
+</script>
