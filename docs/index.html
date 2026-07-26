@@ -97,7 +97,58 @@
     max-width: 1180px;
     margin: 0 auto;
     padding: 0 clamp(1rem, 4vw, 2.5rem);
+    transition: grid-template-columns .28s ease;
   }
+  /* recolher o menu no desktop — campo de leitura fica inteiro pra você */
+  .shell.collapsed { grid-template-columns: 0px minmax(0, 1fr); }
+  .shell.collapsed .nav { opacity: 0; pointer-events: none; overflow: hidden; padding: 0; border: 0; }
+
+  /* ============ TOPBAR + GAVETA (mobile) — ocultos no desktop ============ */
+  .topbar, .backdrop, .nav-close { display: none; }
+  .nav-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    flex-shrink: 0;
+    border: 1px solid var(--rule);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .icon-btn:hover { border-color: var(--brass); color: var(--brass); }
+  .icon-btn svg { width: 1.2rem; height: 1.2rem; display: block; }
+
+  /* botão de recolher o menu — só no desktop */
+  .collapse-btn {
+    position: sticky;
+    top: 1.25rem;
+    z-index: 10;
+    margin-bottom: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: .38rem .65rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: border-color .15s ease, color .15s ease;
+  }
+  .collapse-btn:hover { border-color: var(--brass); color: var(--brass); }
+  .collapse-btn svg { width: .95rem; height: .95rem; transition: transform .25s ease; }
+  .shell.collapsed .collapse-btn svg { transform: scaleX(-1); }
 
   /* ============ NAV ============ */
   .nav {
@@ -112,7 +163,7 @@
     flex-direction: column;
     gap: 1.5rem;
   }
-  .brand { display: flex; flex-direction: column; gap: .45rem; }
+  .brand { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
   .brand-mark {
     font-family: var(--mono);
     font-size: 1.05rem;
@@ -166,22 +217,8 @@
   .nav a.active { color: var(--brass); font-weight: 600; }
   .nav a.active .n { color: var(--brass); }
 
-  .theme-btn {
-    margin-top: auto;
-    align-self: flex-start;
-    font-family: var(--mono);
-    font-size: .7rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    background: none;
-    border: 1px solid var(--rule);
-    border-radius: 3px;
-    padding: .4rem .7rem;
-    cursor: pointer;
-    transition: border-color .15s ease, color .15s ease;
-  }
-  .theme-btn:hover { color: var(--brass); border-color: var(--brass); }
+  .nav .theme-btn { margin-top: auto; align-self: flex-start; }
+  .theme-btn .i-moon { color: var(--steel); }
 
   /* ============ CONTENT ============ */
   main {
@@ -462,34 +499,131 @@
     color: var(--ink-3);
   }
 
-  /* ============ MOBILE ============ */
-  @media (max-width: 860px) {
-    .shell { grid-template-columns: 1fr; }
-    .nav {
-      position: static;
-      height: auto;
-      overflow: visible;
-      border-right: 0;
+  /* nav-scroll é sempre coluna vertical — a rolagem horizontal virou gaveta */
+  .nav-scroll { display: flex; flex-direction: column; gap: 1.35rem; }
+
+  /* ============ MOBILE — gaveta deslizante + leitura maior ============ */
+  @media (max-width: 880px) {
+    html { font-size: 17.5px; scroll-padding-top: 4.25rem; }
+    body { line-height: 1.72; }
+    section { scroll-margin-top: 4.25rem; }
+
+    .collapse-btn { display: none; }
+
+    /* topbar fixa: hambúrguer · seção atual · tema */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: .65rem clamp(1rem, 4vw, 2rem);
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      background: var(--surface);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--rule);
-      padding: 1.75rem 0 1.25rem;
-      gap: 1rem;
     }
-    .nav-scroll { display: flex; gap: 1.75rem; overflow-x: auto; padding-bottom: .5rem; }
-    .nav-group { min-width: max-content; }
-    .theme-btn { margin-top: 0; }
-    main { padding: 2.5rem 0 5rem; }
+    .topbar-left { display: flex; align-items: center; gap: .8rem; min-width: 0; }
+    .topbar-id { display: flex; flex-direction: column; gap: .05rem; min-width: 0; }
+    .topbar-brand {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: .92rem;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .topbar-brand span { color: var(--brass); }
+    .topbar-section {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--ink-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* backdrop por trás da gaveta */
+    .backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 9, 8, .5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .28s ease;
+      z-index: 55;
+    }
+    .backdrop.show { opacity: 1; pointer-events: auto; }
+
+    /* a gaveta em si */
+    .shell { display: block; padding: 0; max-width: none; }
+    .nav {
+      position: fixed;
+      top: 0; left: 0;
+      width: min(85vw, 336px);
+      height: 100dvh;
+      background: var(--surface);
+      border-right: 1px solid var(--rule);
+      box-shadow: var(--shadow);
+      padding: 1.35rem 1.35rem 2rem;
+      gap: 1.6rem;
+      transform: translateX(-102%);
+      transition: transform .32s cubic-bezier(.22, .8, .28, 1);
+      z-index: 60;
+    }
+    .nav.open { transform: translateX(0); }
+
+    .nav-close { display: inline-flex; }
+    .nav .theme-btn { display: none; } /* a versão da topbar já cobre o tema no mobile */
+
+    main {
+      padding: 1.85rem clamp(1rem, 4vw, 2rem) 5.5rem;
+      max-width: none;
+    }
+    .lede { font-size: 1.2rem; }
+    h1 { letter-spacing: -.03em; }
+    h2 { font-size: 1.55rem; }
+    h3 { font-size: 1.12rem; }
+    .t-wrap table { font-size: .92rem; }
+    pre { font-size: .87rem; }
+    section + section { margin-top: 3.5rem; }
   }
-  @media (min-width: 861px) {
-    .nav-scroll { display: flex; flex-direction: column; gap: 1.35rem; }
-  }
+
+  /* trava de rolagem do fundo enquanto a gaveta está aberta */
+  html.drawer-open, html.drawer-open body { overflow: hidden; height: 100%; }
 </style>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="icon-btn" id="hamburgerBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="topbar-id">
+      <div class="topbar-brand">/<span>harness</span></div>
+      <div class="topbar-section" id="topbarSection">Manual</div>
+    </div>
+  </div>
+  <button class="icon-btn theme-btn" id="themeBtnTop" type="button" aria-label="Alternar tema">
+    <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/><line x1="5" y1="5" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19" y2="19"/><line x1="5" y1="19" x2="6.8" y2="17.2"/><line x1="17.2" y1="6.8" x2="19" y2="5"/></svg>
+    <svg class="i-moon" viewBox="0 0 24 24" fill="currentColor" stroke="none" hidden><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg>
+  </button>
+</header>
+
+<div class="backdrop" id="backdrop"></div>
 
 <div class="shell">
 
-  <nav class="nav" aria-label="Sumário do manual">
-    <div class="brand">
-      <div class="brand-mark">/<span>harness</span></div>
-      <div class="brand-meta">Manual · v1.1.0 · 26.07.2026</div>
+  <nav class="nav" id="nav" aria-label="Sumário do manual">
+    <div class="nav-top">
+      <div class="brand">
+        <div class="brand-mark">/<span>harness</span></div>
+        <div class="brand-meta">Manual · v1.1.0 · 26.07.2026</div>
+      </div>
+      <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
     </div>
 
     <div class="nav-scroll">
@@ -528,10 +662,18 @@
       </div>
     </div>
 
-    <button class="theme-btn" id="themeBtn" type="button">Tema</button>
+    <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label="Alternar tema">
+      <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/><line x1="5" y1="5" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19" y2="19"/><line x1="5" y1="19" x2="6.8" y2="17.2"/><line x1="17.2" y1="6.8" x2="19" y2="5"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" fill="currentColor" stroke="none" hidden><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg>
+    </button>
   </nav>
 
   <main>
+    <button class="collapse-btn" id="collapseBtn" type="button" aria-expanded="true" aria-controls="nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><line x1="9.5" y1="4.5" x2="9.5" y2="19.5"/></svg>
+      Ocultar menu
+    </button>
+
     <header class="masthead">
       <p class="eyebrow">Skill de governança de projetos</p>
       <h1>Manual <code style="font-size:.82em;background:none;padding:0;color:var(--brass)">/harness</code></h1>
@@ -1366,44 +1508,152 @@ Desce por desuso (não se provou)</code></pre>
 </div>
 
 <script>
-  // tema
+  var root = document.documentElement;
+  var MOBILE = window.matchMedia('(max-width: 880px)');
+
+  // ---------- tema (dois botões: sidebar desktop + topbar mobile) ----------
   (function () {
-    var btn = document.getElementById('themeBtn');
-    var root = document.documentElement;
-    btn.addEventListener('click', function () {
+    var botoes = [document.getElementById('themeBtn'), document.getElementById('themeBtnTop')].filter(Boolean);
+
+    function efetivo() {
       var atual = root.getAttribute('data-theme');
-      if (!atual) {
-        atual = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
-      root.setAttribute('data-theme', atual === 'dark' ? 'light' : 'dark');
+      if (atual) return atual;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function sincronizarIcones() {
+      // usa o atributo diretamente: a propriedade .hidden não existe em SVGElement,
+      // só em HTMLElement — setar b.querySelector('svg').hidden = x é um no-op silencioso.
+      var escuro = efetivo() === 'dark';
+      botoes.forEach(function (b) {
+        var sol = b.querySelector('.i-sun'), lua = b.querySelector('.i-moon');
+        if (escuro) { sol.setAttribute('hidden', ''); lua.removeAttribute('hidden'); }
+        else { lua.setAttribute('hidden', ''); sol.removeAttribute('hidden'); }
+      });
+    }
+    botoes.forEach(function (b) {
+      b.addEventListener('click', function () {
+        root.setAttribute('data-theme', efetivo() === 'dark' ? 'light' : 'dark');
+        sincronizarIcones();
+      });
+    });
+    sincronizarIcones();
+  })();
+
+  // ---------- gaveta do menu (mobile) ----------
+  (function () {
+    var nav = document.getElementById('nav');
+    var hamburger = document.getElementById('hamburgerBtn');
+    var fechar = document.getElementById('navClose');
+    var backdrop = document.getElementById('backdrop');
+    if (!nav || !hamburger) return;
+
+    function abrir() {
+      nav.classList.add('open');
+      backdrop.classList.add('show');
+      root.classList.add('drawer-open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      var alvo = fechar || nav.querySelector('a, button');
+      if (alvo) alvo.focus();
+    }
+    function fecharGaveta(devolverFoco) {
+      nav.classList.remove('open');
+      backdrop.classList.remove('show');
+      root.classList.remove('drawer-open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      if (devolverFoco) hamburger.focus();
+    }
+
+    hamburger.addEventListener('click', function () {
+      nav.classList.contains('open') ? fecharGaveta(true) : abrir();
+    });
+    if (fechar) fechar.addEventListener('click', function () { fecharGaveta(true); });
+    backdrop.addEventListener('click', function () { fecharGaveta(false); });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('open')) fecharGaveta(true);
+    });
+
+    // fecha a gaveta ao navegar para uma seção
+    nav.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function () {
+        if (MOBILE.matches) fecharGaveta(false);
+      });
+    });
+
+    // trap de Tab simples enquanto a gaveta está aberta
+    nav.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab' || !nav.classList.contains('open')) return;
+      var focaveis = Array.prototype.slice.call(nav.querySelectorAll('a[href], button:not([hidden])'));
+      if (!focaveis.length) return;
+      var primeiro = focaveis[0], ultimo = focaveis[focaveis.length - 1];
+      if (e.shiftKey && document.activeElement === primeiro) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primeiro.focus(); }
+    });
+
+    // virou desktop com a gaveta aberta: destrava
+    MOBILE.addEventListener('change', function (e) {
+      if (!e.matches) fecharGaveta(false);
     });
   })();
 
-  // scroll-spy
+  // ---------- recolher menu (desktop) ----------
+  (function () {
+    var shell = document.querySelector('.shell');
+    var btn = document.getElementById('collapseBtn');
+    if (!shell || !btn) return;
+    btn.addEventListener('click', function () {
+      var recolhido = shell.classList.toggle('collapsed');
+      btn.lastChild.textContent = recolhido ? ' Mostrar menu' : ' Ocultar menu';
+      btn.setAttribute('aria-expanded', String(!recolhido));
+    });
+  })();
+
+  // ---------- scroll-spy (sidebar + rótulo da topbar) ----------
+  // Ativa a ÚLTIMA seção cujo topo já cruzou a "linha de leitura" (logo abaixo da
+  // topbar). Caminha em ordem de documento e para no primeiro que ainda não chegou —
+  // as seções são sequenciais, então isso é O(n) e correto mesmo quando duas seções
+  // ficam simultaneamente "intersectando" a tela (a anterior só com uma tira no topo).
   (function () {
     var links = Array.prototype.slice.call(document.querySelectorAll('.nav a[href^="#"]'));
+    var topbarSection = document.getElementById('topbarSection');
     var mapa = {};
+    var textoDaSecao = {};
     var alvos = [];
     links.forEach(function (a) {
       var el = document.getElementById(a.getAttribute('href').slice(1));
-      if (el) { mapa[el.id] = a; alvos.push(el); }
+      if (el) { mapa[el.id] = a; textoDaSecao[el.id] = a.textContent.trim(); alvos.push(el); }
     });
-    if (!('IntersectionObserver' in window) || !alvos.length) return;
+    if (!alvos.length) return;
 
-    var visiveis = new Set();
-    var obs = new IntersectionObserver(function (entradas) {
-      entradas.forEach(function (e) {
-        if (e.isIntersecting) { visiveis.add(e.target.id); }
-        else { visiveis.delete(e.target.id); }
-      });
-      var primeiro = null;
+    function linhaDeLeitura() {
+      var tb = document.querySelector('.topbar');
+      var alturaTopbar = (tb && tb.offsetParent !== null) ? tb.getBoundingClientRect().height : 0;
+      return alturaTopbar + 100;
+    }
+
+    function atualizar() {
+      var linha = linhaDeLeitura();
+      var atual = alvos[0].id;
       for (var i = 0; i < alvos.length; i++) {
-        if (visiveis.has(alvos[i].id)) { primeiro = alvos[i].id; break; }
+        if (alvos[i].getBoundingClientRect().top - linha <= 0) atual = alvos[i].id;
+        else break;
       }
       links.forEach(function (a) { a.classList.remove('active'); });
-      if (primeiro && mapa[primeiro]) { mapa[primeiro].classList.add('active'); }
-    }, { rootMargin: '0px 0px -65% 0px', threshold: 0 });
+      if (mapa[atual]) {
+        mapa[atual].classList.add('active');
+        if (topbarSection) topbarSection.textContent = textoDaSecao[atual];
+      }
+    }
 
-    alvos.forEach(function (el) { obs.observe(el); });
+    var agendado = false;
+    function agendar() {
+      if (agendado) return;
+      agendado = true;
+      requestAnimationFrame(function () { agendado = false; atualizar(); });
+    }
+
+    window.addEventListener('scroll', agendar, { passive: true });
+    window.addEventListener('resize', agendar);
+    agendar();
   })();
 </script>
