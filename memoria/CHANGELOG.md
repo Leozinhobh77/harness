@@ -8,6 +8,59 @@
 
 ---
 
+## v1.3.1 — 2026-07-27
+
+**O check do `ESTADO.md` estava errado pela terceira vez. Agora não pergunta mais pelo relógio.**
+
+### Procedência
+Achado ao vivo no `/harness upgrade` de **Finanças**, minutos depois de publicar a v1.3.0: o
+`doctor` acusou `[Deriva] ESTADO.md e mais antigo que o ultimo commit` logo após um commit que
+regenerou o próprio `ESTADO.md`. Reproduzido com carimbo de tempo na mão:
+
+```
+ESTADO.md regenerado às   15:35:10
+commit 703168b            15:35:12   ← 2 segundos depois
+```
+
+### O erro, em três tentativas
+1. **v1.2.x** — comparava o `mtime` com o último commit. Mas o commit que **carrega** o
+   `ESTADO.md` é sempre alguns segundos mais novo que o arquivo. Insatisfazível após commitar.
+2. **v1.3.0** — passou a usar `git log -1 -- . ':(exclude)ESTADO.md'`. O filtro exclui o
+   **caminho**, não o **commit**: commitar o `ESTADO.md` junto com qualquer outro arquivo — o
+   caso normal — devolvia o mesmo commit, e o check voltava a ser insatisfazível.
+3. **v1.3.1** — a pergunta certa não tem relógio nenhum: *regenerar hoje daria um arquivo
+   diferente do que está no disco?* `estado.ps1 -Preview` devolve o conteúdo sem escrever, então
+   o `doctor` continua só lendo (regra 1 da skill).
+
+### A parte que a comparação de conteúdo revelou
+Trocar relógio por conteúdo **não bastou** — e isso foi a descoberta que valeu a rodada. O
+`ESTADO.md` embute a lista dos últimos commits e o status do git. Ambos são **insatisfazíveis
+por construção**: no instante em que o arquivo é commitado já falta um commit na lista — o
+próprio —, e o "working tree limpo" fica falso assim que se edita qualquer coisa.
+
+Então a comparação ficou só na parte **estável**: título, planos ativos e quantidade de
+concluídos. É exatamente a deriva que importa — plano que mudou de status ou foi arquivado sem o
+`ESTADO.md` ser regenerado. O resto é uma vista de cortesia que não dá para cobrar exatidão.
+
+### Verificação
+Dois cenários, os dois conferidos:
+- `ESTADO.md` em dia → `OK - nenhum problema mecanico encontrado`
+- plano ativo inventado no arquivo → `[Deriva] ESTADO.md nao bate com o que seria gerado agora`
+
+### Abate (Lei 4)
+**Nada abatido, e a razão é a mesma da v1.3.0:** 1 projeto, 2 dias de vida. Os critérios pedem
+90 dias sem disparo ou ≥2 projetos independentes. Não há dado, e chutar remoção é pior que
+esperar. Marcado de novo para a próxima rodada — se cair uma terceira vez sem abate, o problema
+passa a ser o julgamento, não a falta de dado.
+
+### Observação para a próxima rodada
+`SKILL.md` está com **81 linhas**. O exemplo de saída do `evolve` fala em "SKILL.md 58/60
+linhas", sugerindo um teto de 60 — mas `criterios/ORCAMENTOS.md` **não tem linha para
+`SKILL.md`**, então nada fiscaliza. É o mesmo tipo de buraco que a v1.3.0 fechou para
+`REGRAS-DE-NEGOCIO.md`. Não mexi agora porque é decisão de orçamento, não correção de bug.
+
+---
+
 ## v1.3.0 — 2026-07-27
 
 **O `doctor` estava cego em quatro pontos. Achado rodando o próprio `doctor` num projeto real.**

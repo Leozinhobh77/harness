@@ -1,7 +1,19 @@
 {
   "_leia": "Registro de última data de uso de cada comando, por SKILL.md (secao 'Registrar uso'). Lido pelo /menu-harness. Formato: { \"<comando>\": { \"data\": \"AAAA-MM-DD\", \"projeto\": \"<nome ou null>\" } }. Comando ausente daqui = nunca usado.",
-  "doctor": { "data": "2026-07-27", "projeto": "Financas" },
-  "fix": { "data": "2026-07-27", "projeto": "Financas" },
-  "upgrade": { "data": "2026-07-27", "projeto": "Financas" },
-  "evolve": { "data": "2026-07-27", "projeto": null }
+  "doctor": {
+    "data": "2026-07-27",
+    "projeto": "Financas"
+  },
+  "fix": {
+    "data": "2026-07-27",
+    "projeto": "Financas"
+  },
+  "upgrade": {
+    "data": "2026-07-27",
+    "projeto": "Financas"
+  },
+  "evolve": {
+    "data": "2026-07-27",
+    "projeto": "Financas"
+  }
 }

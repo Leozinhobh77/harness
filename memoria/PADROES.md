@@ -41,6 +41,22 @@
 
 ---
 
+### P007 — Arquivo derivado não se confere por relógio, e nem todo conteúdo dele é conferível
+- **Visto em:** skill /harness, projeto Finanças (2026-07-27) — três tentativas de acertar
+- **Nível da solução:** 2 (o próprio doctor acusou, ao vivo, logo depois de commitar)
+- **Solução:** para saber se um arquivo derivado está em dia, **não compare timestamps** —
+  regenere numa prévia que não escreve e compare o conteúdo. O gerador é a definição de "em
+  dia"; qualquer heurística de tempo é aproximação.
+- **A segunda metade, que é a menos óbvia:** compare só a parte **estável** do derivado. Se ele
+  embute algo que muda por tê-lo gerado (lista de commits que passa a incluir o commit dele
+  mesmo, status de working tree), essa parte é **insatisfazível por construção** e cobrá-la
+  produz alarme permanente. Alarme que nunca apaga é pior que alarme nenhum: ensina a ignorar.
+- **Como reconhecer em outro lugar:** todo check de "X está atualizado?" onde o ato de atualizar
+  X muda a coisa contra a qual X é comparado. Se existe essa circularidade, o check precisa
+  excluir explicitamente a parte circular.
+- **Promovido ao template:** não — é conhecimento do `doctor` da própria skill. Vale como regra
+  de projeto se algum dia um harness gerar outro arquivo derivado.
+
 ### P003 — `.hidden` não existe em SVGElement, só em HTMLElement
 - **Visto em:** skill /harness (2026-07-26)
 - **Nível da solução:** 3 (teste Playwright pegou antes de publicar)

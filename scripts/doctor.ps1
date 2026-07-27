@@ -25,6 +25,35 @@ function Add-Achado {
     $achados.Add([pscustomobject]@{ severidade=$Sev; familia=$Familia; mensagem=$Msg; correcao=$Fix })
 }
 
+# Normaliza um ESTADO.md para comparacao de CONTEUDO (ver F2).
+#
+# Fica so a parte ESTAVEL: titulo, planos ativos e quantidade de concluidos.
+# O que sai, e por que:
+#   - a linha "> Gerado em ...": traz a data, muda todo dia sem nada de
+#     substancia mudar;
+#   - a secao de commits e o status do git ate o fim do arquivo: sao
+#     INSATISFAZIVEIS por construcao. O ESTADO.md lista os ultimos commits,
+#     entao no instante em que ele e commitado ja falta um - o proprio. E o
+#     status "working tree limpo" fica falso assim que se edita qualquer coisa.
+#     Conferir isso e cobrar do arquivo uma exatidao que ele nao pode ter.
+#
+# O que sobra e exatamente a deriva que importa: plano que mudou de status ou
+# foi arquivado sem o ESTADO.md ser regenerado.
+function Get-EstadoComparavel {
+    param([string]$Texto)
+    if (-not $Texto) { return '' }
+    $t = ($Texto -replace "`r`n", "`n").TrimStart([char]0xFEFF)
+
+    $saida = New-Object System.Collections.Generic.List[string]
+    foreach ($l in ($t -split "`n")) {
+        # corta fora da secao de commits em diante (o cabecalho tem "commits")
+        if ($l -match '^##\s.*commits') { break }
+        if ($l -match '^\s*>\s*Gerado em') { continue }
+        $saida.Add($l.TrimEnd())
+    }
+    return (($saida -join "`n").Trim())
+}
+
 if (-not (Test-Path $Projeto)) { Write-Output "ERRO: projeto nao encontrado -> $Projeto"; exit 1 }
 
 $nome      = Split-Path $Projeto -Leaf
@@ -141,26 +170,29 @@ if (Test-Path $dirPlanos) {
 # ============ F2 ESTADO derivado ============
 $estado = Join-Path $Projeto 'ESTADO.md'
 if (Test-Path $estado) {
-    $voltar1 = $false
-    try {
-        Push-Location $Projeto -ErrorAction Stop
-        $voltar1 = $true
-        $null = git rev-parse --is-inside-work-tree 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            # O commit que CONTEM o ESTADO.md e sempre mais novo que o proprio
-            # arquivo (o commit acontece depois da escrita). Comparar com ele
-            # deixaria o check impossivel de satisfazer logo apos commitar.
-            # Por isso: ultimo commit que mexeu em QUALQUER COISA menos o ESTADO.md.
-            $ultimo = git log -1 --format='%aI' -- . ':(exclude)ESTADO.md' 2>$null
-            if ($ultimo) {
-                $dtCommit = [datetime]::Parse($ultimo, [Globalization.CultureInfo]::InvariantCulture)
-                $dtEstado = (Get-Item $estado).LastWriteTime
-                if ($dtEstado -lt $dtCommit) {
-                    Add-Achado 'AMARELO' 'Deriva' 'ESTADO.md e mais antigo que o ultimo commit' '/harness fix'
+    # RELOGIO nao serve para esta pergunta, e duas tentativas ja falharam:
+    #   v1.2.x  comparava com o ultimo commit - mas o commit que CARREGA o
+    #           ESTADO.md e sempre alguns segundos mais novo que o arquivo.
+    #   v1.3.0  passou a excluir ':(exclude)ESTADO.md' - so que isso exclui o
+    #           CAMINHO, nao o COMMIT. Commitar o ESTADO.md junto com qualquer
+    #           outro arquivo (o caso normal) devolvia o mesmo commit, e o check
+    #           voltava a ser impossivel de satisfazer.
+    # A pergunta certa nao tem relogio nenhum: regenerar hoje daria um arquivo
+    # diferente do que esta no disco? -Preview devolve o conteudo sem escrever,
+    # entao o doctor continua so lendo (regra 1 da skill).
+    $gerador = Join-Path $PSScriptRoot 'estado.ps1'
+    if (Test-Path $gerador) {
+        try {
+            $previa = (& $gerador -Projeto $Projeto -Preview) -join "`n"
+            # se o gerador falhou, ele devolve uma mensagem de erro - nao acuse por isso
+            if ($previa -match '(?m)^\s*#\s*ESTADO') {
+                $atual = Get-Content $estado -Raw -ErrorAction Stop
+                if ((Get-EstadoComparavel $atual) -ne (Get-EstadoComparavel $previa)) {
+                    Add-Achado 'AMARELO' 'Deriva' 'ESTADO.md nao bate com o que seria gerado agora' '/harness fix'
                 }
             }
-        }
-    } catch { } finally { if ($voltar1) { Pop-Location } }
+        } catch { }
+    }
 }
 
 # ============ F3 Inchaco ============
