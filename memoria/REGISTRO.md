@@ -8,7 +8,7 @@
 
 | Projeto | Caminho | Tier | Criado em | Versão da skill | Estado |
 |---|---|---|---|---|---|
-| _nenhum ainda_ | — | — | — | — | — |
+| Finanças | `~/Desktop/Projetos/Finanças` | T2+ | 2026-07-26 | v1.0.0 (nascido) · v1.2.1 (atual) | `ativo` |
 
 ## Estados
 

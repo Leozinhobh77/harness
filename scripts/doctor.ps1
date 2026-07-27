@@ -147,7 +147,11 @@ if (Test-Path $estado) {
         $voltar1 = $true
         $null = git rev-parse --is-inside-work-tree 2>$null
         if ($LASTEXITCODE -eq 0) {
-            $ultimo = git log -1 --format='%aI' 2>$null
+            # O commit que CONTEM o ESTADO.md e sempre mais novo que o proprio
+            # arquivo (o commit acontece depois da escrita). Comparar com ele
+            # deixaria o check impossivel de satisfazer logo apos commitar.
+            # Por isso: ultimo commit que mexeu em QUALQUER COISA menos o ESTADO.md.
+            $ultimo = git log -1 --format='%aI' -- . ':(exclude)ESTADO.md' 2>$null
             if ($ultimo) {
                 $dtCommit = [datetime]::Parse($ultimo, [Globalization.CultureInfo]::InvariantCulture)
                 $dtEstado = (Get-Item $estado).LastWriteTime
@@ -160,20 +164,29 @@ if (Test-Path $estado) {
 }
 
 # ============ F3 Inchaco ============
+# Tetos de criterios/ORCAMENTOS.md. Manter os dois em sincronia:
+# documento com teto la e sem linha aqui nunca e conferido por ninguem.
 $orcamentos = @{
-    'AGENTS.md'            = 120
-    'CLAUDE.md'            = 40
-    'ESTADO.md'            = 40
-    'docs\GOVERNANCA.md'   = 140
-    'docs\PRD.md'          = 100
-    'docs\SPEC.md'         = 150
+    'AGENTS.md'                    = 120
+    'CLAUDE.md'                    = 40
+    'ESTADO.md'                    = 40
+    'docs\GOVERNANCA.md'           = 140
+    'docs\PRD.md'                  = 100
+    'docs\SPEC.md'                 = 150
+    'docs\REGRAS-DE-NEGOCIO.md'    = 250
+    'Planos\MANUAL.md'             = 140
 }
+
+# Custo de sessao != soma dos orcamentos. So estes carregam em TODA sessao;
+# o resto e leitura sob demanda e nao cobra pedagio por sessao.
+$sempreCarregados = @('AGENTS.md', 'CLAUDE.md', 'ESTADO.md')
+
 $totalLinhas = 0
 foreach ($k in $orcamentos.Keys) {
     $fp = Join-Path $Projeto $k
     if (Test-Path $fp) {
         $n = @(Get-Content $fp -Encoding UTF8).Count
-        $totalLinhas += $n
+        if ($sempreCarregados -contains $k) { $totalLinhas += $n }
         if ($n -gt $orcamentos[$k]) {
             Add-Achado 'AMARELO' 'Inchaco' "$k tem $n linhas (teto $($orcamentos[$k]))" '/harness fix'
         }
@@ -192,8 +205,13 @@ if (Test-Path $decisoes) {
 # custo estimado (~13 tokens por linha de markdown)
 $custo = [int]($totalLinhas * 13)
 $alertaCusto = @{ 'T1'=900; 'T2'=4000; 'T3'=8000 }
-if ($alertaCusto.ContainsKey($tier) -and $custo -gt $alertaCusto[$tier]) {
-    Add-Achado 'AMARELO' 'Inchaco' "Harness custa ~$custo tokens/sessao (alerta ${tier}: $($alertaCusto[$tier]))" '/harness fix --limpar'
+# Tier vem do manifesto e pode ter sufixo ('T2+'). Sem normalizar, a chave nao
+# existe no mapa e o alerta nunca dispara - falha silenciosa, nao erro.
+$tierBase = ($tier -replace '[^T0-9]', '')
+if ($alertaCusto.ContainsKey($tierBase) -and $custo -gt $alertaCusto[$tierBase]) {
+    Add-Achado 'AMARELO' 'Inchaco' "Harness custa ~$custo tokens/sessao (alerta ${tierBase}: $($alertaCusto[$tierBase]))" '/harness fix --limpar'
+} elseif (-not $alertaCusto.ContainsKey($tierBase)) {
+    Add-Achado 'AZUL' 'Inchaco' "Tier '$tier' nao tem alerta de custo definido - o custo nao esta sendo vigiado" 'revisar criterios/ORCAMENTOS.md'
 }
 
 # ============ F5 Mecanica: guardas sem disparo ============
@@ -222,6 +240,18 @@ if (Test-Path $log) {
     }
 } elseif ($tier -ne 'T1' -and (Test-Path (Join-Path $Projeto '.claude\hooks'))) {
     Add-Achado 'AMARELO' 'Mecanica' 'log-guardas.jsonl vazio ou ausente - os hooks podem nao estar rodando' 'verificar settings.json'
+}
+
+# ============ F5 Mecanica: projeto registrado na skill ============
+# Passo escrito em comandos/init.md que ja foi pulado uma vez. REGISTRO.md vazio
+# = a etapa 2 do /harness evolve nao tem o que varrer, e a skill nunca aprende.
+# Lei 2: virou check mecanico em vez de continuar sendo so um pedido em texto.
+$registro = Join-Path (Split-Path $PSScriptRoot -Parent) 'memoria\REGISTRO.md'
+if (Test-Path $registro) {
+    $rtxt = Get-Content $registro -Raw -Encoding UTF8
+    if ($rtxt -notmatch [regex]::Escape($nome)) {
+        Add-Achado 'AMARELO' 'Mecanica' "Projeto ausente de memoria/REGISTRO.md - a skill nao aprende com ele" '/harness evolve'
+    }
 }
 
 # ============ F5 git ============

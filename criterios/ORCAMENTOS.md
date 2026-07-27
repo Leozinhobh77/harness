@@ -35,6 +35,11 @@ garantia de que um dos dois vai desatualizar sem ninguém notar.
 O `doctor` também soma o custo total: quantos tokens este harness cobra só por existir, em
 toda sessão.
 
+**Só entram na conta os documentos que carregam sempre** — `AGENTS.md`, `CLAUDE.md` e
+`ESTADO.md`. `SPEC.md`, `REGRAS-DE-NEGOCIO.md`, `MANUAL.md` e companhia são leitura sob demanda:
+têm teto de linha (a tabela acima), mas **não** cobram pedágio por sessão. Somar os dois era o
+mesmo erro de duas contas diferentes com o mesmo nome — inflava o número e escondia o real.
+
 | Tier | Alvo | Alerta |
 |---|---|---|
 | T1 | ~500 | > 900 |

@@ -8,6 +8,58 @@
 
 ---
 
+## v1.3.0 — 2026-07-27
+
+**O `doctor` estava cego em quatro pontos. Achado rodando o próprio `doctor` num projeto real.**
+
+### Procedência
+Rodada completa `doctor → fix → upgrade → evolve` no projeto **Finanças** (1º projeto do
+registro). Cada item abaixo é uma falha **silenciosa** — nenhuma delas dava erro; todas
+simplesmente deixavam de acusar algo. É o pior tipo de defeito num comando de diagnóstico:
+o usuário lê "OK" e acredita.
+
+### Entra
+- **Orçamento de todos os documentos.** O mapa `$orcamentos` em `scripts/doctor.ps1` tinha 6
+  arquivos fixos; `criterios/ORCAMENTOS.md` define 8. `docs/REGRAS-DE-NEGOCIO.md` (teto 250) e
+  `Planos/MANUAL.md` (teto 140) nunca eram conferidos por ninguém. **Impacto real:** o
+  `REGRAS-DE-NEGOCIO.md` de Finanças estava com **281 linhas** desde sempre, sem nunca ter sido
+  acusado. Comentário no código agora manda manter os dois em sincronia.
+- **Custo de sessão vs. orçamento viraram duas contas separadas.** O custo somava "todos os
+  documentos com teto" e chamava isso de custo por sessão — mas `SPEC.md`,
+  `REGRAS-DE-NEGOCIO.md` e `MANUAL.md` são leitura sob demanda, não carregam em toda sessão.
+  Agora o custo soma só `AGENTS.md` + `CLAUDE.md` + `ESTADO.md`. Em Finanças o número caiu de
+  **~5.213 para ~1.924** tokens/sessão — o alarme de inchaço era, ele próprio, inflado.
+  Documentado em `criterios/ORCAMENTOS.md`.
+- **Alerta de custo passou a normalizar o tier.** O mapa tinha `T1`/`T2`/`T3`; o manifesto de
+  Finanças diz `T2+`, a chave não existia e o `if` nunca disparava — **o alerta estava
+  desligado no único projeto que existe**. Agora `T2+` normaliza para `T2`, e tier
+  desconhecido vira achado 🔵 explícito em vez de silêncio.
+- **Check do `ESTADO.md` deixou de ser insatisfazível.** Comparava o `mtime` do arquivo com o
+  último commit — mas o commit que **contém** o `ESTADO.md` é sempre alguns segundos mais novo
+  que ele, então o check reclamava para sempre depois de commitar. Agora compara com o último
+  commit que mexeu em qualquer coisa **exceto** o `ESTADO.md`
+  (`git log -1 -- . ':(exclude)ESTADO.md'`). Pego ao vivo: acusou logo após o commit do próprio
+  `fix` desta mesma rodada.
+- **Registro do projeto virou mecânico (Lei 2).** `comandos/init.md:75-78` manda registrar o
+  projeto em `memoria/REGISTRO.md` — e o passo foi **pulado** na criação de Finanças. Como a
+  etapa 2 do `evolve` varre justamente esse registro, a skill estava condenada a nunca aprender
+  com nenhum projeto: `REGISTRO.md` vazio = varredura vazia, para sempre. Um passo escrito que
+  foi ignorado é exatamente o anti-padrão da Lei 2, então virou check no `doctor`.
+- `memoria/REGISTRO.md`: Finanças registrado (dado consertado). `projetos_criados: 1`.
+
+### Abate (Lei 4)
+**Nada abatido nesta rodada** — e isso é uma admissão, não um atestado. A skill tem 1 dia; os
+critérios objetivos de abate pedem 90 dias sem disparo ou ≥2 projetos independentes. Não há
+dado ainda, e chutar remoção seria pior que esperar. Fica marcado para a próxima rodada.
+
+### Nota de método
+Todos os 5 achados vieram de **rodar a skill de verdade num projeto**, não de reler o código
+dela. O auto-doctor (`SKILL.md` no orçamento, parsers OK, 0 bytes não-ASCII, 10/10 comandos da
+rota existindo) passou limpo e não teria encontrado nenhum deles — porque nenhum é erro de
+sintaxe ou de estrutura. São erros de **cobertura**: código correto conferindo a coisa errada.
+
+---
+
 ## v1.2.1 — 2026-07-26
 
 **Correção no `guarda.ps1` (T2+): comando proibido só bloqueia dentro do próprio projeto.**
