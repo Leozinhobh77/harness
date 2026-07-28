@@ -211,7 +211,16 @@ $orcamentos = @{
 
 # Custo de sessao != soma dos orcamentos. So estes carregam em TODA sessao;
 # o resto e leitura sob demanda e nao cobra pedagio por sessao.
+# ATENCAO: cada arquivo tem o SEU orcamento. Nunca some dois documentos
+# diferentes para comparar com um teto - a medicao que embasa os limites e
+# POR ARQUIVO. Somar e erro de categoria.
 $sempreCarregados = @('AGENTS.md', 'CLAUDE.md', 'ESTADO.md')
+
+# TOLERANCIA (ver criterios/ORCAMENTOS.md). O teto e a mira, nao a linha da
+# morte: passar um pouco nao justifica cortar conteudo que presta. Alarme so
+# quando o excesso e grande. Sem isto, o doctor reprovava por 5 linhas e o
+# proximo assistente propunha mutilar documento bom para agradar um numero.
+$tolerancia = 1.20
 
 $totalLinhas = 0
 foreach ($k in $orcamentos.Keys) {
@@ -219,8 +228,10 @@ foreach ($k in $orcamentos.Keys) {
     if (Test-Path $fp) {
         $n = @(Get-Content $fp -Encoding UTF8).Count
         if ($sempreCarregados -contains $k) { $totalLinhas += $n }
-        if ($n -gt $orcamentos[$k]) {
-            Add-Achado 'AMARELO' 'Inchaco' "$k tem $n linhas (teto $($orcamentos[$k]))" '/harness fix'
+        $teto = $orcamentos[$k]
+        if ($n -gt [math]::Ceiling($teto * $tolerancia)) {
+            $pct = [math]::Round((($n / $teto) - 1) * 100)
+            Add-Achado 'AMARELO' 'Inchaco' "$k tem $n linhas (teto $teto, ${pct}% acima)" '/harness fix'
         }
     }
 }

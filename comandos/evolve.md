@@ -65,7 +65,8 @@ Traga **o que muda a skill**, com fonte. Notícia que não muda nada não entra 
 /harness doctor --skill
 ```
 A skill é um harness. Ela tem que passar no próprio exame:
-- `SKILL.md` dentro do orçamento?
+- `SKILL.md` continua só **roteando**? (ele não tem teto em `ORCAMENTOS.md` — o que se cobra
+  dele é o papel, não o tamanho: instrução de comando mora em `comandos/`, não aqui)
 - links entre os arquivos dela funcionam?
 - todo comando documentado existe? todo arquivo existente está documentado?
 - alguma regra dela sem procedência? (Lei 1 aplicada a si mesma)
@@ -99,7 +100,7 @@ Nunca aplique direto. Monte o relatório e espere:
      → vale usar em porta-saida.ps1?  fonte: <url>
 
 🪞 AUTO-DOCTOR
-  ✅ passou · SKILL.md 58/60 linhas
+  ✅ passou · 10/10 comandos existem · 3 scripts com parser limpo
 
 Aprova quais? (números, "todos" ou "nenhum")
 ```

@@ -8,6 +8,52 @@
 
 ---
 
+## v1.3.2 — 2026-07-27
+
+**O teto de orçamento ganhou tolerância. E parou de somar arquivos diferentes.**
+
+### Procedência
+Correção do **usuário**, não minha. Eu somei `SKILL.md` (81 linhas) com `CONSTITUICAO.md` (113)
+e argumentei que o total de 194 passava do limiar de ~150 da Lei 3. Ele derrubou os dois pontos:
+
+> *"A skill.md é uma coisa, a constituição é outra, cada uma com suas coisas — não é juntar as
+> duas que vai virar uma coisa só. E se passar um pouco, quarenta linhas, vinte linhas, a gente
+> não vai ficar cortando o conteúdo. Já fez a coisa toda certinha e vai ficar cortando? Só iria
+> estourar se fossem muitas linhas, cem, duzentas — mas dez, vinte por cento a gente deixa."*
+
+Ele está certo nas duas. A medição que embasa os tetos é **por arquivo**; somar dois documentos
+com funções diferentes e comparar com um limiar de arquivo único é erro de categoria. E teto
+binário faz o número mandar no conteúdo — a "correção" vira mutilar texto bom.
+
+### Entra
+- **Tolerância de 20% em `scripts/doctor.ps1`.** Achado só acima de `teto × 1.20`, e a mensagem
+  passa a dizer o excesso em porcentagem (`"tem 239 linhas (teto 150, 59% acima)"`). Antes
+  reprovava por 1 linha.
+- **`criterios/ORCAMENTOS.md`** ganhou a seção "A tolerância — o teto é mira, não linha da
+  morte", com a procedência acima e o aviso explícito de **nunca somar arquivos distintos**.
+- Comentário no `doctor.ps1` repetindo a regra do não-somar, ao lado de `$sempreCarregados` —
+  que é justamente onde a tentação de somar aparece.
+
+### Corrige
+- `comandos/evolve.md` dizia `✅ passou · SKILL.md 58/60 linhas` numa saída de exemplo. Esse
+  "60" **nunca existiu** em `ORCAMENTOS.md` — era número ilustrativo, e me levou a tratar como
+  teto real e propor ação por causa dele. Trocado por um exemplo que não inventa limite.
+- A mesma seção listava "`SKILL.md` dentro do orçamento?" no auto-doctor. Agora diz o que de
+  fato se cobra dele: **continuar só roteando** — instrução de comando mora em `comandos/`.
+  Papel, não tamanho.
+
+### Verificação
+Três cenários, com o `docs/SPEC.md` de Finanças (teto 150):
+- 165 linhas (10% acima) → **nenhum achado**
+- 239 linhas (59% acima) → `[Inchaco] docs\SPEC.md tem 239 linhas (teto 150, 59% acima)`
+- restaurado para 111 → `OK - nenhum problema mecanico encontrado`
+
+### Nota
+A quebra de `REGRAS-DE-NEGOCIO.md` (D008 em Finanças) continua justificada: 587 linhas num teto
+de 250 é **135% acima**, muito além de qualquer tolerância. A regra nova não a teria evitado.
+
+---
+
 ## v1.3.1 — 2026-07-27
 
 **O check do `ESTADO.md` estava errado pela terceira vez. Agora não pergunta mais pelo relógio.**

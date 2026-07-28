@@ -18,6 +18,25 @@
 | `Planos/MANUAL.md` | 90 | **140** | — |
 | plano individual | 120 | **200** | plano grande demais = deveria ser dois planos |
 
+## A tolerância — o teto é mira, não linha da morte
+
+**Passar até ~20% do teto não é achado.** O `doctor` só acusa acima disso, e diz de quanto foi
+o excesso em porcentagem.
+
+Sem essa folga, o número passa a mandar no conteúdo: um documento bom com 5 linhas a mais vira
+"problema", e a correção proposta é **mutilar texto que presta** para agradar um limite. É o
+inverso do que a Lei 3 quer — ela existe para impedir inchaço, não para impedir que um
+documento seja completo.
+
+**E cada arquivo tem o seu.** Nunca some dois documentos diferentes para comparar com um teto:
+a medição que embasa os limites é **por arquivo**. `SKILL.md` e `CONSTITUICAO.md` são coisas
+distintas, com trabalhos distintos — somar os dois e comparar com o limiar de um é erro de
+categoria.
+
+**Procedência:** correção do usuário em 27/07/2026, depois de eu ter somado `SKILL.md` (81) com
+`CONSTITUICAO.md` (113) e proposto ação por causa do total. Palavras dele: *"já fez a coisa toda
+certinha e vai ficar cortando o conteúdo? só iria estourar se fossem muitas linhas"*.
+
 ## A regra do ponteiro
 
 Estourou o orçamento, **não corte informação — mude de lugar.**
