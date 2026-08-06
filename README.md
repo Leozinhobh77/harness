@@ -44,7 +44,10 @@ Nem todo projeto merece a mesma governança. O `init` propõe sempre **o menor t
 |---|---|---|
 | **T1 · Leve** | protótipo, script solto | ~500 tokens |
 | **T2 · Padrão** | aplicação real, mantida por meses | ~2.500 tokens |
-| **T3 · Completo** | multi-módulo, dado sensível, mais de uma pessoa | ~5.000 tokens |
+| **T3 · Completo** ⚠️ | multi-módulo, dado sensível, mais de uma pessoa | ~5.000 tokens |
+
+⚠️ O T3 está **projetado, ainda não implementado** — nenhum projeto chegou perto do gatilho, e
+construir sem caso concreto seria palpite. Hoje a skill entrega T1, T2 e T2+.
 
 A subida acontece por **gatilho objetivo** (primeiro bug real, dado sensível entrou, virou
 multi-módulo) — nunca por achismo. E existe **descida**: guarda que não disparou em 90 dias vira
@@ -66,19 +69,10 @@ que transforma "acho que dá pra limpar" em decisão baseada em dado.
 
 ## Estrutura
 
-```
-harness/
-├── SKILL.md              roteador — carrega um comando por vez
-├── CONSTITUICAO.md       as 5 leis anti-inchaço
-├── VERSAO.json           versão e datas
-├── comandos/             a instrução de cada comando
-├── criterios/            TIERS · ORCAMENTOS · CHECKS
-├── templates/            T1-leve · T2-padrao · T3-completo
-├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1
-├── manual/MANUAL.md      📌 fonte única do manual
-├── docs/index.html       página publicada (GitHub Pages)
-└── memoria/              REGISTRO · PADROES · CHANGELOG
-```
+A árvore canônica mora em [`SKILL.md`](SKILL.md) — fonte única, para não desatualizar em dois
+lugares. Em resumo: `SKILL.md` roteia · `comandos/` guarda a instrução de cada comando ·
+`criterios/` os limites · `templates/` o que é gerado · `scripts/` os checks mecânicos ·
+`manual/MANUAL.md` é a fonte única do manual e `docs/index.html` a página publicada.
 
 ## Instalação
 

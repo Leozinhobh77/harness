@@ -1,6 +1,6 @@
 # 📖 MANUAL `/harness`
 
-> **Versão 1.2.1** · gerado em **26/07/2026**
+> **Versão 1.3.3** · gerado em **06/08/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -152,7 +152,7 @@ ele você tem um template bonito que envelhece. Com ele você tem um sistema que
 O "bom dia" da skill. **Máximo 10 linhas**, barato, não roda auditoria completa.
 
 ```
-📁 Finanças · tier T2 · harness v1.1.0 · criado 26/07/2026
+📁 Finanças · tier T2 · harness v1.3.3 · criado 26/07/2026
 
 Estado: 1 plano ativo (0003 — dashboard de filtros, 6/14 tarefas)
 Último commit: há 2 dias — "feat: filtro por período customizado"
@@ -226,7 +226,7 @@ pararia de rodar.
 |---|---|
 | **Integridade** | link quebrado · plano fantasma no índice · número duplicado · JSON inválido |
 | **Deriva** ⭐ | índice ≠ disco · plano parado há 30 dias · `SPEC` que não bate com o código |
-| **Inchaço** | documento acima do teto · 15+ decisões sem quebrar · custo alto demais |
+| **Inchaço** | documento acima do teto (com 20% de tolerância) · 15+ decisões sem quebrar · custo alto demais |
 | **Procedência** ⭐⭐ | regra que não previne erro nenhum · regra genérica · regras que se contradizem |
 | **Mecânica** | hooks configurados? rodam? guarda que nunca disparou? |
 | **Escada** | o projeto cruzou um gatilho de tier e ainda não subiu? |
@@ -245,14 +245,14 @@ Não sabe responder com um caso real? É candidata a abate.
 ### A saída
 
 ```
-🩺 DOCTOR — Finanças · tier T2 · harness v1.1.0 · 26/07/2026
+🩺 DOCTOR — Finanças · tier T2 · harness v1.3.3 · 06/08/2026
 
 🔴 QUEBRADO (1)
   • Planos/INDICE.md:19 aponta para o plano 0003, que não existe
     → /harness fix
 
 🟡 DERIVA (1)
-  • AGENTS.md tem 134 linhas (teto 120)
+  • AGENTS.md tem 191 linhas (teto 120, 59% acima)
     → /harness fix  (migra o excedente para docs/SPEC.md)
 
 🔵 OPORTUNIDADE (1)
@@ -262,6 +262,19 @@ Não sabe responder com um caso real? É candidata a abate.
 📊 Custo do harness: ~2.700 tokens/sessão (alvo T2: 2.500) ⚠️
 ✅ 34 checks passaram
 ```
+
+### O teto é mira, não linha da morte
+
+Desde a **v1.3.2**, o `doctor` só acusa acima de **teto × 1,20** — e diz o excesso em
+porcentagem. Um `AGENTS.md` de 134 linhas num teto de 120 **não vira achado**.
+
+O motivo é prático: sem essa folga, um documento bom com 5 linhas a mais vira "problema", e a
+correção proposta é **mutilar texto que presta** para agradar um número. É o inverso do que a
+Lei 3 quer. A regra veio de uma correção do usuário, não de teoria — está registrada em
+`criterios/ORCAMENTOS.md`.
+
+E **cada arquivo tem o seu teto**. Somar dois documentos diferentes e comparar o total com o
+limite de um só é erro de categoria — foi exatamente o erro que originou a regra.
 
 ### Modos
 
@@ -431,7 +444,7 @@ propósito: projeto estável não deve mudar sozinho porque a skill mudou.
 
 ```
 /harness upgrade              # traz o que a skill aprendeu
-/harness upgrade --tier 3     # sobe de tier
+/harness upgrade --tier 2+    # sobe de tier
 /harness upgrade --tier 2     # desce de tier (raro, mas existe)
 ```
 
@@ -578,11 +591,21 @@ Olhe a linha final:
 |---|---|---|
 | T1 | ~500 | > 900 |
 | T2 | ~2.500 | > 4.000 |
-| T3 | ~5.000 | > 8.000 |
+| T3 ⚠️ | ~5.000 | > 8.000 |
 
 Estourou? São só duas causas possíveis, e o doctor diz qual:
 1. o projeto **subiu de tier sem passar pelo gatilho** → desça
 2. algum documento **inchou** → `/harness fix` migra o excedente
+
+### O que entra nessa conta (mudou na v1.3.0)
+
+Só os documentos que **carregam em toda sessão**: `AGENTS.md`, `CLAUDE.md` e `ESTADO.md`. O
+`SPEC.md`, o `REGRAS-DE-NEGOCIO.md` e o `Planos/MANUAL.md` são leitura **sob demanda** — têm teto
+de linha, mas não cobram pedágio por sessão.
+
+Antes o custo somava todo documento com teto e chamava aquilo de custo por sessão. Em Finanças o
+número caiu de **~5.213 para ~1.924** tokens/sessão quando a conta foi corrigida: o alarme de
+inchaço era, ele próprio, inflado. São duas contas diferentes que tinham o mesmo nome.
 
 ---
 ---
@@ -640,6 +663,20 @@ Ele é montado a partir dos `Planos/` + `git log`. Isso mata a deriva na raiz:
 > Ele **não é fonte de nada** — é uma vista. Logo, é **impossível** ele divergir da realidade.
 
 Por isso existe uma guarda que bloqueia editá-lo à mão. Se quiser atualizar: `/harness fix`.
+
+**Como o `doctor` sabe que ele está velho — e as duas tentativas erradas antes (v1.3.1).** Ele
+**não olha relógio**. Comparar o `mtime` do `ESTADO.md` com o último commit é insatisfazível por
+construção: o commit que *contém* o `ESTADO.md` é sempre mais novo que o arquivo, então o check
+reclamava para sempre depois de commitar. Excluir o caminho do `git log` também não resolveu —
+isso exclui o **arquivo**, não o **commit**, e commitar o `ESTADO.md` junto com qualquer outra
+coisa devolvia o mesmo commit.
+
+A pergunta certa não tem relógio nenhum: **regenerar agora daria um arquivo diferente?** O gerador
+roda em modo prévia (sem escrever, então o `doctor` continua só lendo) e o conteúdo é comparado.
+
+E compara-se só a parte **estável**: a lista de commits e o status do working tree são
+insatisfazíveis por construção — o ato de gerar muda a coisa contra a qual se compara. Alarme que
+nunca apaga é pior que alarme nenhum, porque ensina a ignorar.
 
 ### `.harness/guardas.json` — a peça mais elegante
 
@@ -843,6 +880,13 @@ pedágio.
 **Estourou não significa cortar informação.** Significa **mudar de lugar**: migra pro documento
 de profundidade e deixa um ponteiro. Nunca duplique parágrafo entre documentos.
 
+**Duas ressalvas que a lei aprendeu na prática (v1.3.2):**
+
+1. **O teto tem 20% de folga.** Ele é mira, não linha da morte. Passar um pouco não é achado —
+   senão o número passa a mandar no conteúdo e a "correção" vira mutilar texto bom.
+2. **O teto é por arquivo.** Nunca some dois documentos com funções diferentes para comparar com
+   um limite de arquivo único. A medição que embasa os números é por arquivo.
+
 ### Lei 4 — o critério objetivo
 
 Nunca é chute:
@@ -865,7 +909,11 @@ Governança que não serve é atrito puro — e atrito faz você abandonar o pro
 | **T1 · Leve** | script, protótipo, POC | `AGENTS.md` (~40 linhas) + `.gitignore` | ~500 tokens |
 | **T2 · Padrão** | app pessoal real | + estado, governança, PRD/SPEC, decisões, planos, 3 hooks | ~2.500 |
 | **T2+** | ...que mexe com dinheiro ou dado sensível | + testes de regra de negócio | +variável |
-| **T3 · Completo** | multi-módulo, mais de uma pessoa | + auditor cego, `AGENTS.md` aninhado, guardas extras | ~5.000 |
+| **T3 · Completo** ⚠️ | multi-módulo, mais de uma pessoa | + auditor cego, `AGENTS.md` aninhado, guardas extras | ~5.000 |
+
+⚠️ **O T3 está projetado, ainda não implementado.** Não existe template T3 nem comando que o
+monte — nenhum projeto chegou perto do gatilho, e construir sem caso concreto seria palpite
+(Lei 1). Hoje a skill entrega **T1, T2 e T2+**.
 
 ### Os gatilhos de subida
 
@@ -875,7 +923,7 @@ Governança que não serve é atrito puro — e atrito faz você abandonar o pro
 |---|---|
 | **T1 → T2** | primeiro plano criado · 3+ arquivos de código · você disse "continua de onde parou" |
 | **T2 → T2+** | primeiro bug real que chegou ao uso · dado sensível entrou · regra que, se quebrar, você só descobre tarde |
-| **T2+ → T3** | virou multi-módulo · outra pessoa passou a mexer · 15+ decisões registradas |
+| **T2+ → T3** ⚠️ | virou multi-módulo · outra pessoa passou a mexer · 15+ decisões registradas — o gatilho é **registrado**, mas não há subida para aplicar (ver ⚠️ acima) |
 
 ### A descida — o que quase nenhum sistema tem
 
@@ -1077,6 +1125,10 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| 1.3.3 | 2026-08-06 | A skill rodou o próprio `doctor --skill` e reprovou em 4 pontos. Corrigida a deriva do `SKILL.md` (apontava a saída do manual pra um arquivo inexistente), eliminada a segunda árvore de estrutura do `README.md` (fonte única), e o **T3 passou a se declarar "projetado, ainda não implementado"** — havia gatilho, check e descrição, mas nenhum template. Abatido do `evolve` o item que cobrava um orçamento inexistente. **Este manual foi atualizado da 1.2.1 até aqui.** |
+| 1.3.2 | 2026-07-27 | O teto de orçamento ganhou **20% de tolerância** e parou de somar arquivos diferentes. Correção do usuário: teto binário faz o número mandar no conteúdo, e somar `SKILL.md` com `CONSTITUICAO.md` é erro de categoria. |
+| 1.3.1 | 2026-07-27 | O check do `ESTADO.md` parou de perguntar pelo relógio — errado nas duas tentativas anteriores. Agora regenera uma prévia (sem escrever) e compara só a parte estável do conteúdo. |
+| 1.3.0 | 2026-07-27 | O `doctor` estava **cego em 4 pontos**, achado rodando-o num projeto real: orçamento de 2 documentos nunca conferido, custo de sessão somando leitura sob demanda (inflava de ~1.924 pra ~5.213), alerta de custo desligado em tier com sufixo (`T2+`), e o registro do projeto na skill virou check mecânico (Lei 2). |
 | 1.2.1 | 2026-07-26 | Só o hook `guarda.ps1` (template T2+): não bloqueia mais comando proibido quando o `cd` do comando aponta pra fora do projeto — achado ao vivo (P006). Conteúdo deste arquivo não mudou. |
 | 1.2.0 | 2026-07-26 | Comando novo `/menu-harness` — lançador com descrição + último uso de cada comando. Roteador (`SKILL.md`) ganha o passo "Registrar uso", central pra qualquer jeito de invocar um comando. |
 | 1.1.1 | 2026-07-26 | Só apresentação (`docs/index.html`): gaveta deslizante no mobile, leitura maior, colapso de menu no desktop. Conteúdo deste arquivo não mudou. |

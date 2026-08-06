@@ -5,7 +5,7 @@
 
 ```
 /harness upgrade              # traz o que a skill aprendeu desde a última vez
-/harness upgrade --tier 3     # sobe o projeto de tier
+/harness upgrade --tier 2+    # sobe o projeto de tier
 /harness upgrade --tier 2     # desce de tier (raro, mas existe)
 ```
 
@@ -50,6 +50,10 @@ Git limpo antes. Só o aprovado. Atualize `manifesto.json`. Rode o `doctor` no f
 2. **Mostre o custo:** o que entra e quantos tokens a mais por sessão.
 3. **Gere só o delta.** Nunca regenere o que já existe.
 4. Atualize o `manifesto.json`.
+
+⚠️ **`--tier 3` não tem o que aplicar.** Não existe template T3 (ver `criterios/TIERS.md`). Se o
+projeto cruzou o gatilho, registre o caso e diga a verdade ao usuário — não gere um T3 improvisado
+na hora.
 
 ### Descendo (existe, e é saudável)
 

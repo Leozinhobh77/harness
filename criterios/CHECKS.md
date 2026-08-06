@@ -84,7 +84,7 @@ Detecta se o projeto **cruzou um gatilho** de `criterios/TIERS.md` e ainda não 
 |---|---|
 | T1 com 3+ arquivos de código ou 1º plano criado → propor T2 | 🔵 |
 | T2 com dado sensível ou bug real registrado → propor T2+ (testes de regra) | 🔵 |
-| T2+ multi-módulo, mais de uma pessoa, ou 15+ decisões → propor T3 | 🔵 |
+| T2+ multi-módulo, mais de uma pessoa, ou 15+ decisões → **registrar** que cruzou o gatilho de T3 ⚠️ (não prometer a subida: não existe template T3 — ver `criterios/TIERS.md`) | 🔵 |
 | Versão da skill no `manifesto.json` é anterior à atual → sugerir `upgrade` | 🔵 |
 
 ---

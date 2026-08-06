@@ -8,6 +8,60 @@
 
 ---
 
+## v1.3.3 — 2026-08-06
+
+**A skill rodou o próprio `doctor --skill` e reprovou em quatro pontos. Três eram deriva; um era
+uma promessa que ela não cumpria.**
+
+### Procedência
+Usuário pediu o procedimento de avaliação **da skill** (não de projeto) e mandou rodar o
+`doctor --skill` — o passo que o `evolve` normalmente faz na etapa 6, aqui isolado. Achados
+verificados no disco, não inferidos:
+
+- `SKILL.md:69` apontava a saída do manual para `manual/web/manual.html`. Esse caminho **não
+  existe**; a saída real é `docs/index.html` (`comandos/exportar.md:10,31`). O `SKILL.md` é lido
+  em toda invocação, e a regra logo abaixo manda "corrigir o `MANUAL.md` e rodar `--exportar`" —
+  quem fosse arrumar a página tinha caminho aberto para criar o arquivo errado.
+- Duas árvores de estrutura, `SKILL.md:60` e `README.md:69`, descrevendo a mesma pasta. A do
+  README já tinha sido corrigida para `docs/index.html`; a do `SKILL.md` não. É textualmente o
+  que `criterios/ORCAMENTOS.md` proíbe — *"duplicata é garantia de que um dos dois vai
+  desatualizar sem ninguém notar"*. Aconteceu dentro da própria skill.
+- Nenhuma das duas árvores listava `README.md`, `.gitignore` ou (no caso do `SKILL.md`) `docs/`,
+  contra o check "todo arquivo existente está documentado".
+- **T3 era um degrau sem escada.** `TIERS.md` definia os gatilhos, `CHECKS.md:87` mandava o
+  `doctor` **propor T3**, `MANUAL.md:868` descrevia o que ele traz — e `templates/T3-completo/`
+  tem um arquivo só, com **zero** menções a T3 em `comandos/` (grep). Um projeto que cruzasse o
+  gatilho e aceitasse a proposta encontraria nada para aplicar.
+
+### Entra
+- `SKILL.md` — árvore corrigida (`docs/index.html`), com `README.md`, `.gitignore` e `docs/`
+  listados, e declarada explicitamente como **fonte única da estrutura**
+- `README.md` — árvore substituída por ponteiro para o `SKILL.md` + resumo em uma frase
+- **T3 marcado como "projetado, ainda não implementado"** nos cinco lugares que o prometiam:
+  `criterios/TIERS.md` (tabela, seção e gatilho), `criterios/CHECKS.md` (o check passa a
+  *registrar* que cruzou, não a prometer subida), `comandos/upgrade.md` (`--tier 3` sai do bloco
+  de uso, com aviso de não improvisar um T3 na hora), `README.md` e `manual/MANUAL.md`
+
+### Sai (Lei 4)
+- `comandos/evolve.md` — o item de abate *"documento da skill que estourou o próprio orçamento"*.
+  `criterios/ORCAMENTOS.md` só tem tetos para documentos de **projeto**; o critério que essa
+  linha cobrava não existe em lugar nenhum, então ela nunca reprovou nada e nunca poderia.
+
+### Decisão registrada
+Optou-se por **dizer a verdade sobre o T3 agora** em vez de construí-lo. Motivo: os 2 projetos do
+`REGISTRO.md` estão longe do gatilho, e template sem caso concreto é palpite — a Lei 1 aplicada à
+própria skill. Quando o primeiro projeto cruzar, ele vira o caso de uso e o T3 nasce medido.
+
+### Não mexido de propósito
+`manual/MANUAL.md` continua na v1.2.1 quanto ao **conteúdo** — as três entradas de 27/07 (v1.3.0,
+v1.3.1, v1.3.2) ainda não entraram nele, e `docs/index.html` segue de 26/07. Só as marcações de
+T3 foram aplicadas. Fica como o próximo trabalho.
+
+`ultima_evolucao` **não** foi mexida: isto foi `doctor --skill` + correção, não um ciclo de
+`evolve` (não houve varredura de convergência nem pesquisa externa).
+
+---
+
 ## v1.3.2 — 2026-07-27
 
 **O teto de orçamento ganhou tolerância. E parou de somar arquivos diferentes.**

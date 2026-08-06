@@ -8,7 +8,9 @@
 |---|---|---|
 | **T1 · Leve** | script solto, protótipo, POC, experimento, 1–2 arquivos | ~500 tokens |
 | **T2 · Padrão** | aplicação pessoal real, que você vai usar e manter por meses | ~2.500 tokens |
-| **T3 · Completo** | multi-módulo, dado sensível de terceiro, mais de uma pessoa, vida longa | ~5.000 tokens |
+| **T3 · Completo** ⚠️ | multi-módulo, dado sensível de terceiro, mais de uma pessoa, vida longa | ~5.000 tokens |
+
+⚠️ **O T3 é projeto, não entrega.** Ver a seção dele abaixo antes de propor a alguém.
 
 ## O que cada tier gera
 
@@ -32,7 +34,16 @@ Planos/MANUAL.md · MODELO-DE-PLANO.md · INDICE.md · Concluídos/
 .harness/manifesto.json · log-guardas.jsonl
 ```
 
-### T3 · Completo
+### T3 · Completo  ⚠️ projetado, ainda não implementado
+
+> **Não existe template T3 executável.** `templates/T3-completo/` tem um arquivo só
+> (`docs/REGRAS-DE-NEGOCIO.md`) e nenhum comando sabe montar o resto. O que vem abaixo é o
+> **alvo de desenho**, não o que a skill entrega hoje.
+>
+> Por que está assim: nenhum projeto do `memoria/REGISTRO.md` chegou perto do gatilho.
+> Construir sem caso concreto é palpite — exatamente o que a Lei 1 proíbe. Quando o primeiro
+> projeto cruzar, ele vira o caso de uso e o template nasce medido, não imaginado.
+
 Tudo do T2, **mais**:
 ```
 docs/REGRAS-DE-NEGOCIO.md   + os testes executáveis que provam cada regra
@@ -52,7 +63,11 @@ O `doctor` detecta o gatilho e **propõe** — nunca aplica sozinho.
 |---|---|
 | **T1 → T2** | • primeiro plano de trabalho criado<br>• 3+ arquivos de código no projeto<br>• primeira vez que o usuário disse "continua de onde parou" |
 | **T2 → T2+** | • primeiro bug real que chegou ao uso<br>• dado sensível entrou no projeto (dinheiro, pessoal, credencial)<br>• regra de negócio que, se quebrar, o usuário só descobre tarde |
-| **T2+ → T3** | • projeto virou multi-módulo (2+ pastas de código independentes)<br>• outra pessoa passou a usar ou mexer<br>• passou de 15 decisões registradas |
+| **T2+ → T3** ⚠️ | • projeto virou multi-módulo (2+ pastas de código independentes)<br>• outra pessoa passou a usar ou mexer<br>• passou de 15 decisões registradas |
+
+⚠️ Cruzar o gatilho de T3 hoje **não tem upgrade para aplicar**. O `doctor` registra que cruzou
+e o caso vira a matéria-prima para construir o T3 de verdade — não prometa a subida como se ela
+existisse.
 
 **"T2+"** não é um tier separado — é o T2 com os testes de regra de negócio adicionados. Ele
 existe porque a diferença entre "app pessoal" e "app pessoal que mexe com dinheiro" é grande

@@ -61,14 +61,20 @@ outro comando.
 harness/
 ├── SKILL.md              este arquivo — só roteia
 ├── CONSTITUICAO.md       as 5 leis anti-inchaço
+├── README.md             vitrine do repositório — não é lido em execução
 ├── VERSAO.json           versão + datas (máquina)
+├── .gitignore
 ├── comandos/             a instrução de cada comando
 ├── criterios/            TIERS · ORCAMENTOS · CHECKS
-├── templates/            T1-leve · T2-padrao · T3-completo · comum
+├── templates/            T1-leve · T2-padrao · comum · T3-completo (parcial — ver TIERS.md)
 ├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1
-├── manual/               MANUAL.md (fonte única) · web/manual.html (saída)
+├── manual/               MANUAL.md — 📌 fonte única do manual
+├── docs/                 index.html — página publicada (GitHub Pages), saída do --exportar
 └── memoria/              REGISTRO · PADROES · CHANGELOG · uso.json (p/ /menu-harness)
 ```
+
+> **Esta árvore é a fonte única da estrutura.** O `README.md` aponta para cá em vez de manter
+> uma cópia — enquanto existiram duas, uma desatualizou sem ninguém notar (v1.3.3).
 
 ## Uma regra sobre o manual
 

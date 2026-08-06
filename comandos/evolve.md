@@ -45,7 +45,6 @@ remoção:**
 - guarda no template que **nunca disparou em nenhum projeto** → propor tirar do template
 - regra em `criterios/` que nunca reprovou nada → propor abater
 - comando que o usuário nunca usou → propor simplificar ou fundir
-- documento da skill que estourou o próprio orçamento → propor migrar
 
 Se você não encontrou **nada** para remover, diga isso explicitamente — e desconfie de si mesmo.
 
