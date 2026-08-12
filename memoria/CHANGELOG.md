@@ -8,6 +8,50 @@
 
 ---
 
+## v1.6.0 — 2026-08-12
+
+**O degrau 3: `/harness gauntlet` — o loop fechado, com os freios que a evidência exige.**
+
+### Procedência
+
+Decisão explícita do usuário, tomada **depois** da pesquisa da v1.5.0 e com as alternativas na
+mesa (só relatório · instalar a skill pronta · construir o degrau 3). Ele escolheu o degrau 3.
+As implementações públicas foram dissecadas antes ([robonuggets/gauntlet-loop](https://github.com/robonuggets/gauntlet-loop)
+e [duolahypercho/gauntlet-loop](https://github.com/duolahypercho/gauntlet-loop)): as duas são
+**"pure prompt"** — a segunda diz textualmente *"No harness. No state machine. No helper
+scripts."* e *"You are the brake. The loop will not finish on its own."* Sem portão, sem
+rollback, sem teto.
+
+A evidência que definiu os freios é a mesma da v1.5.0 (LoopsBench 25% + regressões em todos os
+perfis; juiz inflando 0,72→0,94 com qualidade real em 0,20; Proof-or-Stop 1,7%→0,1%). O que a
+v1.5.0 concluiu — *"o loop não é o que funciona, o portão é"* — virou desenho: **o loop existe,
+mas cada freio é um passo obrigatório do fluxo.**
+
+### Entra
+
+- `comandos/gauntlet.md` — o 11º comando. Por rodada: foto da sombra → builder corrige **só** o
+  gap → portão determinístico → crítico cego (reusa `criticar` §3–6, fonte única) → decisão.
+- **Cinco paradas**, qualquer uma encerra: vitória · teto (padrão 3, `--rodadas N`) · **platô**
+  (mesmo gap 2× seguidas) · **regressão** (portão quebrou → rollback pela foto) · o usuário.
+- **Anti-reward-hacking fixo:** uma mutação por rodada (hill climbing) · builder nunca vê o
+  transcript do crítico, só o gap em texto · nunca nota nem score em arquivo · nada roda sem OK
+  explícito com barra, teto e custo na mesa (regra 3 da skill).
+- Rota no `SKILL.md`, item 6 no menu, §4.10 no manual, seção na página.
+
+### Zero mudança nos projetos
+
+Todas as peças já estavam neles desde a v1.4.0/1.5.0: `critico-cego.md`, `referencias/`, a
+sombra, o doctor. Só o `versao_skill` dos manifestos sobe. É o desenho em camadas pagando:
+**o loop é só a ordem em que as peças existentes rodam.**
+
+### Fora de escopo, deliberado
+
+❌ Fan-out de builders em paralelo (dobra custo sem evidência de ganho no nosso caso) ·
+❌ score/telemetria de rodadas em arquivo (a métrica que convida ao hacking) ·
+❌ rodar sem confirmação.
+
+---
+
 ## v1.5.0 — 2026-08-12
 
 **A barra: `referencias/` e o crítico cego. O harness passa a ter uma categoria que não tinha —

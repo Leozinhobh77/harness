@@ -32,20 +32,21 @@ Para publicar: `comandos/exportar.md`.
    4 · /harness fix       corrigir o que o doctor achou
    5 · /harness voltar    máquina do tempo — desfazer o acidente     🕰️
    6 · /harness criticar  comparar com a referência, às cegas         🔍
-   7 · /harness learn     transformar um erro em guarda permanente   ⭐
-   8 · /harness evolve    a skill melhora a si mesma                ⭐⭐
-   9 · /harness upgrade   trazer melhorias da skill pro projeto
+   7 · /harness gauntlet  loop até vencer a barra (com freios)        🏟️
+   8 · /harness learn     transformar um erro em guarda permanente   ⭐
+   9 · /harness evolve    a skill melhora a si mesma                ⭐⭐
+  10 · /harness upgrade   trazer melhorias da skill pro projeto
 
   ENTENDENDO POR DENTRO
-  10 · Tiers e a escada — como a estrutura cresce junto com o projeto
-  11 · As 5 leis anti-inchaço — por que ela se recusa a crescer à toa
-  12 · Hooks — a espinha mecânica que impede erro de verdade
-  13 · Referências — a barra que o projeto quer bater
-  14 · Versão, changelog e o lembrete automático
+  11 · Tiers e a escada — como a estrutura cresce junto com o projeto
+  12 · As 5 leis anti-inchaço — por que ela se recusa a crescer à toa
+  13 · Hooks — a espinha mecânica que impede erro de verdade
+  14 · Referências — a barra que o projeto quer bater
+  15 · Versão, changelog e o lembrete automático
 
   ATALHOS
-  15 · Colinha — todos os comandos numa tela
-  16 · Perguntas frequentes
+  16 · Colinha — todos os comandos numa tela
+  17 · Perguntas frequentes
 
 Digite o número (ou "tudo" para o resumo de todos).
 ```
@@ -76,20 +77,21 @@ usuário — não recite o arquivo.
 | 4 | §4.4 `fix` | automático × decisão; `--limpar` é o abate |
 | 5 | §4.8 `voltar` | o buraco que o `/rewind` nativo deixa: **comando de shell** |
 | 6 | §4.9 `criticar` | quem julga não pode ter visto construir; **perder é resultado bom** |
-| 7 | §4.5 `learn` | a pergunta-chave: *"dá pra impedir mecanicamente?"* |
-| 8 | §4.6 `evolve` | os 3 ciclos; promoção exige **2 projetos** |
-| 9 | §4.7 `upgrade` | **sua customização sempre vence o template** |
-| 10 | §7.3 Tiers | sobe por gatilho, **desce por desuso** |
-| 11 | §7.2 As 5 leis | Lei 1 (procedência) e Lei 2 (mecânico > escrito) pesam mais |
-| 12 | §7.4 Hooks | os **4** hooks, o que cada um pega, o `log-guardas.jsonl` |
-| 13 | §6 `referencias/` | os 3 critérios · a regra da companheira · a ficha de personagem |
-| 14 | §9 + `VERSAO.json` | por que o lembrete existe e como calar (rodando `evolve`) |
+| 7 | §4.10 `gauntlet` | o loop **com freios**: portão · foto por rodada · platô · teto · você |
+| 8 | §4.5 `learn` | a pergunta-chave: *"dá pra impedir mecanicamente?"* |
+| 9 | §4.6 `evolve` | os 3 ciclos; promoção exige **2 projetos** |
+| 10 | §4.7 `upgrade` | **sua customização sempre vence o template** |
+| 11 | §7.3 Tiers | sobe por gatilho, **desce por desuso** |
+| 12 | §7.2 As 5 leis | Lei 1 (procedência) e Lei 2 (mecânico > escrito) pesam mais |
+| 13 | §7.4 Hooks | os **4** hooks, o que cada um pega, o `log-guardas.jsonl` |
+| 14 | §6 `referencias/` | os 3 critérios · a regra da companheira · a ficha de personagem |
+| 15 | §9 + `VERSAO.json` | por que o lembrete existe e como calar (rodando `evolve`) |
 
 Há ainda duas camadas que o índice numerado não expõe direto, mas que você deve oferecer quando
 a pergunta pedir: **§5 Receitas** (situação → o que fazer) e **§6 Anatomia** (cada arquivo
 explicado).
 
-### Tópico 15 — Colinha (mostre exatamente isto)
+### Tópico 16 — Colinha (mostre exatamente isto)
 
 ```
 /harness              onde estamos (10 linhas, barato)
@@ -99,6 +101,7 @@ explicado).
 /harness fix --limpar abater o que não se provou útil
 /harness voltar       máquina do tempo · desfaz o acidente  🕰️ o dia em que salva
 /harness criticar     compara com a referência, às cegas    🔍 sobe a barra
+/harness gauntlet     loop até vencer a barra, com freios   🏟️ quando tem orçamento
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
@@ -112,7 +115,7 @@ Rotina saudável:
   a cada ~2 semanas ........ evolve
 ```
 
-### Tópico 16 — FAQ
+### Tópico 17 — FAQ
 
 Responda estas, curto:
 

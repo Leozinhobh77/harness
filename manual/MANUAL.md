@@ -1,6 +1,6 @@
 # 📖 MANUAL `/harness`
 
-> **Versão 1.5.0** · gerado em **12/08/2026**
+> **Versão 1.6.0** · gerado em **12/08/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -20,6 +20,7 @@
 /harness fix --limpar abater o que não se provou útil
 /harness voltar       máquina do tempo · desfaz o acidente  🕰️ o dia em que salva
 /harness criticar     compara com a referência, às cegas    🔍 sobe a barra
+/harness gauntlet     loop até vencer a barra, com freios   🏟️ quando tem orçamento
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
@@ -40,7 +41,7 @@ Rotina saudável:
 | Camada | Seções |
 |---|---|
 | 🚀 **Começando** | [Visão geral](#1-visão-geral) · [Primeiro projeto](#2-meu-primeiro-projeto) · [Glossário](#3-glossário) |
-| 📕 **Referência** | [status](#41-harness--status) · [init](#42-harness-init) · [doctor](#43-harness-doctor) · [fix](#44-harness-fix) · [learn](#45-harness-learn-) · [evolve](#46-harness-evolve-) · [upgrade](#47-harness-upgrade) · [voltar](#48-harness-voltar-) · [criticar](#49-harness-criticar-) |
+| 📕 **Referência** | [status](#41-harness--status) · [init](#42-harness-init) · [doctor](#43-harness-doctor) · [fix](#44-harness-fix) · [learn](#45-harness-learn-) · [evolve](#46-harness-evolve-) · [upgrade](#47-harness-upgrade) · [voltar](#48-harness-voltar-) · [criticar](#49-harness-criticar-) · [gauntlet](#410-harness-gauntlet-) |
 | 🍳 **Receitas** | [6 situações do dia a dia](#5-receitas) |
 | 🔧 **Anatomia** | [Cada arquivo que ele cria](#6-anatomia) |
 | 🧠 **Conceitos** | [Flywheel](#71-o-efeito-flywheel) · [5 leis](#72-as-5-leis-anti-inchaço) · [Tiers](#73-tiers-e-a-escada) · [Hooks](#74-hooks) |
@@ -606,10 +607,72 @@ ensinar alguma coisa.
 
 ### O que ele deliberadamente NÃO faz
 
-Não roda em loop sozinho. A pesquisa que originou este comando (o **Gauntlet Loop**) propõe
-exatamente isso, e o benchmark sério da área — **LoopsBench**, julho/2026 — mediu **25%** de
-resolução na melhor configuração, com regressões visíveis em todos os perfis de loop. O ganho
-medido vem do crítico **existir**; o risco medido vem de ele rodar sem freio. **Você é o freio.**
+Não roda em loop sozinho. Para o ciclo completo — corrigir o gap, passar pelo portão, criticar
+de novo — existe o `gauntlet` (§4.10), que fecha o loop **com freios**. O `criticar` é a rodada
+avulsa e barata; o `gauntlet` é a sequência com orçamento.
+
+---
+
+## 4.10 `/harness gauntlet` 🏟️
+
+**O loop até vencer a barra — com os freios que a versão original não tem.**
+
+### De onde veio
+
+Do **Gauntlet Loop** de Matt Shumer (julho/2026): dar ao agente uma barra concreta, separar quem
+constrói de quem julga, e iterar até o crítico escolher o nosso às cegas. A ideia é boa. As
+implementações públicas, porém, são "pure prompt" — sem portão, sem rollback, sem teto; o único
+freio é o usuário lembrar de existir.
+
+E a evidência pede freio: o benchmark da área (**LoopsBench**, 07/2026) mediu **25%** de
+resolução na melhor configuração com **regressões em todos os perfis de loop**, e mediu-se juiz
+LLM inflando aprovação (0,72→0,94) com a qualidade real parada (0,20). Por isso aqui **cada
+freio é um passo obrigatório**, não um conselho.
+
+### Como funciona
+
+```
+/harness gauntlet "refazer a home"            # teto padrão: 3 rodadas
+
+cada rodada:
+  1. FOTO da sombra          (dá pra voltar a qualquer rodada)
+  2. BUILDER corrige SÓ o gap apontado — uma mutação por rodada
+  3. PORTÃO determinístico   build · testes · doctor
+  4. CRÍTICO CEGO            o mesmo do criticar
+  5. VENCEMOS? → fim  ·  PERDEMOS? → o gap vira a próxima rodada
+```
+
+### Os cinco freios
+
+| Freio | O que faz |
+|---|---|
+| 🏆 Vitória | crítico escolheu o nosso às cegas → fim |
+| 🔢 Teto | 3 rodadas por padrão — acabou, acabou; você decide se estende |
+| 📉 Platô | o MESMO gap voltou duas vezes → para (a 3ª tentativa falha igual) |
+| 💥 Regressão | portão quebrou e não consertou → **rollback pela foto** + para |
+| 🛑 Você | interrupção manual, a qualquer momento |
+
+### As regras anti-trapaça (fixas, não configuráveis)
+
+- **Uma mutação por rodada.** Nada de "já que estou aqui" — mudança dupla esconde o que causou
+  a melhora ou a piora.
+- **O builder não vê o transcript do crítico** — só recebe o gap em texto. Histórico de
+  julgamento no contexto do builder é o começo do reward hacking.
+- **Nunca nota, nunca score em arquivo.** O veredito é binário e morre com a rodada.
+- **Nada roda sem o seu OK** — o comando mostra barra, teto e custo, e espera.
+
+### A pegadinha
+
+**Vitória fácil é suspeita.** Se a barra perde de primeira, e não é a primeira vez, a barra
+provavelmente está baixa demais para ensinar. Barra que sempre perde não é barra, é plateia.
+
+### Quando usar qual
+
+| Situação | Use |
+|---|---|
+| quer saber o maior gap | `criticar` — uma rodada, barato |
+| quer entregar NO NÍVEL da barra e tem orçamento | `gauntlet` |
+| não tem referência | nenhum — monte a barra primeiro |
 
 ---
 ---
@@ -1280,10 +1343,15 @@ demanda. O que carrega em toda sessão é uma linha de ponteiro — 13 tokens me
 documento que carrega sempre; nada aqui carrega.
 
 **Por que o `criticar` não roda em loop sozinho?**
-Porque o benchmark sério da área (LoopsBench, julho/2026) mediu **25%** de resolução na melhor
-configuração, com regressões em todos os perfis de loop — e mediu-se juiz LLM subindo de 0,72 a
-0,94 de aprovação com a acurácia real parada em 0,20. O ganho comprovado vem do crítico
-**existir**. O risco comprovado vem de ele rodar sem freio.
+Porque loop é decisão de orçamento, e ela é sua. Quando você quer o ciclo completo, existe o
+`gauntlet` (§4.10) — que roda o loop **com freios**: portão determinístico entre rodadas, foto
+da sombra antes de cada mutação, parada por platô, teto de rodadas, e seu OK antes de começar.
+
+**Qual a diferença entre o `gauntlet` daqui e o Gauntlet Loop original?**
+Os freios. A versão "pure prompt" não tem portão, rollback nem teto — o único freio é o usuário.
+A evidência que pede freio: LoopsBench (07/2026) mediu **25%** de resolução com regressões em
+todos os perfis de loop, e juiz LLM sem portão infla aprovação (0,72→0,94) com a qualidade real
+parada (0,20). Aqui cada freio é um passo obrigatório do fluxo.
 
 **Por que ela insiste tanto em ser pequena?**
 Acima de ~150 linhas o custo sobe 20–23% sem ganho medido, e regra genérica chega a **piorar** o
@@ -1407,6 +1475,7 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| **1.6.0** | **2026-08-12** | **O loop com freios: `/harness gauntlet`** 🏟️ — fecha o ciclo que o `criticar` deixou aberto: builder corrige o gap → portão determinístico → crítico cego → repete, até vencer a barra ou um freio parar. Os cinco freios são passos obrigatórios, não conselhos: vitória · teto de rodadas (padrão 3) · **platô** (mesmo gap 2× → para) · **regressão** (portão quebrou → rollback pela foto da sombra + para) · você. Anti-reward-hacking fixo: uma mutação por rodada, builder nunca vê o transcript do crítico, nunca nota nem score em arquivo, nada roda sem OK explícito. Zero mudança nos projetos — todas as peças (crítico, sombra, portão, barra) já existiam das v1.4–1.5. |
 | **1.5.0** | **2026-08-12** | **A barra: `referencias/` e o crítico cego** 🔍 — o harness ganha uma categoria que não tinha: **material de entrada** (o que o projeto quer parecer), separado de documento de governança (o que ele decidiu). Prateleira de 8 pastas + `INDICE.md` com os 3 critérios de entrada (**Nomeada · Buscável · Inspecionável**) + ficha de consistência de personagem. Comando novo `/harness criticar`: portão determinístico primeiro, depois um **subagente crítico com contexto limpo** compara o resultado real contra a barra **às cegas**, decisão binária sem nota, e **não conserta**. Nasceu de pesquisa sobre o **Gauntlet Loop** — que entrou pela metade de propósito: entrou o crítico (ganho medido de ~78% dos defeitos), **não entrou o loop autônomo** (LoopsBench: 25% de resolução e regressões em todos os perfis; reward hacking de juiz medido em 0,72→0,94 com acurácia real em 0,20). Prateleira nasce inteira mesmo vazia — custo zero, e *o que não é visto não é lembrado*. |
 | **1.4.0** | **2026-08-12** | **A quarta guarda: a sombra** 🕰️ — máquina do tempo do projeto, em `.harness/sombra.git`. Nasceu de uma pergunta do usuário (*"ela faz backup do meu projeto?"*), cuja resposta era **não**: a única rede era git, e procedimental. Pesquisa do dia delimitou o buraco exato — o `/rewind` nativo do Claude Code **não** rastreia mudança feita por comando de shell, subagente em segundo plano, nem nada depois de 30 dias. A sombra cobre esse buraco e só ele. **T1 ganhou hook pela primeira vez** (a sombra é chão, não tier). Comando novo `/harness voltar`, 3 checks novos no `doctor`. Provado em teste real: arquivo apagado, pasta apagada e arquivo sobrescrito por shell — os três voltaram. Dois defeitos achados na verificação, um deles sério (`-Restaurar` quebrava em projeto com **exatamente uma foto**, justo na primeira vez que alguém precisaria dele — P009). |
 | 1.3.3 | 2026-08-06 | A skill rodou o próprio `doctor --skill` e reprovou em 4 pontos. Corrigida a deriva do `SKILL.md` (apontava a saída do manual pra um arquivo inexistente), eliminada a segunda árvore de estrutura do `README.md` (fonte única), e o **T3 passou a se declarar "projetado, ainda não implementado"** — havia gatilho, check e descrição, mas nenhum template. Abatido do `evolve` o item que cobrava um orçamento inexistente. **Este manual foi atualizado da 1.2.1 até aqui.** |

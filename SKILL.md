@@ -30,6 +30,7 @@ description: Cria, audita, mantém e evolui o harness de governança de qualquer
 | "a IA errou X", "isso não pode repetir", `learn` | `comandos/learn.md` | Erro → guarda permanente |
 | "voltar", "desfazer", "apagou meu arquivo", "socorro" | `comandos/voltar.md` | Máquina do tempo — restaura pelas fotos da sombra |
 | "está bom?", "compara com a referência", `criticar` | `comandos/criticar.md` | Comparação cega contra a barra de `referencias/` |
+| "roda o loop", "itera até vencer", `gauntlet` | `comandos/gauntlet.md` | Loop builder→portão→crítico com freios — até vencer a barra |
 | "evoluir a skill", "melhorar você", `evolve` | `comandos/evolve.md` | A skill audita e melhora a si mesma |
 | "atualizar este projeto", `upgrade` | `comandos/upgrade.md` | Traz melhorias da skill pro projeto |
 | "manual", "ajuda", "como usa" | `comandos/manual.md` | Manual navegável por número |
