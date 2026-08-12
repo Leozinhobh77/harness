@@ -59,6 +59,22 @@ try {
     if ($evento -eq 'SessionStart') {
         $motivo   = 'inicio da sessao'
         $comPausa = $false
+
+        # ESTADO.md e derivado, e vivia desatualizado: o doctor acusava, ninguem
+        # rodava o fix, e o alarme virava paisagem (2 de 3 projetos - evolve
+        # v1.7.0). Lei 2: se da para ser mecanico, nao fica sendo pedido.
+        # Roda ANTES da foto, para a foto ja pegar o arquivo em dia.
+        #
+        # BEST-EFFORT de proposito: o gerador mora na skill, e este hook e
+        # autocontido. Sem a skill instalada, pula em silencio - a FOTO, que e
+        # o que realmente importa aqui, nao depende disto.
+        try {
+            $gerador = Join-Path $env:USERPROFILE '.claude\skills\harness\scripts\estado.ps1'
+            if ((Test-Path -LiteralPath $gerador) -and
+                (Test-Path -LiteralPath (Join-Path $raiz 'ESTADO.md'))) {
+                $null = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $gerador -Projeto $raiz 2>$null
+            }
+        } catch { }
     }
     elseif ($tool -match '^(Write|Edit|NotebookEdit)$') {
         $nome = $alvo

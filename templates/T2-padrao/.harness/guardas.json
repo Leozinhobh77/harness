@@ -18,10 +18,10 @@
 
   "comandos_proibidos": [
     {
-      "nome": "sem-push",
-      "padrao": "git\\s+push",
-      "motivo": "Repositorio local e privado. Publicar exige decisao explicita do usuario.",
-      "procedencia": "regra de nascimento - dado do projeto nao vai para remoto sem autorizacao"
+      "nome": "sem-push-force",
+      "padrao": "git\\s+push\\s+.*(--force|-f)\\b",
+      "motivo": "push --force reescreve historico remoto e apaga trabalho que ja estava publicado. Nao tem desfazer para quem ja baixou.",
+      "procedencia": "convergencia de 2 projetos independentes (evolve v1.7.0): Zenith 30/07 abateu a guarda 'sem-push' original e criou esta no lugar; Central 11/08 omitiu 'sem-push' no init pelo mesmo motivo e criou esta. Bloquear TODO push e largo demais - em projeto que publica, o push e o fluxo normal. O que precisa de guarda e o destrutivo."
     },
     {
       "nome": "sem-reset-hard",

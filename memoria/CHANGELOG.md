@@ -8,6 +8,78 @@
 
 ---
 
+## v1.7.0 — 2026-08-12  ·  🧬 primeira rodada completa de `evolve`
+
+**A skill varreu os 3 projetos, achou uma convergência real, promoveu, abateu, e passou no
+próprio doctor.** É o Ciclo 3 funcionando pela primeira vez de ponta a ponta.
+
+### Como foi a varredura
+
+3 projetos vivos · 0 🔴 em todos · custo entre 2.028 e 2.236 tokens/sessão · auto-doctor limpo
+(13/13 comandos roteados e existentes, 0 links quebrados, 8 scripts com parser e ASCII OK,
+`SKILL.md` em 91 linhas). Pesquisa externa **pulada** — a última foi no mesmo dia.
+
+### 📈 Promovido — a convergência (P011)
+
+**`sem-push` sai do template T2; `sem-push-force` entra.**
+
+Dois projetos independentes rejeitaram a guarda larga, em datas e por motivos diferentes:
+
+| Projeto | O que fez | Motivo registrado no próprio projeto |
+|---|---|---|
+| Zenith (30/07) | **abateu** `sem-push`, criou `sem-push-forcado` | *"a guarda foi abatida quando o usuário autorizou a publicação; sobrou a parte destrutiva"* |
+| Central (11/08) | **omitiu** `sem-push` no `init`, criou `sem-push-force` | *"neste projeto o push é o mecanismo de deploy, bloquear seria quebrar o fluxo"* |
+
+**A lição, e ela é maior que esta guarda:** guarda larga demais não é conservadora — é **frágil**.
+Ela não vira mais estreita com o uso; ela vira **desligada**. E o abate leva junto a proteção
+contra a variante destrutiva. A pergunta certa ao desenhar guarda não é *"o que pode dar errado
+nesta família de comandos?"* e sim *"qual variante não tem desfazer?"*.
+
+Testado: 9/9 casos — bloqueia `--force`, `-f`, `--force-with-lease`; libera `push`,
+`push origin main`, `push -u origin feature`.
+
+### 📈 Promovido — Lei 2 aplicada ao `ESTADO.md`
+
+`ESTADO.md nao bate com o que seria gerado agora` aparecia em **2 de 3** projetos: o `doctor`
+acusava, ninguém rodava o `fix`, e o alarme virava paisagem. Alarme que nunca apaga ensina a
+ignorar (é o P007 de novo, por outro ângulo).
+
+Agora o hook `sombra.ps1` regenera o `ESTADO.md` no `SessionStart`, **antes** de tirar a foto.
+Best-effort de propósito: o gerador mora na skill e o hook é autocontido — sem a skill, pula em
+silêncio, e a foto (o que realmente importa) não depende disso.
+
+⚠️ **Caveat achado no teste:** se o `ESTADO.md` estiver **aberto em editor**, a escrita falha por
+lock e o hook segue em silêncio. Correto (fail-open), mas explica por que às vezes não regenera.
+
+### 📉 Abatido (Lei 4)
+
+**`templates/T3-completo/` deixou de existir.** A pasta tinha **um** arquivo — e nem era do T3:
+`REGRAS-DE-NEGOCIO.md` é o que o **T2+** adiciona, e os dois projetos T2+ já o usam (67 e 145
+linhas). Pasta com um arquivo errado dentro é pior que pasta nenhuma: parece que há algo pronto.
+O arquivo foi para `templates/comum/`; o `TIERS.md` agora diz que **não existe template T3**, em
+vez de apontar para um enganoso.
+
+### 🔧 Observado, não mexido
+
+`learn` marca **nunca usado** em `uso.json` — o comando que a própria skill chama de "o mais
+importante" — e mesmo assim guarda customizada com procedência nasceu em 2 projetos. Ou o
+trabalho acontece por fora dele (via decisão no `init`), ou o passo "Registrar uso" é pulado.
+**Não sei qual, e não vou chutar** — fica para investigar no próximo uso real.
+
+### P008 ganhou uma terceira ocorrência — e um limite honesto
+
+A guarda `sem-push-force` do Central bloqueou um comando que só **escrevia um arquivo de teste**
+contendo a string, dentro de um heredoc. Três sistemas diferentes, o mesmo defeito, no mesmo dia.
+E este caso **não tem conserto por regex**: distinguir execução de dado exige interpretar o
+shell. A mitigação é passar dado por arquivo, não por linha de comando.
+
+### Nos projetos
+
+Nenhum muda sozinho — é a regra do `upgrade`. **Finanças fica com a `sem-push` velha**, a mesma
+que os outros dois rejeitaram, e a decisão de trocar é do usuário.
+
+---
+
 ## v1.6.0 — 2026-08-12
 
 **O degrau 3: `/harness gauntlet` — o loop fechado, com os freios que a evidência exige.**

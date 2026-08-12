@@ -8,9 +8,13 @@
 
 | Projeto | Caminho | Tier | Criado em | Versão da skill | Estado |
 |---|---|---|---|---|---|
-| Finanças | `~/Desktop/Projetos/Finanças` | T2+ | 2026-07-26 | v1.0.0 (nascido) · v1.2.1 (atual) | `ativo` |
-| Zenith Invest | `~/Desktop/Projetos/Zenith Invest` | T2+ | 2026-07-30 | v1.3.2 (nascido) | `ativo` |
-| Central de Projetos e MCPs | `~/Desktop/Projetos/Central de Projetos e MCPs (Computador)` | T2 | 2026-08-11 | v1.3.3 (nascido) | `ativo` |
+| Finanças | `~/Desktop/Projetos/Finanças` | T2+ | 2026-07-26 | v1.0.0 (nascido) · v1.7.0 (atual) | `ativo` |
+| Zenith Invest | `~/Desktop/Projetos/Zenith Invest` | T2+ | 2026-07-30 | v1.3.2 (nascido) · v1.7.0 (atual) | `ativo` |
+| Central de Projetos e MCPs | `~/Desktop/Projetos/Central de Projetos e MCPs (Computador)` | T2 | 2026-08-11 | v1.3.3 (nascido) · v1.7.0 (atual) | `ativo` |
+
+> **Varredura do `evolve` de 2026-08-12:** os 3 vivos, 0 🔴, custo entre 2.028 e 2.236
+> tokens/sessão. A convergência achada (P011) saiu de Zenith + Central. **Finanças ficou com a
+> guarda `sem-push` antiga** — decisão pendente do usuário.
 
 ## Estados
 

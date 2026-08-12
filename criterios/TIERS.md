@@ -48,13 +48,18 @@ referencias/INDICE.md + a prateleira (visual · personagens · texto · document
 
 ### T3 · Completo  ⚠️ projetado, ainda não implementado
 
-> **Não existe template T3 executável.** `templates/T3-completo/` tem um arquivo só
-> (`docs/REGRAS-DE-NEGOCIO.md`) e nenhum comando sabe montar o resto. O que vem abaixo é o
-> **alvo de desenho**, não o que a skill entrega hoje.
+> **Não existe template T3. Nenhum arquivo, nenhuma pasta.** O que vem abaixo é o **alvo de
+> desenho**, não o que a skill entrega hoje.
 >
-> Por que está assim: nenhum projeto do `memoria/REGISTRO.md` chegou perto do gatilho.
-> Construir sem caso concreto é palpite — exatamente o que a Lei 1 proíbe. Quando o primeiro
-> projeto cruzar, ele vira o caso de uso e o template nasce medido, não imaginado.
+> Até a v1.6.0 existia uma pasta `templates/T3-completo/` com **um** arquivo dentro
+> (`REGRAS-DE-NEGOCIO.md`) — e esse arquivo nem era do T3: é o que o **T2+** adiciona, e os dois
+> projetos T2+ do registro já o usam. Pasta com um arquivo errado dentro é pior que pasta
+> nenhuma: parece que existe algo pronto. Abatida no `evolve` da v1.7.0; o arquivo foi para
+> `templates/comum/`, onde o T2+ o alcança.
+>
+> Por que continua sem template: nenhum projeto do `memoria/REGISTRO.md` chegou perto do
+> gatilho. Construir sem caso concreto é palpite — exatamente o que a Lei 1 proíbe. Quando o
+> primeiro projeto cruzar, ele vira o caso de uso e o template nasce medido, não imaginado.
 
 Tudo do T2, **mais**:
 ```
@@ -81,9 +86,10 @@ O `doctor` detecta o gatilho e **propõe** — nunca aplica sozinho.
 e o caso vira a matéria-prima para construir o T3 de verdade — não prometa a subida como se ela
 existisse.
 
-**"T2+"** não é um tier separado — é o T2 com os testes de regra de negócio adicionados. Ele
-existe porque a diferença entre "app pessoal" e "app pessoal que mexe com dinheiro" é grande
-demais para ignorar, e pequena demais para virar T3.
+**"T2+"** não é um tier separado — é o T2 mais `docs/REGRAS-DE-NEGOCIO.md` (template em
+`templates/comum/`) e os testes que provam cada regra. Ele existe porque a diferença entre "app
+pessoal" e "app pessoal que mexe com dinheiro" é grande demais para ignorar, e pequena demais
+para virar T3.
 
 ---
 

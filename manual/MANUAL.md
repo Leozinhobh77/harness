@@ -1,6 +1,6 @@
 # 📖 MANUAL `/harness`
 
-> **Versão 1.6.0** · gerado em **12/08/2026**
+> **Versão 1.7.0** · gerado em **12/08/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -872,7 +872,13 @@ Ele é montado a partir dos `Planos/` + `git log`. Isso mata a deriva na raiz:
 
 > Ele **não é fonte de nada** — é uma vista. Logo, é **impossível** ele divergir da realidade.
 
-Por isso existe uma guarda que bloqueia editá-lo à mão. Se quiser atualizar: `/harness fix`.
+Por isso existe uma guarda que bloqueia editá-lo à mão. E desde a v1.7.0 **ele se regenera
+sozinho ao abrir a sessão** — o hook `sombra.ps1` roda o gerador antes de tirar a foto do dia.
+Antes disso o `doctor` acusava a deriva, ninguém rodava o `fix`, e o alarme virava paisagem (era
+assim em 2 dos 3 projetos do registro). Alarme que nunca apaga ensina a ignorar.
+
+Se o arquivo estiver aberto no editor, a escrita falha por lock e o hook segue em silêncio —
+nesse caso, `/harness fix` resolve.
 
 **Como o `doctor` sabe que ele está velho — e as duas tentativas erradas antes (v1.3.1).** Ele
 **não olha relógio**. Comparar o `mtime` do `ESTADO.md` com o último commit é insatisfazível por
@@ -896,14 +902,21 @@ As guardas moram aqui **como dado**:
 {
   "comandos_proibidos": [
     {
-      "nome": "sem-push",
-      "padrao": "git\\s+push",
-      "motivo": "Repositório local e privado.",
-      "procedencia": "regra de nascimento — dado não vai pra remoto sem autorização"
+      "nome": "sem-push-force",
+      "padrao": "git\\s+push\\s+.*(--force|-f)\\b",
+      "motivo": "Reescreve histórico publicado. Não tem desfazer pra quem já baixou.",
+      "procedencia": "convergência de 2 projetos independentes (evolve v1.7.0)"
     }
   ]
 }
 ```
+
+> **Repare no que esta guarda NÃO faz: ela não bloqueia `git push`.** Até a v1.6.0 bloqueava — e
+> foi abatida em 2 dos 3 projetos, porque neles publicar é o trabalho normal. A lição virou o
+> P011: **guarda larga demais não é conservadora, é frágil** — ela não vira mais estreita com o
+> uso, ela vira *desligada*. E o abate leva junto a proteção contra a variante que importava.
+> A pergunta certa não é *"o que pode dar errado nesta família de comandos?"*, é **"qual variante
+> não tem desfazer?"**.
 
 **Guarda nova entra sem ninguém editar script.** O `learn` acrescenta uma entrada aqui, e ela
 já está valendo. O campo `procedencia` é obrigatório — é ele que o doctor confere.
@@ -913,7 +926,7 @@ já está valendo. O campo `procedencia` é obrigatório — é ele que o doctor
 Uma linha por disparo:
 
 ```json
-{"data":"2026-07-26T02:15:27","guarda":"sem-push","acao":"bloqueou","detalhe":"git push origin main"}
+{"data":"2026-08-12T02:15:27","guarda":"sem-push-force","acao":"bloqueou","detalhe":"git push --force"}
 ```
 
 **É isso que transforma "acho que dá pra limpar" em dado.** Guarda com zero disparos em 90 dias
@@ -1475,6 +1488,7 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| **1.7.0** | **2026-08-12** | **Primeira rodada completa de `evolve`** 🧬 — a skill varreu os 3 projetos, achou convergência real, promoveu, abateu e passou no próprio doctor. **Promovido:** `sem-push` sai do template, `sem-push-force` entra — dois projetos independentes rejeitaram a guarda larga em datas e por motivos diferentes (P011: *guarda larga demais não é conservadora, é frágil — vira desligada, e o abate leva junto a proteção que importava*). **Promovido:** o `ESTADO.md` passa a se regenerar sozinho no início da sessão (Lei 2 — o `doctor` acusava a deriva em 2 de 3 projetos e ninguém rodava o `fix`). **Abatido:** `templates/T3-completo/` deixou de existir — tinha um arquivo só, e nem era do T3; `REGRAS-DE-NEGOCIO.md` foi para `comum/`, onde o T2+ o alcança. **Observado sem mexer:** `learn` marca "nunca usado" e mesmo assim guarda customizada nasceu em 2 projetos — investigar no próximo uso real. |
 | **1.6.0** | **2026-08-12** | **O loop com freios: `/harness gauntlet`** 🏟️ — fecha o ciclo que o `criticar` deixou aberto: builder corrige o gap → portão determinístico → crítico cego → repete, até vencer a barra ou um freio parar. Os cinco freios são passos obrigatórios, não conselhos: vitória · teto de rodadas (padrão 3) · **platô** (mesmo gap 2× → para) · **regressão** (portão quebrou → rollback pela foto da sombra + para) · você. Anti-reward-hacking fixo: uma mutação por rodada, builder nunca vê o transcript do crítico, nunca nota nem score em arquivo, nada roda sem OK explícito. Zero mudança nos projetos — todas as peças (crítico, sombra, portão, barra) já existiam das v1.4–1.5. |
 | **1.5.0** | **2026-08-12** | **A barra: `referencias/` e o crítico cego** 🔍 — o harness ganha uma categoria que não tinha: **material de entrada** (o que o projeto quer parecer), separado de documento de governança (o que ele decidiu). Prateleira de 8 pastas + `INDICE.md` com os 3 critérios de entrada (**Nomeada · Buscável · Inspecionável**) + ficha de consistência de personagem. Comando novo `/harness criticar`: portão determinístico primeiro, depois um **subagente crítico com contexto limpo** compara o resultado real contra a barra **às cegas**, decisão binária sem nota, e **não conserta**. Nasceu de pesquisa sobre o **Gauntlet Loop** — que entrou pela metade de propósito: entrou o crítico (ganho medido de ~78% dos defeitos), **não entrou o loop autônomo** (LoopsBench: 25% de resolução e regressões em todos os perfis; reward hacking de juiz medido em 0,72→0,94 com acurácia real em 0,20). Prateleira nasce inteira mesmo vazia — custo zero, e *o que não é visto não é lembrado*. |
 | **1.4.0** | **2026-08-12** | **A quarta guarda: a sombra** 🕰️ — máquina do tempo do projeto, em `.harness/sombra.git`. Nasceu de uma pergunta do usuário (*"ela faz backup do meu projeto?"*), cuja resposta era **não**: a única rede era git, e procedimental. Pesquisa do dia delimitou o buraco exato — o `/rewind` nativo do Claude Code **não** rastreia mudança feita por comando de shell, subagente em segundo plano, nem nada depois de 30 dias. A sombra cobre esse buraco e só ele. **T1 ganhou hook pela primeira vez** (a sombra é chão, não tier). Comando novo `/harness voltar`, 3 checks novos no `doctor`. Provado em teste real: arquivo apagado, pasta apagada e arquivo sobrescrito por shell — os três voltaram. Dois defeitos achados na verificação, um deles sério (`-Restaurar` quebrava em projeto com **exatamente uma foto**, justo na primeira vez que alguém precisaria dele — P009). |

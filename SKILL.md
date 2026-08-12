@@ -69,8 +69,9 @@ harness/
 ├── .gitignore
 ├── comandos/             a instrução de cada comando
 ├── criterios/            TIERS · ORCAMENTOS · CHECKS
-├── templates/            T1-leve · T2-padrao · T3 (parcial)
-│                        comum/ ESTADO.tpl · sombra.ps1 · critico-cego.md · referencias/
+├── templates/            T1-leve · T2-padrao (não existe T3 — ver TIERS.md)
+│                        comum/ ESTADO.tpl · sombra.ps1 · critico-cego.md
+│                               REGRAS-DE-NEGOCIO.md (T2+) · referencias/
 ├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1 · sombra.ps1
 ├── manual/               MANUAL.md — 📌 fonte única do manual
 ├── docs/                 index.html — página publicada (GitHub Pages), saída do --exportar

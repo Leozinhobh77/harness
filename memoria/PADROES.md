@@ -57,6 +57,27 @@
 - **Promovido ao template:** não — é conhecimento do `doctor` da própria skill. Vale como regra
   de projeto se algum dia um harness gerar outro arquivo derivado.
 
+### P011 — Guarda que bloqueia a CLASSE inteira é abatida; sobrevive a que bloqueia só o destrutivo
+- **Visto em:** Zenith Invest (2026-07-30), Central de Projetos (2026-08-11) — ⭐ **2 projetos
+  independentes, datas e motivos diferentes, mesma conclusão**
+- **Nível da solução:** 2 (a guarda continua sendo hook — mudou o escopo, não o nível)
+- **O padrão:** o template T2 nascia com `sem-push`, que bloqueia **todo** `git push`. Nos dois
+  projetos em que o push virou fluxo normal, o usuário **não refinou a guarda — ele a removeu**:
+  Zenith abateu depois de autorizar publicação; Central omitiu no `init`. Nos dois casos, criou
+  em seguida uma guarda nova cobrindo **só `--force`**.
+- **A lição generalizável:** guarda larga demais não é "conservadora", é **frágil** — ela não
+  vira mais estreita com o uso, ela vira **desligada**. E guarda desligada protege zero. Ao
+  desenhar uma guarda, a pergunta não é *"o que pode dar errado nesta família de comandos?"* e
+  sim *"qual variante específica não tem desfazer?"*. `git push` republica; `git push --force`
+  apaga o que já estava publicado. Só a segunda merece hook.
+- **Como reconhecer em outro lugar:** toda guarda cujo padrão casa um comando inteiro sem
+  qualificador (`git push`, `rm`, `npm install`). Se o comando base é parte do trabalho normal
+  de algum projeto plausível, a guarda vai ser abatida lá — e o abate leva junto a proteção
+  contra a variante destrutiva.
+- **Promovido ao template:** **sim** (v1.7.0) — `sem-push` sai, `sem-push-force` entra em
+  `templates/T2-padrao/.harness/guardas.json`. Projetos existentes não mudam sozinhos; o
+  Finanças fica com a guarda velha até o usuário decidir.
+
 ### P010 — O CSS do projeto derrota o `hidden` do HTML, e o conserto do JS vira enfeite
 - **Visto em:** skill /harness, página do manual (2026-08-12) — **é o P003 uma camada acima**
 - **Nível da solução:** 3 (teste Playwright pegou; a olho nu passou meses despercebido)
@@ -114,9 +135,18 @@
 - **Como reconhecer em outro lugar:** toda guarda que decide escopo por `$comando -match
   '<caminho>'`. Se a mesma string pode aparecer como *argumento de outra coisa*, o falso positivo
   é questão de tempo — e falso positivo em guarda ensina a contornar guarda.
+- **Terceira ocorrência (2026-08-12, evolve v1.7.0):** agora foi a guarda `sem-push-force` do
+  **próprio projeto Central** — bloqueou um comando que só **escrevia um arquivo de casos de
+  teste** contendo a string `git push --force` dentro de um heredoc. Nenhum push ia acontecer.
+  **Três sistemas diferentes, o mesmo defeito, no mesmo dia.**
+- **O limite honesto:** este terceiro caso **não tem conserto por regex**. Distinguir "vai
+  executar um push --force" de "a string aparece como dado" exige interpretar o shell, e o hook
+  só recebe texto. O P006 resolveu o caso do `cd` porque ali havia sinal estrutural; aqui não há.
+  **A mitigação é o contorno normal**, não um regex melhor: passar dado por arquivo (ferramenta
+  de escrita) em vez de pela linha de comando.
 - **Promovido ao template:** não — o `guarda.ps1` do T2 já está correto desde o P006. Registrado
-  porque a segunda ocorrência **confirma o padrão** (regra dos 2 casos) e porque a armadura da
-  Forge é do usuário: vale a correção lá, quando ele quiser.
+  porque as ocorrências seguintes **confirmam o padrão** (regra dos 2 casos, aqui com 3) e porque
+  a armadura da Forge é do usuário: vale a correção lá, quando ele quiser.
 
 ### P003 — `.hidden` não existe em SVGElement, só em HTMLElement
 - **Visto em:** skill /harness (2026-07-26)
