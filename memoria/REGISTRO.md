@@ -10,6 +10,7 @@
 |---|---|---|---|---|---|
 | Finanças | `~/Desktop/Projetos/Finanças` | T2+ | 2026-07-26 | v1.0.0 (nascido) · v1.2.1 (atual) | `ativo` |
 | Zenith Invest | `~/Desktop/Projetos/Zenith Invest` | T2+ | 2026-07-30 | v1.3.2 (nascido) | `ativo` |
+| Central de Projetos e MCPs | `~/Desktop/Projetos/Central de Projetos e MCPs (Computador)` | T2 | 2026-08-11 | v1.3.3 (nascido) | `ativo` |
 
 ## Estados
 
