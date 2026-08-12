@@ -31,6 +31,7 @@ A estrutura pode encolher. Sobe por gatilho, desce por desuso.
 | `/harness init` | cria ou adota a estrutura, dimensionada ao projeto |
 | `/harness doctor` | audita — **nunca escreve** |
 | `/harness fix` | aplica o que o doctor achou · `--limpar` abate o que não se provou |
+| `/harness voltar` | máquina do tempo — desfaz o que o `/rewind` nativo não alcança |
 | `/harness learn "<erro>"` | transforma um erro real em guarda permanente |
 | `/harness evolve` | a skill audita e melhora a si mesma |
 | `/harness upgrade` | leva as melhorias da skill para um projeto |
@@ -55,13 +56,24 @@ candidata a abate, com base no log de disparos.
 
 ## A espinha mecânica
 
-Três hooks, gerados a partir do tier T2:
+Quatro hooks. Três impedem o erro; o quarto aceita que um dia um erro passa.
 
-| Hook | Evento | O que faz |
-|---|---|---|
-| `guarda` | `PreToolUse` | bloqueia o proibido, antes de acontecer |
-| `pos-edicao` | `PostToolUse` | valida e devolve o erro para o modelo se corrigir |
-| `porta-saida` | `Stop` | não deixa encerrar o turno com plano sem baixa |
+| Hook | Evento | O que faz | Tier |
+|---|---|---|---|
+| `guarda` | `PreToolUse` | bloqueia o proibido, antes de acontecer | T2+ |
+| `pos-edicao` | `PostToolUse` | valida e devolve o erro para o modelo se corrigir | T2+ |
+| `porta-saida` | `Stop` | não deixa encerrar o turno com plano sem baixa | T2+ |
+| **`sombra`** | `PreToolUse` · `SessionStart` | **fotografa o projeto antes de cada ação de risco** | **todos** |
+
+A sombra é um repositório git separado em `.harness/sombra.git` — histórico próprio, não polui o
+`git log` do usuário. Ela existe por um motivo medido: o checkpoint nativo do Claude Code
+(`/rewind`) **não rastreia mudança feita por comando de shell** (`rm`, `mv`, `>`), nem edição de
+subagente em segundo plano, nem nada depois de 30 dias. A sombra cobre esse buraco, e só ele —
+reimplementar o `/rewind` seria o inchaço que a Lei 1 proíbe.
+
+Ela é a única guarda que nasce em **todos** os tiers, porque não é funcionalidade de tier: é chão,
+como o `.gitignore`. E como ele, **nunca é candidata a abate** — zero restaurações é o sucesso
+dela, não o fracasso.
 
 As guardas moram em `.harness/guardas.json` — **como dado, não como código**. Guarda nova entra
 sem ninguém editar script, e cada disparo vira uma linha em `.harness/log-guardas.jsonl`. É isso

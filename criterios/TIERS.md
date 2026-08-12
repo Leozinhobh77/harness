@@ -18,9 +18,14 @@
 ```
 AGENTS.md          ≤ 40 linhas — stack, comandos, o que nunca tocar
 .gitignore
+.claude/settings.json + hooks/sombra.ps1   ← a única guarda de T1
 ```
-Só isso. Sem `docs/`, sem `Planos/`, sem hooks. Um protótipo não precisa de governança —
+Sem `docs/`, sem `Planos/`, sem guarda de processo. Um protótipo não precisa de governança —
 precisa que você descubra rápido se a ideia presta.
+
+⚠️ **A sombra é a exceção, e ela não é funcionalidade de tier — é chão.** Vale a mesma regra do
+`.gitignore` e do bloqueio de dado sensível (ver `comandos/upgrade.md`): perder trabalho num
+protótipo dói igual, e um protótipo é justamente onde ninguém commita. Custo: 0 token por sessão.
 
 ### T2 · Padrão
 ```
@@ -28,10 +33,10 @@ AGENTS.md          ≤ 120 linhas — canônico, estilo ponteiro
 CLAUDE.md          ≤ 40 linhas — camada fina, sem estado volátil dentro
 ESTADO.md          ≤ 40 linhas — GERADO por scripts/estado.ps1, nunca escrito à mão
 .gitignore
-.claude/settings.json + hooks/{guarda,pos-edicao,porta-saida}.ps1
+.claude/settings.json + hooks/{sombra,guarda,pos-edicao,porta-saida}.ps1
 docs/GOVERNANCA.md · PRD.md · SPEC.md · DECISOES.md
 Planos/MANUAL.md · MODELO-DE-PLANO.md · INDICE.md · Concluídos/
-.harness/manifesto.json · log-guardas.jsonl
+.harness/manifesto.json · log-guardas.jsonl · sombra.git/
 ```
 
 ### T3 · Completo  ⚠️ projetado, ainda não implementado

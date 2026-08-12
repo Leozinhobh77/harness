@@ -14,6 +14,7 @@
     "ESTADO.md",
     ".gitignore",
     ".claude/settings.json",
+    ".claude/hooks/sombra.ps1",
     ".claude/hooks/guarda.ps1",
     ".claude/hooks/pos-edicao.ps1",
     ".claude/hooks/porta-saida.ps1",

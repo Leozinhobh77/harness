@@ -65,12 +65,15 @@ final. Se você não sabe o que escrever num campo, **corte a seção** em vez d
 
 Ordem de geração:
 1. `.gitignore` e as guardas de dado — **primeiro**, antes de existir risco
-2. `AGENTS.md`
-3. Resto do tier
-4. `.claude/settings.json` + hooks (T2+)
-5. `.harness/manifesto.json`
-6. `ESTADO.md` — **por último**, rodando `scripts/estado.ps1` (ele é gerado, nunca escrito)
-7. `git init` se ainda não for repo (**pergunte antes**)
+2. **A sombra** — `.claude/hooks/sombra.ps1` (de `templates/comum/`) + a entrada dela no
+   `settings.json`. **Todo tier, inclusive T1.** É a rede de segurança; ela nasce antes de
+   existir o que salvar, senão o primeiro acidente acontece sem foto nenhuma.
+3. `AGENTS.md`
+4. Resto do tier
+5. `.claude/settings.json` completo + demais hooks (T2+)
+6. `.harness/manifesto.json`
+7. `ESTADO.md` — **por último**, rodando `scripts/estado.ps1` (ele é gerado, nunca escrito)
+8. `git init` se ainda não for repo (**pergunte antes**)
 
 ### Passo 5 — REGISTRE e prove
 

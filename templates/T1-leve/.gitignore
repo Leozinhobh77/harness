@@ -5,27 +5,11 @@
 # ============================================================
 {{DADOS_PROTEGIDOS}}
 
-# Instrumentação do harness (local, não versionar)
-.harness/log-guardas.jsonl
-.harness/abatidos/
-.harness/hibernado/
-
 # A sombra — as fotos do projeto (máquina do tempo local).
-# Fica FORA do git de propósito: é rede de segurança da máquina, não
-# histórico do projeto. Versionar duplicaria tudo a cada commit.
+# Rede de segurança da máquina, não histórico do projeto.
 .harness/sombra.git/
 .harness/.sombra-ultima
-
-# Lock files do Excel (arquivo aberto)
-~$*.xlsx
-**/~$*.xlsx
-
-# Dependências e build
-node_modules/
-dist/
-build/
-__pycache__/
-*.pyc
+.harness/log-guardas.jsonl
 
 # Ambiente e segredos — NUNCA versionar
 .env

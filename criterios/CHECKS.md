@@ -71,8 +71,14 @@ O harness diz uma coisa, a realidade diz outra. É o modo de falha mais comum e 
 | O projeto tem hooks configurados? (T2+) | 🟡 |
 | Cada hook do `settings.json` roda sem erro de sintaxe | 🔴 |
 | `.harness/log-guardas.jsonl` está sendo escrito (os hooks estão vivos) | 🟡 |
+| **`.harness/sombra.git` existe** — todo tier, é chão | 🟡 |
+| **Sombra existe mas com 0 fotos** — o hook não está rodando | 🟡 |
+| **Sombra passou de 300 MB** → propor compactar | 🔵 |
 | Existe guarda que **nunca disparou em 90 dias** → propor abate (Lei 4) | 🔵 |
 | Repositório é git? Working tree limpo? | 🔵 |
+
+> ⚠️ **A sombra nunca é candidata a abate**, mesmo com 0 restaurações — igual ao `.gitignore`.
+> Zero uso é o sucesso dela. Ver `comandos/fix.md`, seção `--limpar`.
 
 ---
 

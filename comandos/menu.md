@@ -20,8 +20,11 @@ o `init` fica mais relevante nesse caso.
 
 ### 3. Monte o menu — dois grupos, nesta ordem
 
-**Grupo "DESTE PROJETO"** (na ordem): `init`, `doctor`, `fix`, `learn`, `upgrade`, `status`
+**Grupo "DESTE PROJETO"** (na ordem): `init`, `doctor`, `fix`, `voltar`, `learn`, `upgrade`, `status`
 **Grupo "DA SKILL"** (na ordem): `evolve`, `manual`, `exportar`
+
+`voltar` fica **logo depois do `fix`**, no bloco de conserto. Quem abre o menu por causa de um
+acidente precisa achar em um segundo — não depois de ler dez linhas.
 
 Para cada um, pegue a descrição de uma linha da tabela abaixo e o último uso de
 `memoria/uso.json` (chave = nome do comando). Formate a data como `DD/MM/AAAA`; se nunca usado,
@@ -32,6 +35,7 @@ escreva literalmente `nunca usado`.
 | `init` | criar ou adotar a estrutura |
 | `doctor` | auditar (nunca escreve) |
 | `fix` | corrigir o que o doctor achou |
+| `voltar` | máquina do tempo — desfazer o que deu errado |
 | `learn` | erro real → guarda permanente |
 | `upgrade` | trazer melhorias da skill pro projeto |
 | `status` | resumo rápido (10 linhas) |
@@ -45,17 +49,18 @@ escreva literalmente `nunca usado`.
 🚀 MENU /harness · v<versão>
 
   DESTE PROJETO (<nome do projeto, ou "nenhum harness aqui">)
-   1 · init      criar ou adotar a estrutura              <último uso>
-   2 · doctor    auditar (nunca escreve)                  <último uso>
+   1 · init      criar ou adotar a estrutura               <último uso>
+   2 · doctor    auditar (nunca escreve)                   <último uso>
    3 · fix       corrigir o que o doctor achou             <último uso>
-   4 · learn     erro real → guarda permanente             <último uso>
-   5 · upgrade   trazer melhorias da skill pro projeto     <último uso>
-   6 · status    resumo rápido (10 linhas)                 <último uso>
+   4 · voltar    máquina do tempo — desfazer o que deu errado  <último uso>
+   5 · learn     erro real → guarda permanente             <último uso>
+   6 · upgrade   trazer melhorias da skill pro projeto     <último uso>
+   7 · status    resumo rápido (10 linhas)                 <último uso>
 
   DA SKILL (global)
-   7 · evolve    a skill melhora a si mesma                <último uso>
-   8 · manual    abrir o manual completo                   <último uso>
-   9 · exportar  publicar o manual (web/github/notion)     <último uso>
+   8 · evolve    a skill melhora a si mesma                <último uso>
+   9 · manual    abrir o manual completo                   <último uso>
+  10 · exportar  publicar o manual (web/github/notion)     <último uso>
 
 Digite o número do comando que quer rodar.
 ```

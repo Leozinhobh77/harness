@@ -8,6 +8,76 @@
 
 ---
 
+## v1.4.0 — 2026-08-12
+
+**A quarta guarda: a sombra. As três primeiras impedem o erro; esta aceita que um dia um erro
+passa, e garante que dá para voltar.**
+
+### Procedência
+
+Pergunta do usuário, ao vivo: *"quando eu vou modificar alguma coisa no meu projeto, ela faz
+algum backup, pra caso aconteça alguma coisa de errado?"*
+
+A resposta era **não**. Auditado no disco antes de responder: a única rede de segurança era git
+— e ela era **procedimental**, não mecânica (`fix` e `upgrade` exigem working tree limpo; o resto
+é pedido escrito no `AGENTS.md`). Nenhum hook copiava nada. O `pos-edicao.ps1` roda *depois* da
+escrita: quando ele valida, o conteúdo anterior já foi embora.
+
+Pesquisa de 12/08/2026 confirmou o tamanho exato do buraco. O checkpoint nativo do Claude Code
+(`/rewind`, desde a v2.0) cobre bastante — snapshot antes de cada prompt, 100 mais recentes, 30
+dias — **mas não rastreia**: mudança feita por comando de shell (`rm`, `mv`, `cp`, `>`), edição de
+subagente em segundo plano, mudança externa, symlink. A doc é explícita: *"Not a replacement for
+version control"*.
+
+**Esta versão cobre esse buraco, e só ele.** Reimplementar o `/rewind` seria o inchaço que a
+Lei 1 proíbe.
+
+### Por que entrou sem os 2 projetos da regra de promoção
+
+É a **exceção única da Lei 1** — guarda de segurança de dado entra preventivamente, porque perder
+dado não tem desfazer. Mesmo estatuto do `.gitignore`.
+
+### Entra
+
+- `scripts/sombra.ps1` — motor: `-Listar` `-Diff N` `-Restaurar N` `-Status` `-Snapshot` `-Limpar`
+- `templates/comum/sombra.ps1` — o hook, **autocontido**: não chama a skill, então o projeto
+  continua protegido mesmo se o `/harness` for desinstalado. Fica em `comum/` e não em
+  `T2-padrao/` porque T1 também o recebe — duas cópias seriam a duplicação que a Lei 3 proíbe
+- `comandos/voltar.md` — o 10º comando, e o único escrito para quem está com medo
+- `templates/T1-leve/.claude/settings.json` + `.gitignore` — **T1 ganha hook pela primeira vez**
+- `criterios/CHECKS.md` — 3 checks novos na Família 5 · `scripts/doctor.ps1` — os mesmos, mecânicos
+- Rota no `SKILL.md`, item 4 no `menu.md`, passo 2 na ordem de geração do `init.md`
+
+### Desenho — as decisões que valem registro
+
+- **Onde mora:** `.harness/sombra.git`, **dentro** do projeto. Mantém a promessa do manual
+  (*"o harness inteiro mora dentro do seu projeto"*). Decisão do usuário, com a alternativa
+  (`~/.harness/sombras/`) apresentada e recusada.
+- **Repositório git separado**, não cópia de arquivo. Ganha da abordagem `.backups/` (a da Forge
+  do usuário) em três pontos: captura o que o **shell** fez, não espalha pasta pela árvore, e
+  restaura tudo de uma vez. Padrão *shadow git* (`GIT_DIR` + `GIT_WORK_TREE`).
+- **Nunca bloqueia.** `exit 0` em qualquer situação, inclusive erro. Rede de segurança que trava
+  o trabalho é desligada na primeira semana — e aí não protege mais nada.
+- **Restaurar não apaga.** Tira foto do estado atual antes, e arquivo criado depois da foto é
+  **listado**, nunca removido. É a regra "nada é apagado" da skill inteira.
+- **Sem mudança no disco = sem foto.** Senão a foto útil fica enterrada em ruído.
+
+### Provado, não presumido
+
+Projeto de teste real: `estilo.css` apagado, `imagens/` apagada, `index.html` sobrescrito — os
+três por comando de shell, o cenário que o `/rewind` **não** desfaz. `-Restaurar 1` trouxe os três
+de volta, e o estado ruim virou foto 1. O hook foi testado com o JSON real de três eventos
+(`Bash` destrutivo → fotografa · `Bash` inofensivo → não fotografa · `SessionStart` → fotografa),
+sempre com `exit 0`.
+
+### Achado durante o teste
+
+O `%ar` do git devolve tempo relativo **em inglês** e não há parâmetro para traduzir. A skill é
+português-only, então `Get-Quando` calcula em PowerShell (*"há 4 min"*, *"ontem 15:40"*). Pego
+pelo teste de aceitação, não pelo usuário.
+
+---
+
 ## v1.3.3 — 2026-08-06
 
 **A skill rodou o próprio `doctor --skill` e reprovou em quatro pontos. Três eram deriva; um era

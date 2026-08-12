@@ -1,14 +1,14 @@
 {
-  "versao": "1.3.3",
+  "versao": "1.4.0",
   "criada_em": "2026-07-26",
-  "atualizada_em": "2026-08-06",
+  "atualizada_em": "2026-08-12",
   "ultima_evolucao": "2026-07-27",
-  "ultima_pesquisa_web": "2026-07-26",
+  "ultima_pesquisa_web": "2026-08-12",
   "prazos_dias": {
     "evolucao_sugerir": 14,
     "evolucao_insistir": 30,
     "pesquisa_web_sugerir": 45
   },
   "projetos_criados": 3,
-  "base_de_pesquisa": "julho/2026 — harness engineering, AGENTS.md, context engineering, spec-driven development, Claude Code hooks"
+  "base_de_pesquisa": "julho/2026 — harness engineering, AGENTS.md, context engineering, spec-driven development, Claude Code hooks · agosto/2026 — checkpointing nativo do Claude Code e padrão shadow git"
 }

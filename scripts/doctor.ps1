@@ -285,6 +285,30 @@ if (Test-Path $log) {
     Add-Achado 'AMARELO' 'Mecanica' 'log-guardas.jsonl vazio ou ausente - os hooks podem nao estar rodando' 'verificar settings.json'
 }
 
+# ============ F5 Mecanica: a sombra ============
+# A sombra e rede de seguranca de DADO, entao vale para todo tier (inclusive
+# T1) - mesma regra do .gitignore. Projeto sem ela nao tem como voltar de um
+# comando destrutivo: o /rewind nativo do Claude Code nao desfaz o que o shell
+# fez. Ver comandos/voltar.md.
+$dirSombra = Join-Path $dirHarn 'sombra.git'
+if (-not (Test-Path (Join-Path $dirSombra 'HEAD'))) {
+    Add-Achado 'AMARELO' 'Mecanica' 'Sem sombra: nao ha como desfazer um comando destrutivo neste projeto' '/harness upgrade'
+} else {
+    $motorSombra = Join-Path $PSScriptRoot 'sombra.ps1'
+    if (Test-Path $motorSombra) {
+        try {
+            $st = (& $motorSombra -Projeto $Projeto -Status -Json) -join "`n" | ConvertFrom-Json
+            if ($st.fotos -eq 0) {
+                Add-Achado 'AMARELO' 'Mecanica' 'Sombra existe mas nao tem nenhuma foto - o hook pode nao estar rodando' 'verificar .claude/settings.json'
+            }
+            # Sem teto, a rede de seguranca vira o inchaco que a Lei 4 combate.
+            if ($st.tamanhoMB -gt 300) {
+                Add-Achado 'AZUL' 'Mecanica' "Sombra ocupa $($st.tamanhoMB) MB" '/harness voltar --limpar'
+            }
+        } catch { }
+    }
+}
+
 # ============ F5 Mecanica: projeto registrado na skill ============
 # Passo escrito em comandos/init.md que ja foi pulado uma vez. REGISTRO.md vazio
 # = a etapa 2 do /harness evolve nao tem o que varrer, e a skill nunca aprende.

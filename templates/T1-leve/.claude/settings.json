@@ -1,0 +1,26 @@
+{
+  "_leia": "T1 e o tier minimo: nenhuma guarda de processo, nenhum orcamento imposto. A sombra e a unica excecao, porque ela nao e funcionalidade de tier - e chao. Perder trabalho num prototipo doi igual.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra.ps1\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra.ps1\""
+          }
+        ]
+      }
+    ]
+  }
+}

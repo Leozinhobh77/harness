@@ -57,6 +57,29 @@
 - **Promovido ao template:** não — é conhecimento do `doctor` da própria skill. Vale como regra
   de projeto se algum dia um harness gerar outro arquivo derivado.
 
+### P008 — Guarda de comando casa o TEXTO INTEIRO, e pega quem só *fala* do comando
+- **Visto em:** skill /harness (2026-07-26, como P006), **armadura C0 da Forge** (2026-08-12) —
+  ⭐ dois sistemas independentes, o mesmo desenho, o mesmo defeito
+- **Nível da solução:** 2 (o hook já era nível 2 — o defeito é o casamento, não o nível)
+- **O padrão:** uma guarda que aplica regex sobre o comando inteiro bloqueia qualquer comando
+  que **mencione** o texto proibido, mesmo quando o trecho destrutivo mira outro lugar — ou
+  quando não existe trecho destrutivo nenhum, só a string dentro de um payload.
+- **Detalhe:** construindo a sombra, dois comandos legítimos foram bloqueados pela armadura da
+  Forge: (1) um `Remove-Item -Recurse` numa pasta de teste em `Temp\`, porque a *outra linha* do
+  mesmo comando citava o caminho `.claude\skills\harness\scripts\sombra.ps1`; (2) um JSON de
+  teste contendo `"command":"rm -rf imagens/"` — o comando não apagava nada, só passava a string
+  para o hook por stdin. O escopo da armadura é `.claude`/`Forge`, e ela concluiu "in-scope"
+  pela menção, não pelo alvo.
+- **A solução, nas duas vezes, é a mesma:** resolver o **alvo efetivo** da parte destrutiva antes
+  de decidir. O `guarda.ps1` já faz isso para `cd ... && ...` (P006); a armadura da Forge ainda
+  não.
+- **Como reconhecer em outro lugar:** toda guarda que decide escopo por `$comando -match
+  '<caminho>'`. Se a mesma string pode aparecer como *argumento de outra coisa*, o falso positivo
+  é questão de tempo — e falso positivo em guarda ensina a contornar guarda.
+- **Promovido ao template:** não — o `guarda.ps1` do T2 já está correto desde o P006. Registrado
+  porque a segunda ocorrência **confirma o padrão** (regra dos 2 casos) e porque a armadura da
+  Forge é do usuário: vale a correção lá, quando ele quiser.
+
 ### P003 — `.hidden` não existe em SVGElement, só em HTMLElement
 - **Visto em:** skill /harness (2026-07-26)
 - **Nível da solução:** 3 (teste Playwright pegou antes de publicar)
