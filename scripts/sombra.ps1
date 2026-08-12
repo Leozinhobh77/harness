@@ -169,9 +169,17 @@ function Get-Fotos {
     return $fotos.ToArray()
 }
 
+# ATENCAO ao @() em toda chamada de Get-Fotos.
+# O PowerShell DESENROLA array de 1 item para escalar, e ".Count" num
+# PSCustomObject nao cai na extensao de escalar do PSv3 - vira busca de
+# propriedade inexistente e devolve $null. Sem o @(), com exatamente UMA foto:
+#   $fotos.Count -eq 0        -> $null -eq 0  -> falso (passa batido)
+#   $Numero -gt $fotos.Count  -> 1 -gt $null  -> VERDADEIRO -> "foto nao existe"
+# Ou seja: o restaurar quebrava justo no projeto novo, na primeira vez que
+# alguem precisasse dele. Achado rodando -Status nos projetos reais.
 function Resolve-Foto {
     param([int]$Numero)
-    $fotos = Get-Fotos -Limite ([math]::Max($Numero, 20))
+    $fotos = @(Get-Fotos -Limite ([math]::Max($Numero, 20)))
     if ($fotos.Count -eq 0) { return $null }
     if ($Numero -lt 1 -or $Numero -gt $fotos.Count) { return $null }
     return $fotos[$Numero - 1]
@@ -205,7 +213,7 @@ function Invoke-Snapshot {
 if ($Status) {
     $existe = Test-SombraExiste
     $fotos  = @()
-    if ($existe) { $fotos = Get-Fotos -Limite 500 }
+    if ($existe) { $fotos = @(Get-Fotos -Limite 500) }
     $ultima = ''
     if ($fotos.Count -gt 0) { $ultima = $fotos[0].data }
 
@@ -237,7 +245,7 @@ if ($Listar) {
         Write-Output 'SEM_SOMBRA: este projeto ainda nao tem sombra.'
         exit 2
     }
-    $fotos = Get-Fotos -Limite $Quantos
+    $fotos = @(Get-Fotos -Limite $Quantos)
     if ($Json) { $fotos | ConvertTo-Json -Depth 3; exit 0 }
 
     if ($fotos.Count -eq 0) { Write-Output 'Nenhuma foto ainda.'; exit 0 }

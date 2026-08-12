@@ -70,11 +70,20 @@ de volta, e o estado ruim virou foto 1. O hook foi testado com o JSON real de tr
 (`Bash` destrutivo → fotografa · `Bash` inofensivo → não fotografa · `SessionStart` → fotografa),
 sempre com `exit 0`.
 
-### Achado durante o teste
+### Dois achados durante a verificação
 
-O `%ar` do git devolve tempo relativo **em inglês** e não há parâmetro para traduzir. A skill é
-português-only, então `Get-Quando` calcula em PowerShell (*"há 4 min"*, *"ontem 15:40"*). Pego
-pelo teste de aceitação, não pelo usuário.
+1. O `%ar` do git devolve tempo relativo **em inglês** e não há parâmetro para traduzir. A skill é
+   português-only, então `Get-Quando` calcula em PowerShell (*"há 4 min"*, *"ontem 15:40"*).
+
+2. ⭐ **`-Restaurar 1` quebrava em projeto com exatamente uma foto** (P009). `.Count` num
+   `PSCustomObject` devolve `$null`, e as comparações ficavam invertidas em silêncio. O teste de
+   aceitação tinha 3 fotos e passou; o defeito só apareceu ao rodar `-Status` nos **projetos
+   reais**, recém-instalados. Corrigido com `@()` em toda chamada de `Get-Fotos`, e reprovado no
+   cenário exato: projeto com uma foto, arquivo apagado, restaurado.
+
+   A lição ficou registrada em `PADROES.md` porque vale além deste bug: **o cenário de
+   demonstração naturalmente tem vários itens, então o caso de 1 é o menos testado — e é o
+   primeiro que o usuário encontra.**
 
 ---
 

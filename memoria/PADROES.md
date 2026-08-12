@@ -57,6 +57,25 @@
 - **Promovido ao template:** não — é conhecimento do `doctor` da própria skill. Vale como regra
   de projeto se algum dia um harness gerar outro arquivo derivado.
 
+### P009 — `.Count` num `PSCustomObject` devolve `$null`, não `1` — e o teste com muitos itens esconde
+- **Visto em:** skill /harness (2026-08-12, construção da sombra)
+- **Nível da solução:** 3 (o parser não pega; só rodar no caso de 1 item pega)
+- **Solução:** **toda** chamada de função que devolve lista vai dentro de `@()`. Sempre, mesmo
+  quando "obviamente" vem mais de um.
+- **Detalhe:** o PowerShell desenrola array de 1 item para escalar. A extensão `.Count` do PSv3
+  cobre escalares comuns, mas num `PSCustomObject` o acesso vira busca de propriedade
+  inexistente e devolve `$null`. As duas comparações seguintes ficam **silenciosamente
+  invertidas**: `$null -eq 0` é falso (parece ter itens) e `1 -gt $null` é verdadeiro (parece
+  fora do intervalo). Resultado: `-Restaurar 1` respondia *"não existe foto numero 1"* em
+  projeto com **exatamente uma foto** — ou seja, quebrava justamente na primeira vez que alguém
+  precisasse dele.
+- **⭐ A lição que vale mais que o bug:** o teste de aceitação passou com 3 fotos e **mascarou o
+  defeito**. Ele só apareceu ao rodar em projeto real recém-instalado. Todo caminho que lida com
+  coleção precisa de um teste com **exatamente um** elemento — é o caso de borda mais comum e o
+  menos testado, porque o cenário de demonstração naturalmente tem vários.
+- **Promovido ao template:** não é template de projeto — é conhecimento de PowerShell da própria
+  skill, como P001 e P002. O check de parser não pega isto: é erro de tipo em tempo de execução.
+
 ### P008 — Guarda de comando casa o TEXTO INTEIRO, e pega quem só *fala* do comando
 - **Visto em:** skill /harness (2026-07-26, como P006), **armadura C0 da Forge** (2026-08-12) —
   ⭐ dois sistemas independentes, o mesmo desenho, o mesmo defeito
