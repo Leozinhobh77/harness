@@ -20,7 +20,7 @@ o `init` fica mais relevante nesse caso.
 
 ### 3. Monte o menu — dois grupos, nesta ordem
 
-**Grupo "DESTE PROJETO"** (na ordem): `init`, `doctor`, `fix`, `voltar`, `learn`, `upgrade`, `status`
+**Grupo "DESTE PROJETO"** (na ordem): `init`, `doctor`, `fix`, `voltar`, `criticar`, `learn`, `upgrade`, `status`
 **Grupo "DA SKILL"** (na ordem): `evolve`, `manual`, `exportar`
 
 `voltar` fica **logo depois do `fix`**, no bloco de conserto. Quem abre o menu por causa de um
@@ -36,6 +36,7 @@ escreva literalmente `nunca usado`.
 | `doctor` | auditar (nunca escreve) |
 | `fix` | corrigir o que o doctor achou |
 | `voltar` | máquina do tempo — desfazer o que deu errado |
+| `criticar` | comparar com a referência, às cegas |
 | `learn` | erro real → guarda permanente |
 | `upgrade` | trazer melhorias da skill pro projeto |
 | `status` | resumo rápido (10 linhas) |
@@ -53,14 +54,15 @@ escreva literalmente `nunca usado`.
    2 · doctor    auditar (nunca escreve)                   <último uso>
    3 · fix       corrigir o que o doctor achou             <último uso>
    4 · voltar    máquina do tempo — desfazer o que deu errado  <último uso>
-   5 · learn     erro real → guarda permanente             <último uso>
-   6 · upgrade   trazer melhorias da skill pro projeto     <último uso>
-   7 · status    resumo rápido (10 linhas)                 <último uso>
+   5 · criticar  comparar com a referência, às cegas       <último uso>
+   6 · learn     erro real → guarda permanente             <último uso>
+   7 · upgrade   trazer melhorias da skill pro projeto     <último uso>
+   8 · status    resumo rápido (10 linhas)                 <último uso>
 
   DA SKILL (global)
-   8 · evolve    a skill melhora a si mesma                <último uso>
-   9 · manual    abrir o manual completo                   <último uso>
-  10 · exportar  publicar o manual (web/github/notion)     <último uso>
+   9 · evolve    a skill melhora a si mesma                <último uso>
+  10 · manual    abrir o manual completo                   <último uso>
+  11 · exportar  publicar o manual (web/github/notion)     <último uso>
 
 Digite o número do comando que quer rodar.
 ```

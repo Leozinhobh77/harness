@@ -67,6 +67,7 @@ Versão completa em `docs/GOVERNANCA.md` §2. As linhas 🔴 são impostas por h
 | `docs/DECISOES.md` | Para entender **por que** algo é assim (memória sob demanda). |
 | `Planos/MANUAL.md` + `MODELO-DE-PLANO.md` | Antes de criar/atualizar um plano. |
 | `Planos/INDICE.md` | Para ver o que já está em andamento antes de começar algo novo. |
+| `referencias/INDICE.md` | **Antes** de trabalho visual, de texto ou de marca — é a barra a bater. |
 | `CLAUDE.md` | Camada específica do Claude Code (não repete o que já está aqui). |
 
 ## 7. Fora de escopo hoje

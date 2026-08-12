@@ -36,8 +36,15 @@ ESTADO.md          ≤ 40 linhas — GERADO por scripts/estado.ps1, nunca escrit
 .claude/settings.json + hooks/{sombra,guarda,pos-edicao,porta-saida}.ps1
 docs/GOVERNANCA.md · PRD.md · SPEC.md · DECISOES.md
 Planos/MANUAL.md · MODELO-DE-PLANO.md · INDICE.md · Concluídos/
+referencias/INDICE.md + a prateleira (visual · personagens · texto · documentos
+                                      dados · mapas · audio · video)
+.claude/agents/critico-cego.md
 .harness/manifesto.json · log-guardas.jsonl · sombra.git/
 ```
+
+> **`referencias/` não conta no orçamento de sessão.** Só o `INDICE.md` tem conteúdo, e ele é
+> leitura sob demanda — igual ao `SPEC.md`. A prateleira nasce inteira mesmo vazia porque o
+> custo é zero e o ganho é de adoção: prateleira invisível não é usada.
 
 ### T3 · Completo  ⚠️ projetado, ainda não implementado
 

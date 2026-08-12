@@ -29,6 +29,7 @@ description: Cria, audita, mantém e evolui o harness de governança de qualquer
 | "corrigir", "arrumar", "limpar", `fix` | `comandos/fix.md` | Aplica o que o doctor achou |
 | "a IA errou X", "isso não pode repetir", `learn` | `comandos/learn.md` | Erro → guarda permanente |
 | "voltar", "desfazer", "apagou meu arquivo", "socorro" | `comandos/voltar.md` | Máquina do tempo — restaura pelas fotos da sombra |
+| "está bom?", "compara com a referência", `criticar` | `comandos/criticar.md` | Comparação cega contra a barra de `referencias/` |
 | "evoluir a skill", "melhorar você", `evolve` | `comandos/evolve.md` | A skill audita e melhora a si mesma |
 | "atualizar este projeto", `upgrade` | `comandos/upgrade.md` | Traz melhorias da skill pro projeto |
 | "manual", "ajuda", "como usa" | `comandos/manual.md` | Manual navegável por número |
@@ -67,7 +68,8 @@ harness/
 ├── .gitignore
 ├── comandos/             a instrução de cada comando
 ├── criterios/            TIERS · ORCAMENTOS · CHECKS
-├── templates/            T1-leve · T2-padrao · comum (ESTADO.tpl · sombra.ps1) · T3 (parcial)
+├── templates/            T1-leve · T2-padrao · T3 (parcial)
+│                        comum/ ESTADO.tpl · sombra.ps1 · critico-cego.md · referencias/
 ├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1 · sombra.ps1
 ├── manual/               MANUAL.md — 📌 fonte única do manual
 ├── docs/                 index.html — página publicada (GitHub Pages), saída do --exportar

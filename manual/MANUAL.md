@@ -1,6 +1,6 @@
 # 📖 MANUAL `/harness`
 
-> **Versão 1.4.0** · gerado em **12/08/2026**
+> **Versão 1.5.0** · gerado em **12/08/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -19,6 +19,7 @@
 /harness fix          corrigir o que o doctor achou
 /harness fix --limpar abater o que não se provou útil
 /harness voltar       máquina do tempo · desfaz o acidente  🕰️ o dia em que salva
+/harness criticar     compara com a referência, às cegas    🔍 sobe a barra
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
@@ -39,7 +40,7 @@ Rotina saudável:
 | Camada | Seções |
 |---|---|
 | 🚀 **Começando** | [Visão geral](#1-visão-geral) · [Primeiro projeto](#2-meu-primeiro-projeto) · [Glossário](#3-glossário) |
-| 📕 **Referência** | [status](#41-harness--status) · [init](#42-harness-init) · [doctor](#43-harness-doctor) · [fix](#44-harness-fix) · [learn](#45-harness-learn-) · [evolve](#46-harness-evolve-) · [upgrade](#47-harness-upgrade) · [voltar](#48-harness-voltar-) |
+| 📕 **Referência** | [status](#41-harness--status) · [init](#42-harness-init) · [doctor](#43-harness-doctor) · [fix](#44-harness-fix) · [learn](#45-harness-learn-) · [evolve](#46-harness-evolve-) · [upgrade](#47-harness-upgrade) · [voltar](#48-harness-voltar-) · [criticar](#49-harness-criticar-) |
 | 🍳 **Receitas** | [6 situações do dia a dia](#5-receitas) |
 | 🔧 **Anatomia** | [Cada arquivo que ele cria](#6-anatomia) |
 | 🧠 **Conceitos** | [Flywheel](#71-o-efeito-flywheel) · [5 leis](#72-as-5-leis-anti-inchaço) · [Tiers](#73-tiers-e-a-escada) · [Hooks](#74-hooks) |
@@ -153,7 +154,7 @@ ele você tem um template bonito que envelhece. Com ele você tem um sistema que
 O "bom dia" da skill. **Máximo 10 linhas**, barato, não roda auditoria completa.
 
 ```
-📁 Finanças · tier T2 · harness v1.3.3 · criado 26/07/2026
+📁 Finanças · tier T2 · harness v1.5.0 · criado 26/07/2026
 
 Estado: 1 plano ativo (0003 — dashboard de filtros, 6/14 tarefas)
 Último commit: há 2 dias — "feat: filtro por período customizado"
@@ -246,7 +247,7 @@ Não sabe responder com um caso real? É candidata a abate.
 ### A saída
 
 ```
-🩺 DOCTOR — Finanças · tier T2 · harness v1.3.3 · 06/08/2026
+🩺 DOCTOR — Finanças · tier T2 · harness v1.5.0 · 06/08/2026
 
 🔴 QUEBRADO (1)
   • Planos/INDICE.md:19 aponta para o plano 0003, que não existe
@@ -549,6 +550,68 @@ E como o `.gitignore`, **nunca é candidata a abate**: zero restaurações é o 
 fracasso.
 
 ---
+
+## 4.9 `/harness criticar` 🔍
+
+**A comparação cega contra uma barra.** Uma rodada, sem loop.
+
+### O problema que ele resolve
+
+Perguntar *"ficou bom?"* para quem acabou de construir não funciona. Quem construiu conhece o
+esforço, sabe o que foi difícil, e defende a obra. Não é má-fé — é como atenção funciona.
+
+A saída é estrutural: **quem julga não pode ter visto construir.**
+
+### Como funciona
+
+```
+1. PORTÃO DETERMINÍSTICO    build? teste? lint? doctor?
+   falhou → PARA. Não se pede opinião estética sobre coisa que nem roda.
+
+2. A BARRA                  lê referencias/INDICE.md
+   nenhuma serve → para. Sem barra não há crítica, há opinião.
+
+3. CAPTURA                  página → screenshot de VERDADE
+                            código/texto → o arquivo
+
+4. SORTEIA A e B            o mapa de quem é quem nunca vai pro disco
+
+5. CRÍTICO CEGO             subagente · contexto limpo · SÓ LEITURA
+   "um é referência profissional, outro é candidato. qual vence?"
+
+6. REPORTA                  venceu/perdeu + UM gap concreto
+                            e não conserta nada
+```
+
+O passo 1 é o que separa isto de "pedir palpite pra IA". É o mesmo mecanismo que, num estudo de
+2026, derrubou amplificação de erro de **1,7% para 0,1%**.
+
+### Não precisa de outra janela
+
+O crítico é um **subagente**: roda na mesma sessão, com janela de contexto própria. Na extensão
+do VS Code ele aparece no painel de agentes, e você pode abrir o transcript dele. Um comando, uma
+janela.
+
+### Por que binário e não nota
+
+Porque **nota vira alvo**. Mediu-se em 2026 um juiz LLM indo de 0,72 a 0,94 de aprovação
+enquanto a acurácia verdadeira ficava parada em 0,20 — o sistema aprendeu a agradar o juiz, não a
+melhorar. Decisão binária mais um gap concreto não oferece essa superfície.
+
+### A pegadinha
+
+**Perder é resultado bom.** Um crítico que sempre aprova está sendo educado, não útil. Se três
+críticas seguidas vencerem, desconfie da barra — ela provavelmente está baixa demais para
+ensinar alguma coisa.
+
+### O que ele deliberadamente NÃO faz
+
+Não roda em loop sozinho. A pesquisa que originou este comando (o **Gauntlet Loop**) propõe
+exatamente isso, e o benchmark sério da área — **LoopsBench**, julho/2026 — mediu **25%** de
+resolução na melhor configuração, com regressões visíveis em todos os perfis de loop. O ganho
+medido vem do crítico **existir**; o risco medido vem de ele rodar sem freio. **Você é o freio.**
+
+---
 ---
 
 # 🍳 RECEITAS
@@ -700,6 +763,8 @@ MeuProjeto/
 ├── .gitignore             guardas de dado
 ├── .claude/
 │   ├── settings.json      configuração dos hooks
+│   ├── agents/
+│   │   └── critico-cego.md 🔍 o juiz que não viu construir
 │   └── hooks/
 │       ├── sombra.ps1        🕰️ FOTOGRAFA antes do risco (todo tier)
 │       ├── guarda.ps1        bloqueia ANTES
@@ -715,6 +780,10 @@ MeuProjeto/
 │   ├── MODELO-DE-PLANO.md template pra copiar
 │   ├── INDICE.md          registro de todos os planos
 │   └── Concluídos/        histórico (nunca apagar)
+├── referencias/           🔍 A BARRA — o que o projeto quer parecer
+│   ├── INDICE.md          o único com conteúdo · leitura sob demanda
+│   ├── visual/ personagens/ texto/ documentos/
+│   └── dados/ mapas/ audio/ video/
 └── .harness/
     ├── manifesto.json     identidade do harness (tier, versão, arquivos)
     ├── guardas.json       ⭐ as guardas como DADO, não como código
@@ -808,6 +877,74 @@ não histórico do projeto. Versionar as fotos duplicaria tudo a cada commit.
 Detalhe de desenho que vale saber: o hook que tira as fotos é **autocontido**. Ele não chama a
 skill. Se você desinstalar o `/harness` amanhã, o projeto **continua sendo fotografado** — só o
 `voltar` (ler e restaurar) é que precisa da skill.
+
+### `referencias/` — a categoria que faltava
+
+Todo o resto do harness é sobre o que o projeto **decidiu**. Esta pasta é sobre o que ele **quer
+parecer**. É material de entrada, não documento de governança — por isso não mora em `docs/`.
+
+```
+referencias/
+├── INDICE.md      ← o único com conteúdo · o resto é prateleira
+├── visual/        prints, telas, paletas
+├── personagens/   consistência de personagem, marca, produto
+├── texto/         tom de voz · exemplo bom E exemplo ruim
+├── documentos/    PDF, briefing, spec de terceiro
+├── dados/         JSON, CSV, esquema de exemplo
+├── mapas/         .canvas, diagrama, mapa mental
+├── audio/         + companheira .md
+└── video/         + companheira .md
+```
+
+**Os 3 critérios de entrada** — todos obrigatórios, e é isso que separa referência de arquivo
+solto:
+
+| Nomeada | Buscável | Inspecionável |
+|---|---|---|
+| uma coisa específica | dá pra abrir, ler, rodar | dá pra pôr lado a lado |
+| ❌ "design moderno" | ❌ link que não abre | ❌ "elegante" |
+
+**Custo por sessão: zero.** Pasta vazia não custa token; o `INDICE.md` é leitura sob demanda,
+igual ao `SPEC.md`. O que carrega sempre é **uma linha** de ponteiro no `AGENTS.md` — medido em
+13 tokens.
+
+**Por que a prateleira nasce inteira, mesmo vazia:** *o que não é visto não é lembrado*. Uma pasta
+`referencias/` sozinha e vazia não ensina onde as coisas vão; oito pastas nomeadas ensinam. Como
+o custo é zero, o único critério que sobra é adoção.
+
+### A regra da companheira — áudio e vídeo
+
+Hoje a IA lê imagem, PDF, markdown, JSON, CSV e `.canvas` direto. **Áudio e vídeo, não.** A regra
+resolve os dois sem esperar nada:
+
+```
+video/transicao-suave.mp4
+video/transicao-suave.md      ← o que tem nele, e o que nele é a barra
+```
+
+Hoje ela lê a companheira. Quando passar a ler o arquivo direto, **o arquivo já está lá**. Zero
+retrabalho — e essa é a parte que faz valer a pena criar a pasta antes de a capacidade existir.
+
+### A ficha de personagem — a peça mais subestimada
+
+Foto sozinha não garante consistência: ela mostra **um** estado. A ficha diz **o que não pode
+mudar entre um estado e outro**.
+
+```markdown
+## Invariantes — nunca mudam
+- cabelo castanho-escuro, ondulado, altura do ombro
+- cicatriz pequena na sobrancelha esquerda
+
+## Variáveis — podem mudar
+expressão · ângulo · iluminação · fundo
+
+## Erros já cometidos      ← a seção que faz a ficha ficar boa
+- 2026-08-12 — saiu de cabelo liso → virou o invariante "ondulado"
+```
+
+A última seção é a **Lei 1 aplicada à referência**: invariante que nasceu de um erro real vale
+muito mais que invariante que alguém imaginou. É o mesmo flywheel do `learn`, aplicado a
+consistência em vez de guarda.
 
 ---
 ---
@@ -1128,6 +1265,26 @@ Pouco — o git guarda só a diferença entre as fotos. Nos projetos de teste fi
 MB. O `doctor` avisa se passar de 300 MB, e `/harness voltar --limpar` compacta sem apagar foto
 nenhuma.
 
+**O crítico precisa de outra janela aberta?**
+Não. Ele é um **subagente**: roda na mesma sessão, com janela de contexto própria, e aparece no
+painel de agentes da extensão do VS Code. Um comando, uma janela.
+
+**Por que o crítico usa um modelo diferente do que construiu?**
+Porque viés de auto-preferência é medido: modelo tende a favorecer saída da própria família. E
+comparar é mais barato que criar. Mas a variável **menos** importante aqui é o modelo — o que faz
+funcionar é o contexto limpo, a cegueira e o portão determinístico antes.
+
+**A pasta `referencias/` vazia não é inchaço?**
+Não, e a conta é literal: pasta vazia custa **zero token**, e o `INDICE.md` é leitura sob
+demanda. O que carrega em toda sessão é uma linha de ponteiro — 13 tokens medidos. A Lei 3 cobra
+documento que carrega sempre; nada aqui carrega.
+
+**Por que o `criticar` não roda em loop sozinho?**
+Porque o benchmark sério da área (LoopsBench, julho/2026) mediu **25%** de resolução na melhor
+configuração, com regressões em todos os perfis de loop — e mediu-se juiz LLM subindo de 0,72 a
+0,94 de aprovação com a acurácia real parada em 0,20. O ganho comprovado vem do crítico
+**existir**. O risco comprovado vem de ele rodar sem freio.
+
 **Por que ela insiste tanto em ser pequena?**
 Acima de ~150 linhas o custo sobe 20–23% sem ganho medido, e regra genérica chega a **piorar** o
 resultado. Enxuto não é estética, é performance.
@@ -1250,6 +1407,7 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| **1.5.0** | **2026-08-12** | **A barra: `referencias/` e o crítico cego** 🔍 — o harness ganha uma categoria que não tinha: **material de entrada** (o que o projeto quer parecer), separado de documento de governança (o que ele decidiu). Prateleira de 8 pastas + `INDICE.md` com os 3 critérios de entrada (**Nomeada · Buscável · Inspecionável**) + ficha de consistência de personagem. Comando novo `/harness criticar`: portão determinístico primeiro, depois um **subagente crítico com contexto limpo** compara o resultado real contra a barra **às cegas**, decisão binária sem nota, e **não conserta**. Nasceu de pesquisa sobre o **Gauntlet Loop** — que entrou pela metade de propósito: entrou o crítico (ganho medido de ~78% dos defeitos), **não entrou o loop autônomo** (LoopsBench: 25% de resolução e regressões em todos os perfis; reward hacking de juiz medido em 0,72→0,94 com acurácia real em 0,20). Prateleira nasce inteira mesmo vazia — custo zero, e *o que não é visto não é lembrado*. |
 | **1.4.0** | **2026-08-12** | **A quarta guarda: a sombra** 🕰️ — máquina do tempo do projeto, em `.harness/sombra.git`. Nasceu de uma pergunta do usuário (*"ela faz backup do meu projeto?"*), cuja resposta era **não**: a única rede era git, e procedimental. Pesquisa do dia delimitou o buraco exato — o `/rewind` nativo do Claude Code **não** rastreia mudança feita por comando de shell, subagente em segundo plano, nem nada depois de 30 dias. A sombra cobre esse buraco e só ele. **T1 ganhou hook pela primeira vez** (a sombra é chão, não tier). Comando novo `/harness voltar`, 3 checks novos no `doctor`. Provado em teste real: arquivo apagado, pasta apagada e arquivo sobrescrito por shell — os três voltaram. Dois defeitos achados na verificação, um deles sério (`-Restaurar` quebrava em projeto com **exatamente uma foto**, justo na primeira vez que alguém precisaria dele — P009). |
 | 1.3.3 | 2026-08-06 | A skill rodou o próprio `doctor --skill` e reprovou em 4 pontos. Corrigida a deriva do `SKILL.md` (apontava a saída do manual pra um arquivo inexistente), eliminada a segunda árvore de estrutura do `README.md` (fonte única), e o **T3 passou a se declarar "projetado, ainda não implementado"** — havia gatilho, check e descrição, mas nenhum template. Abatido do `evolve` o item que cobrava um orçamento inexistente. **Este manual foi atualizado da 1.2.1 até aqui.** |
 | 1.3.2 | 2026-07-27 | O teto de orçamento ganhou **20% de tolerância** e parou de somar arquivos diferentes. Correção do usuário: teto binário faz o número mandar no conteúdo, e somar `SKILL.md` com `CONSTITUICAO.md` é erro de categoria. |

@@ -70,10 +70,16 @@ Ordem de geração:
    existir o que salvar, senão o primeiro acidente acontece sem foto nenhuma.
 3. `AGENTS.md`
 4. Resto do tier
-5. `.claude/settings.json` completo + demais hooks (T2+)
-6. `.harness/manifesto.json`
-7. `ESTADO.md` — **por último**, rodando `scripts/estado.ps1` (ele é gerado, nunca escrito)
-8. `git init` se ainda não for repo (**pergunte antes**)
+5. **A prateleira de referências** (T2+) — `referencias/` com `INDICE.md` e as 8 pastas, cada
+   uma com `.gitkeep`. Copie o índice de `templates/comum/referencias/`.
+   ⚠️ **Crie a prateleira inteira, mesmo vazia.** Pasta vazia custa **zero token** — só o
+   `INDICE.md` tem conteúdo, e ele é leitura sob demanda. O motivo é de adoção, não técnico:
+   *estrutura que não se vê não é lembrada*, e referência que ninguém lembra de pôr não existe.
+   Junto: `.claude/agents/critico-cego.md` (de `templates/comum/`).
+6. `.claude/settings.json` completo + demais hooks (T2+)
+7. `.harness/manifesto.json`
+8. `ESTADO.md` — **por último**, rodando `scripts/estado.ps1` (ele é gerado, nunca escrito)
+9. `git init` se ainda não for repo (**pergunte antes**)
 
 ### Passo 5 — REGISTRE e prove
 

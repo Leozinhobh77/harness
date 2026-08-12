@@ -662,7 +662,7 @@
     <div class="nav-top">
       <div class="brand">
         <div class="brand-mark">/<span>harness</span></div>
-        <div class="brand-meta">Manual · v1.4.0 · 12.08.2026</div>
+        <div class="brand-meta">Manual · v1.5.0 · 12.08.2026</div>
       </div>
       <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
@@ -678,7 +678,7 @@
       </div>
       <div class="nav-group">
         <div class="nav-label">Referência</div>
-        <a href="#s4"><span class="n">4</span> Os oito comandos</a>
+        <a href="#s4"><span class="n">4</span> Os nove comandos</a>
       </div>
       <div class="nav-group">
         <div class="nav-label">Receitas</div>
@@ -741,6 +741,7 @@
 /harness fix          corrigir o que o doctor achou
 /harness fix --limpar abater o que não se provou útil
 /harness voltar       máquina do tempo · desfaz o acidente ← o dia em que salva
+/harness criticar     compara com a referência, às cegas   ← sobe a barra
 /harness learn "..."  erro real → guarda permanente        ← o mais valioso
 /harness evolve       a skill melhora a si mesma           ← a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
@@ -855,11 +856,11 @@ Posso rodar git init? (o harness todo se apoia nele para checkpoint e rollback)<
 
     <!-- ===================== 4 ===================== -->
     <section id="s4">
-      <div class="sec-head"><span class="sec-num">04</span><h2>Os oito comandos</h2></div>
+      <div class="sec-head"><span class="sec-num">04</span><h2>Os nove comandos</h2></div>
 
       <h3><code>/harness</code> — status</h3>
       <p>O “bom dia” da skill. Máximo 10 linhas, barato, não roda auditoria completa.</p>
-      <pre><code>📁 Finanças · tier T2 · harness v1.4.0 · criado 26/07/2026
+      <pre><code>📁 Finanças · tier T2 · harness v1.5.0 · criado 26/07/2026
 
 Estado: 1 plano ativo (0003 — dashboard de filtros, 6/14 tarefas)
 Último commit: há 2 dias — "feat: filtro por período customizado"
@@ -914,7 +915,7 @@ Saúde: 0 vermelho · 2 amarelo     → /harness doctor  para ver</code></pre>
         o teste é uma pergunta só:
       </p>
       <blockquote><p>Se eu apagar esta linha, que erro concreto volta a acontecer?</p></blockquote>
-      <pre><code>DOCTOR — Finanças · tier T2 · harness v1.4.0 · 12/08/2026
+      <pre><code>DOCTOR — Finanças · tier T2 · harness v1.5.0 · 12/08/2026
 
 VERMELHO (1)
   • Planos/INDICE.md:19 aponta para o plano 0003, que não existe
@@ -1080,6 +1081,60 @@ Qual número? (ou "d 2" para ver o que mudou desde a foto 2)</code></pre>
           o sucesso dela, não o fracasso.
         </p>
       </div>
+
+      <h3><code>/harness criticar</code> — a comparação cega</h3>
+      <p>
+        Perguntar <em>“ficou bom?”</em> para quem acabou de construir não funciona. Quem construiu
+        conhece o esforço, sabe o que foi difícil, e defende a obra. Não é má-fé — é como atenção
+        funciona. A saída é estrutural: <strong>quem julga não pode ter visto construir.</strong>
+      </p>
+      <pre><code>1. PORTÃO DETERMINÍSTICO    build? teste? lint? doctor?
+   falhou → PARA. Não se pede opinião estética sobre coisa que nem roda.
+
+2. A BARRA                  lê referencias/INDICE.md
+   nenhuma serve → para. Sem barra não há crítica, há opinião.
+
+3. CAPTURA                  página → screenshot de VERDADE
+                            código/texto → o arquivo
+
+4. SORTEIA A e B            o mapa de quem é quem nunca vai pro disco
+
+5. CRÍTICO CEGO             subagente · contexto limpo · SÓ LEITURA
+   "um é referência profissional, outro é candidato. qual vence?"
+
+6. REPORTA                  venceu/perdeu + UM gap concreto
+                            e não conserta nada</code></pre>
+      <p>
+        O passo 1 é o que separa isto de “pedir palpite pra IA”. É o mesmo mecanismo que, num
+        estudo de 2026, derrubou amplificação de erro de <strong>1,7% para 0,1%</strong>.
+      </p>
+      <div class="note">
+        <span class="note-tag">Não precisa de outra janela</span>
+        <p>
+          O crítico é um <strong>subagente</strong>: roda na mesma sessão, com janela de contexto
+          própria, e aparece no painel de agentes da extensão do VS Code. Um comando, uma janela.
+        </p>
+      </div>
+      <div class="note key">
+        <span class="note-tag">Binário, nunca nota</span>
+        <p>
+          Nota vira alvo. Mediu-se em 2026 um juiz LLM indo de <strong>0,72 a 0,94</strong> de
+          aprovação enquanto a acurácia verdadeira ficava parada em <strong>0,20</strong> — o
+          sistema aprendeu a agradar o juiz, não a melhorar. Decisão binária mais um gap concreto
+          não oferece essa superfície.
+        </p>
+      </div>
+      <div class="note warn">
+        <span class="note-tag">Perder é resultado bom</span>
+        <p>
+          Um crítico que sempre aprova está sendo educado, não útil. Se três críticas seguidas
+          vencerem, desconfie da barra — ela provavelmente está baixa demais para ensinar alguma
+          coisa. E ele <strong>não roda em loop sozinho</strong>: o benchmark sério da área
+          (LoopsBench, julho/2026) mediu <strong>25%</strong> de resolução na melhor configuração,
+          com regressões em todos os perfis de loop. O ganho comprovado vem do crítico existir; o
+          risco comprovado vem de ele rodar sem freio. <strong>Você é o freio.</strong>
+        </p>
+      </div>
     </section>
 
     <!-- ===================== 5 ===================== -->
@@ -1200,6 +1255,8 @@ Qual número? (ou "d 2" para ver o que mudou desde a foto 2)</code></pre>
 ├── .gitignore             guardas de dado
 ├── .claude/
 │   ├── settings.json      configuração dos hooks
+│   ├── agents/
+│   │   └── critico-cego.md  o juiz que não viu construir
 │   └── hooks/
 │       ├── sombra.ps1        FOTOGRAFA antes do risco (todo tier)
 │       ├── guarda.ps1        bloqueia ANTES
@@ -1215,6 +1272,10 @@ Qual número? (ou "d 2" para ver o que mudou desde a foto 2)</code></pre>
 │   ├── MODELO-DE-PLANO.md template pra copiar
 │   ├── INDICE.md          registro de todos os planos
 │   └── Concluídos/        histórico (nunca apagar)
+├── referencias/           A BARRA — o que o projeto quer parecer
+│   ├── INDICE.md          o único com conteúdo · leitura sob demanda
+│   ├── visual/ personagens/ texto/ documentos/
+│   └── dados/ mapas/ audio/ video/
 └── .harness/
     ├── manifesto.json     identidade do harness (tier, versão, arquivos)
     ├── guardas.json       as guardas como DADO, não como código
@@ -1573,6 +1634,9 @@ Desce por desuso (não se provou)</code></pre>
           <tr><td><strong>Se a IA apagar um arquivo meu, dá pra recuperar?</strong></td><td>Dá — <code>/harness voltar</code>. Funciona inclusive quando o estrago veio de comando de shell, que é o caso em que o <code>/rewind</code> nativo <strong>não</strong> ajuda.</td></tr>
           <tr><td>Então a sombra substitui o <code>/rewind</code>?</td><td>Não, e nem tenta. Use o <code>/rewind</code> no dia a dia; o <code>voltar</code> quando ele não der conta.</td></tr>
           <tr><td>A sombra ocupa muito espaço?</td><td>Pouco — o git guarda só a diferença. Nos projetos de teste, entre 0,1 e 1,5 MB. O <code>doctor</code> avisa acima de 300 MB.</td></tr>
+          <tr><td><strong>O crítico precisa de outra janela aberta?</strong></td><td>Não. É um <strong>subagente</strong>: mesma sessão, contexto próprio, aparece no painel de agentes do VS Code.</td></tr>
+          <tr><td>A pasta <code>referencias/</code> vazia não é inchaço?</td><td>Não, e a conta é literal: pasta vazia custa <strong>zero token</strong>; o <code>INDICE.md</code> é leitura sob demanda. O ponteiro no <code>AGENTS.md</code> custa 13 tokens medidos.</td></tr>
+          <tr><td>Por que o <code>criticar</code> não roda em loop sozinho?</td><td>LoopsBench (07/2026) mediu <strong>25%</strong> de resolução com regressões em todos os perfis. O ganho vem do crítico existir; o risco vem de ele rodar sem freio.</td></tr>
           <tr><td>Diferença entre <code>/manual-harness</code> e <code>/menu-harness</code>?</td><td>O manual <strong>ensina</strong> — você escolhe um tópico e ele explica. O menu <strong>lança</strong> — mostra os 10 comandos com último uso e já executa o que você escolher.</td></tr>
           <tr><td>Por que ela insiste em ser pequena?</td><td>Acima de ~150 linhas o custo sobe 20–23% sem ganho, e regra genérica chega a piorar o resultado.</td></tr>
           <tr><td>Como eu apago tudo?</td><td>Apague <code>.harness/</code> e os documentos. Nada fica escondido no sistema.</td></tr>
@@ -1665,7 +1729,7 @@ Desce por desuso (não se provou)</code></pre>
     </section>
 
     <div class="foot">
-      MANUAL /HARNESS · V1.4.0 · 12.08.2026<br>
+      MANUAL /HARNESS · V1.5.0 · 12.08.2026<br>
       FONTE ÚNICA: manual/MANUAL.md · <a href="https://github.com/Leozinhobh77/harness">github.com/Leozinhobh77/harness</a><br>
       ATUALIZE COM /harness manual --exportar
     </div>

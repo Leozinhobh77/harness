@@ -31,19 +31,21 @@ Para publicar: `comandos/exportar.md`.
    3 · /harness doctor    auditar (nunca escreve)
    4 · /harness fix       corrigir o que o doctor achou
    5 · /harness voltar    máquina do tempo — desfazer o acidente     🕰️
-   6 · /harness learn     transformar um erro em guarda permanente   ⭐
-   7 · /harness evolve    a skill melhora a si mesma                ⭐⭐
-   8 · /harness upgrade   trazer melhorias da skill pro projeto
+   6 · /harness criticar  comparar com a referência, às cegas         🔍
+   7 · /harness learn     transformar um erro em guarda permanente   ⭐
+   8 · /harness evolve    a skill melhora a si mesma                ⭐⭐
+   9 · /harness upgrade   trazer melhorias da skill pro projeto
 
   ENTENDENDO POR DENTRO
-   9 · Tiers e a escada — como a estrutura cresce junto com o projeto
-  10 · As 5 leis anti-inchaço — por que ela se recusa a crescer à toa
-  11 · Hooks — a espinha mecânica que impede erro de verdade
-  12 · Versão, changelog e o lembrete automático
+  10 · Tiers e a escada — como a estrutura cresce junto com o projeto
+  11 · As 5 leis anti-inchaço — por que ela se recusa a crescer à toa
+  12 · Hooks — a espinha mecânica que impede erro de verdade
+  13 · Referências — a barra que o projeto quer bater
+  14 · Versão, changelog e o lembrete automático
 
   ATALHOS
-  13 · Colinha — todos os comandos numa tela
-  14 · Perguntas frequentes
+  15 · Colinha — todos os comandos numa tela
+  16 · Perguntas frequentes
 
 Digite o número (ou "tudo" para o resumo de todos).
 ```
@@ -73,19 +75,21 @@ usuário — não recite o arquivo.
 | 3 | §4.3 `doctor` | ⚠️ **nunca escreve** — pode rodar sem medo, a qualquer hora |
 | 4 | §4.4 `fix` | automático × decisão; `--limpar` é o abate |
 | 5 | §4.8 `voltar` | o buraco que o `/rewind` nativo deixa: **comando de shell** |
-| 6 | §4.5 `learn` | a pergunta-chave: *"dá pra impedir mecanicamente?"* |
-| 7 | §4.6 `evolve` | os 3 ciclos; promoção exige **2 projetos** |
-| 8 | §4.7 `upgrade` | **sua customização sempre vence o template** |
-| 9 | §7.3 Tiers | sobe por gatilho, **desce por desuso** |
-| 10 | §7.2 As 5 leis | Lei 1 (procedência) e Lei 2 (mecânico > escrito) pesam mais |
-| 11 | §7.4 Hooks | os **4** hooks, o que cada um pega, o `log-guardas.jsonl` |
-| 12 | §9 + `VERSAO.json` | por que o lembrete existe e como calar (rodando `evolve`) |
+| 6 | §4.9 `criticar` | quem julga não pode ter visto construir; **perder é resultado bom** |
+| 7 | §4.5 `learn` | a pergunta-chave: *"dá pra impedir mecanicamente?"* |
+| 8 | §4.6 `evolve` | os 3 ciclos; promoção exige **2 projetos** |
+| 9 | §4.7 `upgrade` | **sua customização sempre vence o template** |
+| 10 | §7.3 Tiers | sobe por gatilho, **desce por desuso** |
+| 11 | §7.2 As 5 leis | Lei 1 (procedência) e Lei 2 (mecânico > escrito) pesam mais |
+| 12 | §7.4 Hooks | os **4** hooks, o que cada um pega, o `log-guardas.jsonl` |
+| 13 | §6 `referencias/` | os 3 critérios · a regra da companheira · a ficha de personagem |
+| 14 | §9 + `VERSAO.json` | por que o lembrete existe e como calar (rodando `evolve`) |
 
 Há ainda duas camadas que o índice numerado não expõe direto, mas que você deve oferecer quando
 a pergunta pedir: **§5 Receitas** (situação → o que fazer) e **§6 Anatomia** (cada arquivo
 explicado).
 
-### Tópico 13 — Colinha (mostre exatamente isto)
+### Tópico 15 — Colinha (mostre exatamente isto)
 
 ```
 /harness              onde estamos (10 linhas, barato)
@@ -94,6 +98,7 @@ explicado).
 /harness fix          corrigir o que o doctor achou
 /harness fix --limpar abater o que não se provou útil
 /harness voltar       máquina do tempo · desfaz o acidente  🕰️ o dia em que salva
+/harness criticar     compara com a referência, às cegas    🔍 sobe a barra
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
@@ -107,7 +112,7 @@ Rotina saudável:
   a cada ~2 semanas ........ evolve
 ```
 
-### Tópico 14 — FAQ
+### Tópico 16 — FAQ
 
 Responda estas, curto:
 

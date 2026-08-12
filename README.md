@@ -32,6 +32,7 @@ A estrutura pode encolher. Sobe por gatilho, desce por desuso.
 | `/harness doctor` | audita — **nunca escreve** |
 | `/harness fix` | aplica o que o doctor achou · `--limpar` abate o que não se provou |
 | `/harness voltar` | máquina do tempo — desfaz o que o `/rewind` nativo não alcança |
+| `/harness criticar` | compara o resultado com a barra de `referencias/`, **às cegas** |
 | `/harness learn "<erro>"` | transforma um erro real em guarda permanente |
 | `/harness evolve` | a skill audita e melhora a si mesma |
 | `/harness upgrade` | leva as melhorias da skill para um projeto |

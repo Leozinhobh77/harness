@@ -1,5 +1,5 @@
 {
-  "versao": "1.4.0",
+  "versao": "1.5.0",
   "criada_em": "2026-07-26",
   "atualizada_em": "2026-08-12",
   "ultima_evolucao": "2026-07-27",
@@ -10,5 +10,5 @@
     "pesquisa_web_sugerir": 45
   },
   "projetos_criados": 3,
-  "base_de_pesquisa": "julho/2026 — harness engineering, AGENTS.md, context engineering, spec-driven development, Claude Code hooks · agosto/2026 — checkpointing nativo do Claude Code e padrão shadow git"
+  "base_de_pesquisa": "julho/2026 — harness engineering, AGENTS.md, context engineering, spec-driven development, Claude Code hooks · agosto/2026 — checkpointing nativo e shadow git · agosto/2026 — Gauntlet Loop, LoopsBench, evidence-gated control, reward hacking de juízes LLM"
 }

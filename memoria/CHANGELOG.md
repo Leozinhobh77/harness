@@ -8,6 +8,79 @@
 
 ---
 
+## v1.5.0 — 2026-08-12
+
+**A barra: `referencias/` e o crítico cego. O harness passa a ter uma categoria que não tinha —
+material de entrada.**
+
+### Procedência — e ela é mais fraca que a da v1.4.0, de propósito registrado assim
+
+O usuário trouxe o **Gauntlet Loop** (Matt Shumer, julho/2026) e pediu pesquisa antes de decidir.
+A pesquisa mudou o desenho. O que ficou de pé, e o que caiu:
+
+**Contra o loop autônomo:**
+- **LoopsBench** ([2608.00267](https://arxiv.org/abs/2608.00267), 31/07/2026): 112 desafios, 8
+  linguagens. Melhor configuração = **25% de resolução**, e *"eventos de regressão permanecem
+  visíveis em todos os perfis de loop avaliados"*.
+- **Reward hacking de juízes** ([2607.05904](https://arxiv.org/abs/2607.05904)): em self-play a
+  aprovação do juiz foi de **0,72 → 0,94 com a acurácia real parada em 0,20**. Transfere entre
+  famílias de modelo; ensemble de três juízes ainda aceita 55%.
+- **"LLMs Cannot Self-Correct Reasoning Yet"** ([2310.01798](https://arxiv.org/abs/2310.01798)):
+  o gargalo é **detectar** o erro, não corrigir.
+- O "one-shot" do Claude of Duty é falso — foram horas, subagentes, ~55k linhas. E o autor tem o
+  caso **Reflection 70B** (2024) no histórico: demo dele não é evidência.
+
+**A favor do mecanismo, quando há portão:**
+- **Proof-or-Stop** ([2607.14890](https://arxiv.org/abs/2607.14890)): exigir evidência
+  verificável antes de mudar de estado levou amplificação de erro de **1,7% → 0,1%**, zero
+  conclusões falsas em 10 cenários.
+- **Adversarial Test-Hardening** ([2607.23002](https://arxiv.org/abs/2607.23002)): critic loop
+  matou **~78%** dos defeitos restantes.
+
+**Conclusão que guiou o desenho:** o loop não é o que funciona — **o portão determinístico é**.
+Entrou o crítico (uma rodada, com portão antes). **Não entrou o loop autônomo.**
+
+⚠️ **A procedência honesta desta versão é uma lacuna real, não um erro real:** *"o usuário quer
+subir a barra de qualidade em trabalho visual e não tem mecanismo nenhum para isso"*. É mais
+fraca que a da sombra, que era a exceção explícita da Lei 1. Passa porque a Lei 1 governa
+**regra e guarda** — comando não é imposto, não roda sozinho, não custa token sem uso (mesmo
+critério pelo qual o `menu` entrou na v1.2.0). Fica registrado sem maquiagem.
+
+### Entra
+
+- `referencias/` — **categoria nova**: não é documento de governança (o que o projeto *decidiu*),
+  é material de entrada (o que ele *quer parecer*). Prateleira de 8 pastas: `visual` ·
+  `personagens` · `texto` · `documentos` · `dados` · `mapas` · `audio` · `video`.
+- `referencias/INDICE.md` — o único arquivo com conteúdo. Impõe os 3 critérios que a pesquisa
+  mostrou serem o miolo do método: **Nomeada · Buscável · Inspecionável**.
+- `FICHA.tpl.md` — ficha de consistência de personagem/marca, com a seção **"erros já
+  cometidos"**: a Lei 1 aplicada à referência (erro vira invariante escrito).
+- `comandos/criticar.md` + `templates/comum/critico-cego.md` — subagente **read-only**, Sonnet,
+  contexto limpo, comparação **cega** (não sabe qual é o nosso), **decisão binária sem nota**.
+
+### Decisões de desenho
+
+- **Prateleira inteira mesmo vazia.** Decisão do usuário, com argumento que eu aceito como
+  correto: *"o que não é visto não é lembrado"*. Custo medido: **0 token** pela pasta, **13
+  tokens** pela linha de ponteiro no `AGENTS.md`. Adoção é problema real; teto de token aqui não
+  era.
+- **Subagente, não agent teams.** Subagente roda na mesma sessão, com janela de contexto própria
+  — sem abrir janela nova, funciona na extensão do VS Code. Agent teams é experimental, exige
+  variável de ambiente, e split-pane **não funciona no VS Code**.
+- **Sonnet no crítico.** Viés de auto-preferência é medido; se o Opus constrói, crítico Opus
+  puxa a sardinha. E comparar é mais barato que criar. Ressalva honesta: o modelo é a variável
+  **menos** importante — o que faz funcionar é contexto limpo + cegueira + portão antes.
+- **Áudio e vídeo não são lidos hoje.** Verificado, não suposto. A regra da **companheira `.md`**
+  resolve os dois casos: hoje a IA lê a companheira, amanhã lê o arquivo — que já está lá.
+
+### Fora de escopo, explicitamente
+
+❌ Loop autônomo · ❌ nota numérica · ❌ crítico que conserta · ❌ check no `doctor` cobrando
+`referencias/`. Os três primeiros pela evidência; o quarto porque transformaria capacidade
+opcional em obrigação — e aí seria o inchaço que a skill existe para impedir.
+
+---
+
 ## v1.4.0 — 2026-08-12
 
 **A quarta guarda: a sombra. As três primeiras impedem o erro; esta aceita que um dia um erro
