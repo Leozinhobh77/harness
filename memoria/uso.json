@@ -1,8 +1,8 @@
 {
   "_leia": "Registro de última data de uso de cada comando, por SKILL.md (secao 'Registrar uso'). Lido pelo /menu-harness. Formato: { \"<comando>\": { \"data\": \"AAAA-MM-DD\", \"projeto\": \"<nome ou null>\" } }. Comando ausente daqui = nunca usado.",
   "init": {
-    "data": "2026-08-11",
-    "projeto": "Central de Projetos e MCPs"
+    "data": "2026-08-12",
+    "projeto": "Vórtex"
   },
   "doctor": {
     "data": "2026-08-06",
