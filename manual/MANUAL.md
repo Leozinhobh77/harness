@@ -1,6 +1,6 @@
 # 📖 MANUAL `/harness`
 
-> **Versão 1.3.3** · gerado em **06/08/2026**
+> **Versão 1.4.0** · gerado em **12/08/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -18,6 +18,7 @@
 /harness doctor       auditar · NUNCA escreve · rode sem medo
 /harness fix          corrigir o que o doctor achou
 /harness fix --limpar abater o que não se provou útil
+/harness voltar       máquina do tempo · desfaz o acidente  🕰️ o dia em que salva
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
@@ -38,7 +39,7 @@ Rotina saudável:
 | Camada | Seções |
 |---|---|
 | 🚀 **Começando** | [Visão geral](#1-visão-geral) · [Primeiro projeto](#2-meu-primeiro-projeto) · [Glossário](#3-glossário) |
-| 📕 **Referência** | [status](#41-harness--status) · [init](#42-harness-init) · [doctor](#43-harness-doctor) · [fix](#44-harness-fix) · [learn](#45-harness-learn-) · [evolve](#46-harness-evolve-) · [upgrade](#47-harness-upgrade) |
+| 📕 **Referência** | [status](#41-harness--status) · [init](#42-harness-init) · [doctor](#43-harness-doctor) · [fix](#44-harness-fix) · [learn](#45-harness-learn-) · [evolve](#46-harness-evolve-) · [upgrade](#47-harness-upgrade) · [voltar](#48-harness-voltar-) |
 | 🍳 **Receitas** | [6 situações do dia a dia](#5-receitas) |
 | 🔧 **Anatomia** | [Cada arquivo que ele cria](#6-anatomia) |
 | 🧠 **Conceitos** | [Flywheel](#71-o-efeito-flywheel) · [5 leis](#72-as-5-leis-anti-inchaço) · [Tiers](#73-tiers-e-a-escada) · [Hooks](#74-hooks) |
@@ -473,6 +474,81 @@ projeto ativo. Nada é apagado — vai para `.harness/hibernado/`. Voltar é um 
 **Guarda de segurança de dado nunca desce**, em nenhum tier. É chão, não funcionalidade.
 
 ---
+
+## 4.8 `/harness voltar` 🕰️
+
+**A máquina do tempo do projeto.** As outras guardas impedem o erro; esta aceita que um dia um
+erro passa, e garante que dá para voltar.
+
+### Por que ela existe (o buraco que ela tapa)
+
+O Claude Code já tem um "Ctrl+Z" nativo — o `/rewind`. Ele é bom: fotografa antes de cada
+mensagem sua, guarda as 100 últimas, dura 30 dias. **Mas ele só desfaz o que as ferramentas de
+edição fizeram.** O que ele **não** alcança:
+
+| Não volta pelo `/rewind` | Traduzindo |
+|---|---|
+| Mudança feita por comando de shell | um `rm`, um `mv`, um `>` que sobrescreveu |
+| Edição de subagente em segundo plano | agente que trabalha em paralelo |
+| Mudança externa | você editando no VS Code ao mesmo tempo |
+| Qualquer coisa depois de 30 dias | a sessão expirou |
+
+A própria documentação dele diz: *"não substitui controle de versão"*.
+
+**A sombra cobre exatamente esse buraco — e só ele.** Reimplementar o `/rewind` seria o inchaço
+que a Lei 1 proíbe.
+
+### Como funciona
+
+Um repositório git **separado** em `.harness/sombra.git`. Histórico próprio: não polui o seu
+`git log`, não entra nos seus commits, não mexe em branch nenhum seu. Ele fotografa em três
+momentos:
+
+```
+ao abrir a sessão .............. a linha de base do dia
+antes de editar um arquivo ..... com pausa de 90s entre fotos
+antes de comando destrutivo .... SEMPRE, sem pausa   ← o que o /rewind não pega
+```
+
+### Na hora do aperto
+
+```
+/harness voltar
+
+🕰️  SOMBRA — Meu Site          14 fotos · 2,3 MB
+
+   1 · há 4 min      antes de: rm -rf dist/           3 arquivos
+   2 · há 22 min     antes de editar index.html       1 arquivo
+   3 · hoje 09:14    início da sessão                 —
+
+Qual número? (ou "d 2" para ver o que mudou desde a foto 2)
+```
+
+**Número 1 é sempre a mais recente** — em pânico, ninguém quer contar de trás pra frente.
+
+Ele **nunca restaura sem mostrar antes** o que vai mudar. E diz a frase que tira o medo:
+
+> *O estado de agora vira foto também, antes de eu mexer. Dá para desfazer isto.*
+
+### O que ele faz e o que não faz
+
+| Faz | Não faz |
+|---|---|
+| Tira foto do estado atual **primeiro** | ❌ apagar arquivo criado depois da foto |
+| Devolve ao disco o conteúdo da foto | ❌ mexer no seu git (branch, commit, stash) |
+| Recria arquivo e pasta apagados | ❌ restaurar `node_modules/` — rode o install |
+| Lista o que sobrou de novo, pra você decidir | ❌ perguntar duas vezes |
+
+### A pegadinha
+
+**Ela é a única guarda que nasce em todos os tiers, inclusive T1.** Não é funcionalidade de
+tier — é chão, como o `.gitignore`. Protótipo é justamente onde ninguém commita, então é onde
+perder trabalho dói mais.
+
+E como o `.gitignore`, **nunca é candidata a abate**: zero restaurações é o sucesso dela, não o
+fracasso.
+
+---
 ---
 
 # 🍳 RECEITAS
@@ -625,6 +701,7 @@ MeuProjeto/
 ├── .claude/
 │   ├── settings.json      configuração dos hooks
 │   └── hooks/
+│       ├── sombra.ps1        🕰️ FOTOGRAFA antes do risco (todo tier)
 │       ├── guarda.ps1        bloqueia ANTES
 │       ├── pos-edicao.ps1    valida DEPOIS de cada escrita
 │       └── porta-saida.ps1   não deixa ENCERRAR sem baixa
@@ -641,7 +718,8 @@ MeuProjeto/
 └── .harness/
     ├── manifesto.json     identidade do harness (tier, versão, arquivos)
     ├── guardas.json       ⭐ as guardas como DADO, não como código
-    └── log-guardas.jsonl  📊 registro de cada disparo
+    ├── log-guardas.jsonl  📊 registro de cada disparo
+    └── sombra.git/        🕰️ as fotos do projeto (fora do seu git)
 ```
 
 ### Os três documentos de topo — a diferença
@@ -708,6 +786,28 @@ Uma linha por disparo:
 
 **É isso que transforma "acho que dá pra limpar" em dado.** Guarda com zero disparos em 90 dias
 vira candidata objetiva a abate. Sem esse arquivo, limpeza seria chute.
+
+### `.harness/sombra.git` — a rede embaixo do trapézio
+
+Um repositório git **inteiro**, escondido dentro do `.harness/`, com o histórico das fotos do seu
+projeto. Ele usa um truque simples: o git aceita separar *onde mora o histórico* de *onde moram
+os arquivos*. Assim ele enxerga o projeto todo sem existir um `.git` a mais atrapalhando.
+
+O que isso te dá, comparado a "fazer cópia dos arquivos":
+
+| | Cópia de arquivo | Sombra (git) |
+|---|---|---|
+| Pega o que o **shell** fez | ❌ | ✅ |
+| Suja a árvore do projeto | pasta `.backups/` por toda parte | nada visível |
+| Restaurar tudo de uma vez | ❌ | ✅ |
+| Ver o que mudou entre dois pontos | ❌ | ✅ |
+
+Ele fica **fora do seu git** (está no `.gitignore`), porque é rede de segurança **da máquina** —
+não histórico do projeto. Versionar as fotos duplicaria tudo a cada commit.
+
+Detalhe de desenho que vale saber: o hook que tira as fotos é **autocontido**. Ele não chama a
+skill. Se você desinstalar o `/harness` amanhã, o projeto **continua sendo fotografado** — só o
+`voltar` (ler e restaurar) é que precisa da skill.
 
 ---
 ---
@@ -906,8 +1006,8 @@ Governança que não serve é atrito puro — e atrito faz você abandonar o pro
 
 | Tier | Quando | O que ganha | Custo/sessão |
 |---|---|---|---|
-| **T1 · Leve** | script, protótipo, POC | `AGENTS.md` (~40 linhas) + `.gitignore` | ~500 tokens |
-| **T2 · Padrão** | app pessoal real | + estado, governança, PRD/SPEC, decisões, planos, 3 hooks | ~2.500 |
+| **T1 · Leve** | script, protótipo, POC | `AGENTS.md` (~40 linhas) + `.gitignore` + 🕰️ sombra | ~500 tokens |
+| **T2 · Padrão** | app pessoal real | + estado, governança, PRD/SPEC, decisões, planos, +3 hooks | ~2.500 |
 | **T2+** | ...que mexe com dinheiro ou dado sensível | + testes de regra de negócio | +variável |
 | **T3 · Completo** ⚠️ | multi-módulo, mais de uma pessoa | + auditor cego, `AGENTS.md` aninhado, guardas extras | ~5.000 |
 
@@ -946,13 +1046,23 @@ monte — nenhum projeto chegou perto do gatilho, e construir sem caso concreto 
 
 ## 7.4 Hooks
 
-A espinha mecânica. Três, todos testados funcionando.
+A espinha mecânica. Quatro, todos testados funcionando. **Três impedem o erro; o quarto aceita
+que um dia um erro passa.**
 
-| Hook | Evento | Quando dispara | O que faz |
-|---|---|---|---|
-| **`guarda`** | `PreToolUse` | antes de escrever/rodar | **bloqueia** o proibido |
-| **`pos-edicao`** | `PostToolUse` | depois de cada escrita | valida e **devolve o erro pro modelo** |
-| **`porta-saida`** | `Stop` | ao tentar encerrar | **não deixa fechar** com plano sem baixa |
+| Hook | Evento | Quando dispara | O que faz | Tier |
+|---|---|---|---|---|
+| **`sombra`** 🕰️ | `PreToolUse` · `SessionStart` | antes do risco | **fotografa** o projeto | todos |
+| **`guarda`** | `PreToolUse` | antes de escrever/rodar | **bloqueia** o proibido | T2+ |
+| **`pos-edicao`** | `PostToolUse` | depois de cada escrita | valida e **devolve o erro pro modelo** | T2+ |
+| **`porta-saida`** | `Stop` | ao tentar encerrar | **não deixa fechar** com plano sem baixa | T2+ |
+
+### `sombra` — a rede de segurança
+
+Fotografa antes de cada ação de risco, com atenção especial ao **comando de shell** — que é
+justamente o que o `/rewind` nativo não desfaz. Ver [§4.8](#48-harness-voltar-).
+
+> **Nunca bloqueia. Nunca.** Sai com sucesso em qualquer situação, inclusive erro. Uma rede de
+> segurança que trava o trabalho é desligada na primeira semana — e aí não protege mais nada.
 
 ### `guarda` — bloqueia antes
 
@@ -1000,8 +1110,23 @@ Serve. O `init` detecta e vira modo adoção: audita o que tem e propõe melhori
 
 **Qual a diferença entre `/manual-harness` e `/menu-harness`?**
 O manual **ensina** — você escolhe um tópico e ele explica a fundo, com exemplo. O menu
-**lança** — mostra os 9 comandos com descrição curta e a data do último uso de cada um, e
+**lança** — mostra os 10 comandos com descrição curta e a data do último uso de cada um, e
 escolher um número já executa aquele comando. Use o manual pra entender; o menu pra agir.
+
+**Se a IA apagar um arquivo meu, dá pra recuperar?**
+Dá — é pra isso que a sombra existe. `/harness voltar` lista as fotos e devolve o arquivo, a
+pasta, ou o conteúdo sobrescrito. Funciona inclusive quando o estrago veio de um comando de
+shell, que é o caso em que o `/rewind` nativo do Claude Code **não** consegue ajudar.
+
+**Então a sombra substitui o `/rewind`?**
+Não, e nem tenta. O `/rewind` é mais rápido para desfazer edição dentro da conversa. A sombra
+cobre o que ele não alcança: comando de shell, subagente em segundo plano, e o que passou de 30
+dias. Use o `/rewind` no dia a dia; o `voltar` quando ele não der conta.
+
+**Ela ocupa muito espaço?**
+Pouco — o git guarda só a diferença entre as fotos. Nos projetos de teste ficou entre 0,1 e 1,5
+MB. O `doctor` avisa se passar de 300 MB, e `/harness voltar --limpar` compacta sem apagar foto
+nenhuma.
 
 **Por que ela insiste tanto em ser pequena?**
 Acima de ~150 linhas o custo sobe 20–23% sem ganho medido, e regra genérica chega a **piorar** o
@@ -1125,6 +1250,7 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| **1.4.0** | **2026-08-12** | **A quarta guarda: a sombra** 🕰️ — máquina do tempo do projeto, em `.harness/sombra.git`. Nasceu de uma pergunta do usuário (*"ela faz backup do meu projeto?"*), cuja resposta era **não**: a única rede era git, e procedimental. Pesquisa do dia delimitou o buraco exato — o `/rewind` nativo do Claude Code **não** rastreia mudança feita por comando de shell, subagente em segundo plano, nem nada depois de 30 dias. A sombra cobre esse buraco e só ele. **T1 ganhou hook pela primeira vez** (a sombra é chão, não tier). Comando novo `/harness voltar`, 3 checks novos no `doctor`. Provado em teste real: arquivo apagado, pasta apagada e arquivo sobrescrito por shell — os três voltaram. Dois defeitos achados na verificação, um deles sério (`-Restaurar` quebrava em projeto com **exatamente uma foto**, justo na primeira vez que alguém precisaria dele — P009). |
 | 1.3.3 | 2026-08-06 | A skill rodou o próprio `doctor --skill` e reprovou em 4 pontos. Corrigida a deriva do `SKILL.md` (apontava a saída do manual pra um arquivo inexistente), eliminada a segunda árvore de estrutura do `README.md` (fonte única), e o **T3 passou a se declarar "projetado, ainda não implementado"** — havia gatilho, check e descrição, mas nenhum template. Abatido do `evolve` o item que cobrava um orçamento inexistente. **Este manual foi atualizado da 1.2.1 até aqui.** |
 | 1.3.2 | 2026-07-27 | O teto de orçamento ganhou **20% de tolerância** e parou de somar arquivos diferentes. Correção do usuário: teto binário faz o número mandar no conteúdo, e somar `SKILL.md` com `CONSTITUICAO.md` é erro de categoria. |
 | 1.3.1 | 2026-07-27 | O check do `ESTADO.md` parou de perguntar pelo relógio — errado nas duas tentativas anteriores. Agora regenera uma prévia (sem escrever) e compara só a parte estável do conteúdo. |

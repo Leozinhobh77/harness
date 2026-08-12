@@ -57,6 +57,25 @@
 - **Promovido ao template:** não — é conhecimento do `doctor` da própria skill. Vale como regra
   de projeto se algum dia um harness gerar outro arquivo derivado.
 
+### P010 — O CSS do projeto derrota o `hidden` do HTML, e o conserto do JS vira enfeite
+- **Visto em:** skill /harness, página do manual (2026-08-12) — **é o P003 uma camada acima**
+- **Nível da solução:** 3 (teste Playwright pegou; a olho nu passou meses despercebido)
+- **Solução:** `.icon-btn svg[hidden] { display: none; }` — uma regra explícita que devolve o
+  poder ao atributo.
+- **Detalhe:** o P003 já tinha ensinado a usar `setAttribute('hidden','')` em vez de
+  `.hidden = true` (que é no-op em SVG). O JS estava **correto**. Só que o CSS da página tinha
+  `.icon-btn svg { display: block; }` — especificidade `(0,1,1)`, que **vence** a regra
+  `[hidden] { display: none }` da folha de estilo do navegador, que é `(0,1,0)`. Resultado: o
+  atributo era escrito e removido certinho, e **nunca surtia efeito**. Sol e lua ficavam
+  sobrepostos num botão de 38px, no ar, desde a v1.1.1.
+- **Por que escapou:** o teste anterior (P003) verificava se o **atributo** mudava — e mudava. A
+  pergunta certa é sobre o **estilo computado**, não sobre o atributo: `getComputedStyle(el).display`.
+- **Como reconhecer em outro lugar:** qualquer lugar onde se controla visibilidade por `hidden`
+  e o CSS declara `display` no mesmo elemento por classe. **Toda vez que você declara `display`
+  numa regra de classe, você desarmou o `hidden` daquele elemento** — e o desarme é silencioso.
+- **Promovido ao template:** não é template de projeto — é conhecimento de front-end da própria
+  skill, como P003/P004/P005.
+
 ### P009 — `.Count` num `PSCustomObject` devolve `$null`, não `1` — e o teste com muitos itens esconde
 - **Visto em:** skill /harness (2026-08-12, construção da sombra)
 - **Nível da solução:** 3 (o parser não pega; só rodar no caso de 1 item pega)

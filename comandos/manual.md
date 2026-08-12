@@ -30,19 +30,20 @@ Para publicar: `comandos/exportar.md`.
    2 · /harness init      criar ou adotar a estrutura
    3 · /harness doctor    auditar (nunca escreve)
    4 · /harness fix       corrigir o que o doctor achou
-   5 · /harness learn     transformar um erro em guarda permanente  ⭐
-   6 · /harness evolve    a skill melhora a si mesma               ⭐⭐
-   7 · /harness upgrade   trazer melhorias da skill pro projeto
+   5 · /harness voltar    máquina do tempo — desfazer o acidente     🕰️
+   6 · /harness learn     transformar um erro em guarda permanente   ⭐
+   7 · /harness evolve    a skill melhora a si mesma                ⭐⭐
+   8 · /harness upgrade   trazer melhorias da skill pro projeto
 
   ENTENDENDO POR DENTRO
-   8 · Tiers e a escada — como a estrutura cresce junto com o projeto
-   9 · As 5 leis anti-inchaço — por que ela se recusa a crescer à toa
-  10 · Hooks — a espinha mecânica que impede erro de verdade
-  11 · Versão, changelog e o lembrete automático
+   9 · Tiers e a escada — como a estrutura cresce junto com o projeto
+  10 · As 5 leis anti-inchaço — por que ela se recusa a crescer à toa
+  11 · Hooks — a espinha mecânica que impede erro de verdade
+  12 · Versão, changelog e o lembrete automático
 
   ATALHOS
-  12 · Colinha — todos os comandos numa tela
-  13 · Perguntas frequentes
+  13 · Colinha — todos os comandos numa tela
+  14 · Perguntas frequentes
 
 Digite o número (ou "tudo" para o resumo de todos).
 ```
@@ -71,19 +72,20 @@ usuário — não recite o arquivo.
 | 2 | §4.2 `init` | investiga antes de perguntar; propõe o **menor** tier |
 | 3 | §4.3 `doctor` | ⚠️ **nunca escreve** — pode rodar sem medo, a qualquer hora |
 | 4 | §4.4 `fix` | automático × decisão; `--limpar` é o abate |
-| 5 | §4.5 `learn` | a pergunta-chave: *"dá pra impedir mecanicamente?"* |
-| 6 | §4.6 `evolve` | os 3 ciclos; promoção exige **2 projetos** |
-| 7 | §4.7 `upgrade` | **sua customização sempre vence o template** |
-| 8 | §7.3 Tiers | sobe por gatilho, **desce por desuso** |
-| 9 | §7.2 As 5 leis | Lei 1 (procedência) e Lei 2 (mecânico > escrito) pesam mais |
-| 10 | §7.4 Hooks | os 3 hooks, o que cada um pega, o `log-guardas.jsonl` |
-| 11 | §9 + `VERSAO.json` | por que o lembrete existe e como calar (rodando `evolve`) |
+| 5 | §4.8 `voltar` | o buraco que o `/rewind` nativo deixa: **comando de shell** |
+| 6 | §4.5 `learn` | a pergunta-chave: *"dá pra impedir mecanicamente?"* |
+| 7 | §4.6 `evolve` | os 3 ciclos; promoção exige **2 projetos** |
+| 8 | §4.7 `upgrade` | **sua customização sempre vence o template** |
+| 9 | §7.3 Tiers | sobe por gatilho, **desce por desuso** |
+| 10 | §7.2 As 5 leis | Lei 1 (procedência) e Lei 2 (mecânico > escrito) pesam mais |
+| 11 | §7.4 Hooks | os **4** hooks, o que cada um pega, o `log-guardas.jsonl` |
+| 12 | §9 + `VERSAO.json` | por que o lembrete existe e como calar (rodando `evolve`) |
 
 Há ainda duas camadas que o índice numerado não expõe direto, mas que você deve oferecer quando
 a pergunta pedir: **§5 Receitas** (situação → o que fazer) e **§6 Anatomia** (cada arquivo
 explicado).
 
-### Tópico 12 — Colinha (mostre exatamente isto)
+### Tópico 13 — Colinha (mostre exatamente isto)
 
 ```
 /harness              onde estamos (10 linhas, barato)
@@ -91,6 +93,7 @@ explicado).
 /harness doctor       auditar · NUNCA escreve · rode sem medo
 /harness fix          corrigir o que o doctor achou
 /harness fix --limpar abater o que não se provou útil
+/harness voltar       máquina do tempo · desfaz o acidente  🕰️ o dia em que salva
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
@@ -99,11 +102,12 @@ explicado).
 Rotina saudável:
   ao criar projeto ......... init
   quando a IA errar ........ learn        ← o hábito que mais paga
+  quando algo der errado ... voltar       ← você não precisa lembrar dele antes
   toda semana .............. doctor
   a cada ~2 semanas ........ evolve
 ```
 
-### Tópico 13 — FAQ
+### Tópico 14 — FAQ
 
 Responda estas, curto:
 
@@ -113,6 +117,9 @@ Responda estas, curto:
   customização — ele mostra e pergunta.
 - **"Serve pra projeto que já existe?"** Serve. `init` detecta e vira modo adoção: audita o que
   tem e propõe melhorias uma a uma.
+- **"Se a IA apagar um arquivo meu, dá pra recuperar?"** Dá — `/harness voltar`. Funciona
+  inclusive quando o estrago veio de comando de shell, que é justamente o caso em que o
+  `/rewind` nativo do Claude Code não consegue ajudar.
 - **"Por que ela insiste em ser pequena?"** Porque arquivo de instrução acima de ~150 linhas
   aumenta custo em 20–23% **sem ganho medido** — e regra genérica chega a piorar o resultado.
 - **"Como eu apago tudo?"** Apague a pasta `.harness/` e os documentos. Nada fica escondido no

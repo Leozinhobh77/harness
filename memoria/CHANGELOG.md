@@ -85,6 +85,20 @@ sempre com `exit 0`.
    demonstração naturalmente tem vários itens, então o caso de 1 é o menos testado — e é o
    primeiro que o usuário encontra.**
 
+### Manual e página, atualizados junto (§4.8, hooks, anatomia, tiers, FAQ)
+
+`manual/MANUAL.md` e `docs/index.html` receberam a seção nova do `voltar`, a tabela de hooks com
+quatro linhas, a sombra na árvore da anatomia, o T1 corrigido na tabela de tiers, três perguntas
+novas no FAQ e o carimbo v1.4.0. `comandos/manual.md` renumerou o índice (o `voltar` entra como
+tópico 5, logo depois do `fix`).
+
+**E a conferência da página achou um bug antigo, no ar desde a v1.1.1 (P010).** O botão de tema
+mostrava **sol e lua sobrepostos**: o JS aplicava `hidden` corretamente (o conserto do P003 estava
+lá), mas `.icon-btn svg { display: block }` tem especificidade maior que o `[hidden]` do navegador
+e anulava o atributo em silêncio. Corrigido com uma regra explícita. É o P003 uma camada acima — e
+o teste do P003 não pegava porque conferia o **atributo**, quando a pergunta certa era sobre o
+**estilo computado**.
+
 ---
 
 ## v1.3.3 — 2026-08-06

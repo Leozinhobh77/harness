@@ -131,6 +131,11 @@
   }
   .icon-btn:hover { border-color: var(--brass); color: var(--brass); }
   .icon-btn svg { width: 1.2rem; height: 1.2rem; display: block; }
+  /* O `display:block` acima tem especificidade (0,1,1) e VENCE a regra
+     `[hidden]{display:none}` do navegador, que é (0,1,0). Sem esta linha o
+     atributo `hidden` do JS não surte efeito nenhum e os dois ícones do botão
+     de tema (sol e lua) ficam sobrepostos. Ver P010 em memoria/PADROES.md. */
+  .icon-btn svg[hidden] { display: none; }
 
   /* botão de recolher o menu — só no desktop */
   .collapse-btn {
@@ -657,7 +662,7 @@
     <div class="nav-top">
       <div class="brand">
         <div class="brand-mark">/<span>harness</span></div>
-        <div class="brand-meta">Manual · v1.3.3 · 06.08.2026</div>
+        <div class="brand-meta">Manual · v1.4.0 · 12.08.2026</div>
       </div>
       <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
@@ -673,7 +678,7 @@
       </div>
       <div class="nav-group">
         <div class="nav-label">Referência</div>
-        <a href="#s4"><span class="n">4</span> Os sete comandos</a>
+        <a href="#s4"><span class="n">4</span> Os oito comandos</a>
       </div>
       <div class="nav-group">
         <div class="nav-label">Receitas</div>
@@ -735,6 +740,7 @@
 /harness doctor       auditar · NUNCA escreve · rode sem medo
 /harness fix          corrigir o que o doctor achou
 /harness fix --limpar abater o que não se provou útil
+/harness voltar       máquina do tempo · desfaz o acidente ← o dia em que salva
 /harness learn "..."  erro real → guarda permanente        ← o mais valioso
 /harness evolve       a skill melhora a si mesma           ← a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
@@ -744,6 +750,7 @@
 Rotina saudável:
   ao criar projeto ......... init
   quando a IA errar ........ learn        ← o hábito que mais paga
+  quando algo der errado ... voltar       ← não precisa lembrar dele antes
   toda semana .............. doctor
   a cada ~2 semanas ........ evolve</code></pre>
 
@@ -848,11 +855,11 @@ Posso rodar git init? (o harness todo se apoia nele para checkpoint e rollback)<
 
     <!-- ===================== 4 ===================== -->
     <section id="s4">
-      <div class="sec-head"><span class="sec-num">04</span><h2>Os sete comandos</h2></div>
+      <div class="sec-head"><span class="sec-num">04</span><h2>Os oito comandos</h2></div>
 
       <h3><code>/harness</code> — status</h3>
       <p>O “bom dia” da skill. Máximo 10 linhas, barato, não roda auditoria completa.</p>
-      <pre><code>📁 Finanças · tier T2 · harness v1.3.3 · criado 26/07/2026
+      <pre><code>📁 Finanças · tier T2 · harness v1.4.0 · criado 26/07/2026
 
 Estado: 1 plano ativo (0003 — dashboard de filtros, 6/14 tarefas)
 Último commit: há 2 dias — "feat: filtro por período customizado"
@@ -907,7 +914,7 @@ Saúde: 0 vermelho · 2 amarelo     → /harness doctor  para ver</code></pre>
         o teste é uma pergunta só:
       </p>
       <blockquote><p>Se eu apagar esta linha, que erro concreto volta a acontecer?</p></blockquote>
-      <pre><code>DOCTOR — Finanças · tier T2 · harness v1.3.3 · 06/08/2026
+      <pre><code>DOCTOR — Finanças · tier T2 · harness v1.4.0 · 12/08/2026
 
 VERMELHO (1)
   • Planos/INDICE.md:19 aponta para o plano 0003, que não existe
@@ -1015,6 +1022,62 @@ CICLO 3 — a SKILL aprende     semanas  /harness evolve → todo projeto futuro
           <code>AGENTS.md</code> à mão? Ele nunca sobrescreve — mostra o lado a lado e pergunta.
           Um harness que apaga o trabalho do dono no update é um harness que ninguém atualiza
           nunca mais.
+        </p>
+      </div>
+
+      <h3><code>/harness voltar</code> — a máquina do tempo</h3>
+      <p>
+        As outras guardas impedem o erro. Esta aceita que um dia um erro passa, e garante que
+        <strong>dá para voltar</strong>.
+      </p>
+      <p>
+        O Claude Code já tem um “Ctrl+Z” nativo, o <code>/rewind</code> — e ele é bom. Mas só
+        desfaz o que as <em>ferramentas de edição</em> fizeram. O que ele não alcança:
+      </p>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Não volta pelo <code>/rewind</code></th><th>Traduzindo</th></tr></thead>
+        <tbody>
+          <tr><td>Mudança feita por comando de shell</td><td>um <code>rm</code>, um <code>mv</code>, um <code>&gt;</code> que sobrescreveu</td></tr>
+          <tr><td>Edição de subagente em segundo plano</td><td>agente trabalhando em paralelo</td></tr>
+          <tr><td>Mudança externa</td><td>você editando no editor ao mesmo tempo</td></tr>
+          <tr><td>Qualquer coisa depois de 30 dias</td><td>a sessão expirou</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        A documentação dele diz, com todas as letras: <em>“não substitui controle de versão”</em>.
+        A sombra cobre <strong>exatamente esse buraco — e só ele</strong>. Reimplementar o
+        <code>/rewind</code> seria o inchaço que a Lei 1 proíbe.
+      </p>
+      <p>
+        Por baixo é um repositório git <strong>separado</strong>, em
+        <code>.harness/sombra.git</code>: histórico próprio, não polui o seu <code>git log</code>,
+        não entra nos seus commits. Ele fotografa em três momentos:
+      </p>
+      <pre><code>ao abrir a sessão .............. a linha de base do dia
+antes de editar um arquivo ..... com pausa de 90s entre fotos
+antes de comando destrutivo .... SEMPRE, sem pausa   ← o que o /rewind não pega</code></pre>
+      <pre><code>/harness voltar
+
+SOMBRA — Meu Site          14 fotos · 2,3 MB
+
+   1 · há 4 min      antes de: rm -rf dist/           3 arquivos
+   2 · há 22 min     antes de editar index.html       1 arquivo
+   3 · hoje 09:14    início da sessão                 —
+
+Qual número? (ou "d 2" para ver o que mudou desde a foto 2)</code></pre>
+      <p>
+        <strong>Número 1 é sempre a mais recente</strong> — em pânico, ninguém quer contar de trás
+        pra frente. Ele nunca restaura sem mostrar antes o que vai mudar.
+      </p>
+      <blockquote><p>O estado de agora vira foto também, antes de eu mexer. Dá para desfazer isto.</p></blockquote>
+      <div class="note key">
+        <span class="note-tag">A pegadinha</span>
+        <p>
+          É a <strong>única guarda que nasce em todos os tiers, inclusive T1</strong>. Não é
+          funcionalidade de tier — é chão, como o <code>.gitignore</code>. Protótipo é justamente
+          onde ninguém commita, então é onde perder trabalho dói mais. E como o
+          <code>.gitignore</code>, <strong>nunca é candidata a abate</strong>: zero restaurações é
+          o sucesso dela, não o fracasso.
         </p>
       </div>
     </section>
@@ -1138,6 +1201,7 @@ CICLO 3 — a SKILL aprende     semanas  /harness evolve → todo projeto futuro
 ├── .claude/
 │   ├── settings.json      configuração dos hooks
 │   └── hooks/
+│       ├── sombra.ps1        FOTOGRAFA antes do risco (todo tier)
 │       ├── guarda.ps1        bloqueia ANTES
 │       ├── pos-edicao.ps1    valida DEPOIS de cada escrita
 │       └── porta-saida.ps1   não deixa ENCERRAR sem baixa
@@ -1154,7 +1218,8 @@ CICLO 3 — a SKILL aprende     semanas  /harness evolve → todo projeto futuro
 └── .harness/
     ├── manifesto.json     identidade do harness (tier, versão, arquivos)
     ├── guardas.json       as guardas como DADO, não como código
-    └── log-guardas.jsonl  registro de cada disparo</code></pre>
+    ├── log-guardas.jsonl  registro de cada disparo
+    └── sombra.git/        as fotos do projeto (fora do seu git)</code></pre>
 
       <h3>Os três documentos de topo</h3>
       <div class="t-wrap"><table>
@@ -1405,7 +1470,7 @@ Abate     = desce por desuso         (o freio, via log-guardas.jsonl)</code></pr
       <div class="t-wrap"><table>
         <thead><tr><th>Tier</th><th>Quando</th><th>Custo/sessão</th></tr></thead>
         <tbody>
-          <tr><td><strong>T1 · Leve</strong></td><td>script, protótipo, POC</td><td>~500</td></tr>
+          <tr><td><strong>T1 · Leve</strong></td><td>script, protótipo, POC — <code>AGENTS.md</code>, <code>.gitignore</code> e a sombra</td><td>~500</td></tr>
           <tr><td><strong>T2 · Padrão</strong></td><td>app pessoal real</td><td>~2.500</td></tr>
           <tr><td><strong>T2+</strong></td><td>…que mexe com dinheiro ou dado sensível</td><td>+variável</td></tr>
           <tr><td><strong>T3 · Completo</strong> ⚠️</td><td>multi-módulo, mais de uma pessoa</td><td>~5.000</td></tr>
@@ -1449,15 +1514,28 @@ Desce por desuso (não se provou)</code></pre>
     <!-- ===================== 7.4 ===================== -->
     <section id="s74">
       <div class="sec-head"><span class="sec-num">07.4</span><h2>Hooks</h2></div>
-      <p>A espinha mecânica. Três, todos testados funcionando.</p>
+      <p>
+        A espinha mecânica. Quatro, todos testados funcionando. <strong>Três impedem o erro; o
+        quarto aceita que um dia um erro passa.</strong>
+      </p>
       <div class="t-wrap"><table>
-        <thead><tr><th>Hook</th><th>Evento</th><th>O que faz</th></tr></thead>
+        <thead><tr><th>Hook</th><th>Evento</th><th>O que faz</th><th>Tier</th></tr></thead>
         <tbody>
-          <tr><td><code>guarda</code></td><td>PreToolUse</td><td><strong>bloqueia</strong> o proibido, antes de acontecer</td></tr>
-          <tr><td><code>pos-edicao</code></td><td>PostToolUse</td><td>valida e <strong>devolve o erro pro modelo</strong></td></tr>
-          <tr><td><code>porta-saida</code></td><td>Stop</td><td><strong>não deixa fechar</strong> com plano sem baixa</td></tr>
+          <tr><td><code>sombra</code></td><td>PreToolUse · SessionStart</td><td><strong>fotografa</strong> o projeto antes do risco</td><td><strong>todos</strong></td></tr>
+          <tr><td><code>guarda</code></td><td>PreToolUse</td><td><strong>bloqueia</strong> o proibido, antes de acontecer</td><td>T2+</td></tr>
+          <tr><td><code>pos-edicao</code></td><td>PostToolUse</td><td>valida e <strong>devolve o erro pro modelo</strong></td><td>T2+</td></tr>
+          <tr><td><code>porta-saida</code></td><td>Stop</td><td><strong>não deixa fechar</strong> com plano sem baixa</td><td>T2+</td></tr>
         </tbody>
       </table></div>
+      <div class="note key">
+        <span class="note-tag">A sombra nunca bloqueia</span>
+        <p>
+          Ela sai com sucesso em qualquer situação, inclusive erro. Uma rede de segurança que trava
+          o trabalho é desligada na primeira semana — e aí não protege mais nada. O hook dela também
+          é <strong>autocontido</strong>: se você desinstalar a skill, o projeto continua sendo
+          fotografado.
+        </p>
+      </div>
       <p>
         <code>pos-edicao</code> é o retorno mais rápido que existe: roda depois de cada escrita e
         devolve o problema, que o modelo corrige antes de seguir. Hoje confere JSON válido, sintaxe
@@ -1492,7 +1570,10 @@ Desce por desuso (não se provou)</code></pre>
           <tr><td>Preciso rodar isso toda hora?</td><td>Não. <code>learn</code> quando a IA errar, <code>doctor</code> de vez em quando.</td></tr>
           <tr><td>E se eu editei os arquivos à mão?</td><td>Sua edição vence. O <code>upgrade</code> nunca sobrescreve customização.</td></tr>
           <tr><td>Serve pra projeto que já existe?</td><td>Serve. O <code>init</code> detecta e vira modo adoção.</td></tr>
-          <tr><td>Diferença entre <code>/manual-harness</code> e <code>/menu-harness</code>?</td><td>O manual <strong>ensina</strong> — você escolhe um tópico e ele explica. O menu <strong>lança</strong> — mostra os 9 comandos com último uso e já executa o que você escolher.</td></tr>
+          <tr><td><strong>Se a IA apagar um arquivo meu, dá pra recuperar?</strong></td><td>Dá — <code>/harness voltar</code>. Funciona inclusive quando o estrago veio de comando de shell, que é o caso em que o <code>/rewind</code> nativo <strong>não</strong> ajuda.</td></tr>
+          <tr><td>Então a sombra substitui o <code>/rewind</code>?</td><td>Não, e nem tenta. Use o <code>/rewind</code> no dia a dia; o <code>voltar</code> quando ele não der conta.</td></tr>
+          <tr><td>A sombra ocupa muito espaço?</td><td>Pouco — o git guarda só a diferença. Nos projetos de teste, entre 0,1 e 1,5 MB. O <code>doctor</code> avisa acima de 300 MB.</td></tr>
+          <tr><td>Diferença entre <code>/manual-harness</code> e <code>/menu-harness</code>?</td><td>O manual <strong>ensina</strong> — você escolhe um tópico e ele explica. O menu <strong>lança</strong> — mostra os 10 comandos com último uso e já executa o que você escolher.</td></tr>
           <tr><td>Por que ela insiste em ser pequena?</td><td>Acima de ~150 linhas o custo sobe 20–23% sem ganho, e regra genérica chega a piorar o resultado.</td></tr>
           <tr><td>Como eu apago tudo?</td><td>Apague <code>.harness/</code> e os documentos. Nada fica escondido no sistema.</td></tr>
           <tr><td>Funciona com outras IAs?</td><td>Os documentos sim — <code>AGENTS.md</code> é padrão aberto. Os hooks são do Claude Code.</td></tr>
@@ -1584,7 +1665,7 @@ Desce por desuso (não se provou)</code></pre>
     </section>
 
     <div class="foot">
-      MANUAL /HARNESS · V1.3.3 · 06.08.2026<br>
+      MANUAL /HARNESS · V1.4.0 · 12.08.2026<br>
       FONTE ÚNICA: manual/MANUAL.md · <a href="https://github.com/Leozinhobh77/harness">github.com/Leozinhobh77/harness</a><br>
       ATUALIZE COM /harness manual --exportar
     </div>
