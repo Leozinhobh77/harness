@@ -102,7 +102,11 @@ if ($comando -match '^\s*cd\s+"?([^"&;]+?)"?\s*(&&|;)') {
 }
 $mexeNesteProjeto = $dirEfetivo.TrimEnd('\', '/').StartsWith($raiz.TrimEnd('\', '/'), [StringComparison]::OrdinalIgnoreCase)
 
-if ($comando -and $ferramenta -eq 'Bash' -and $g.comandos_proibidos -and $mexeNesteProjeto) {
+# Bash E PowerShell. Ate a v1.8.0 esta linha olhava so 'Bash' - e no Windows a
+# maioria dos comandos passa pela ferramenta PowerShell, entao `git reset
+# --hard` por la NAO era bloqueado em nenhum projeto. A guarda existia e nao
+# guardava. Achado por leitura de codigo no evolve de 13/08/2026.
+if ($comando -and $ferramenta -match '^(Bash|PowerShell)$' -and $g.comandos_proibidos -and $mexeNesteProjeto) {
     foreach ($regra in $g.comandos_proibidos) {
         if ($comando -match $regra.padrao) {
             $bloqueios.Add("BLOQUEADO: comando proibido neste projeto. Motivo: $($regra.motivo)")

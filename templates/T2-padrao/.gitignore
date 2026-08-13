@@ -33,6 +33,14 @@ __pycache__/
 *.key
 *.pem
 
+# ...com UMA exceção: o modelo sem valor nenhum dentro.
+#
+# Sem esta linha, `.env.*` engole o próprio `.env.example` e ninguém — nem você
+# numa máquina nova — descobre quais variáveis o projeto usa. Achado no Vórtex
+# em 13/08/2026; a partir da v1.8.0 o `/harness doctor --skill` reprova o
+# template que tiver `.env.*` sem esta exceção.
+!.env.example
+
 # Sistema operacional
 Thumbs.db
 .DS_Store

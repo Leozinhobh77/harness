@@ -12,7 +12,12 @@
   powershell -File doctor.ps1 -Projeto "..." -Json
 #>
 param(
-    [Parameter(Mandatory=$true)][string]$Projeto,
+    [string]$Projeto,
+    # Auto-exame: examina a PROPRIA skill em vez de um projeto.
+    # A etapa 6 do evolve manda rodar isto desde a v1.6.0, e ate a v1.8.0 o
+    # parametro nao existia - a instrucao mandava rodar um comando inexistente.
+    # Achado executando o proprio ritual do evolve em 13/08/2026.
+    [switch]$Skill,
     [switch]$Json
 )
 
@@ -54,6 +59,121 @@ function Get-EstadoComparavel {
     return (($saida -join "`n").Trim())
 }
 
+# =====================================================================
+#  AUTO-EXAME  (-Skill)
+#  A skill e um harness. Ela tem que passar no proprio exame - senao
+#  prega orcamento sendo obesa.
+# =====================================================================
+if ($Skill) {
+    $raizSkill = Split-Path $PSScriptRoot -Parent
+
+    # 1. Os scripts compilam?
+    foreach ($s in (Get-ChildItem (Join-Path $raizSkill 'scripts') -Filter *.ps1)) {
+        $errs = $null
+        $null = [System.Management.Automation.Language.Parser]::ParseFile($s.FullName, [ref]$null, [ref]$errs)
+        if ($errs -and $errs.Count -gt 0) {
+            Add-Achado 'VERMELHO' 'Mecanica' "scripts/$($s.Name) tem $($errs.Count) erro(s) de sintaxe" 'corrigir antes de qualquer outra coisa'
+        }
+        # ASCII puro: acento em .ps1 quebra no console do Windows (P001).
+        $naoAscii = @([IO.File]::ReadAllBytes($s.FullName) | Where-Object { $_ -gt 127 }).Count
+        if ($naoAscii -gt 0) {
+            Add-Achado 'AMARELO' 'Mecanica' "scripts/$($s.Name) tem $naoAscii byte(s) nao-ASCII" 'mover texto acentuado para .md'
+        }
+    }
+
+    # 2. Toda rota do SKILL.md tem arquivo? Todo arquivo esta roteado?
+    $skillMd = Join-Path $raizSkill 'SKILL.md'
+    $rotas = @()
+    if (Test-Path $skillMd) {
+        $rotas = ([regex]::Matches((Get-Content $skillMd -Raw -Encoding UTF8), 'comandos/([a-z]+)\.md') |
+                  ForEach-Object { $_.Groups[1].Value }) | Sort-Object -Unique
+        foreach ($r in $rotas) {
+            if (-not (Test-Path (Join-Path $raizSkill "comandos\$r.md"))) {
+                Add-Achado 'VERMELHO' 'Deriva' "SKILL.md roteia para comandos/$r.md, que nao existe" 'criar o arquivo ou tirar a rota'
+            }
+        }
+    } else {
+        Add-Achado 'VERMELHO' 'Estrutura' 'SKILL.md nao existe' ''
+    }
+    foreach ($c in (Get-ChildItem (Join-Path $raizSkill 'comandos') -Filter *.md -ErrorAction SilentlyContinue)) {
+        if ($rotas -notcontains $c.BaseName) {
+            Add-Achado 'AMARELO' 'Deriva' "comandos/$($c.Name) existe mas nenhuma rota do SKILL.md aponta para ele" 'rotear ou abater (Lei 4)'
+        }
+    }
+
+    # 3. Orcamento dos documentos que a skill carrega sempre.
+    #    O SKILL.md nao tem teto de linha: o que se cobra dele e o PAPEL
+    #    (so rotear). Instrucao de comando mora em comandos/.
+    foreach ($par in @(@('CONSTITUICAO.md', 140), @('criterios\TIERS.md', 160), @('criterios\ORCAMENTOS.md', 110))) {
+        $arq = Join-Path $raizSkill $par[0]
+        if (-not (Test-Path $arq)) { continue }
+        $n = @(Get-Content $arq -Encoding UTF8).Count
+        if ($n -gt ([int]$par[1] * 1.2)) {
+            Add-Achado 'AMARELO' 'Orcamento' "$($par[0]) com $n linhas (teto $($par[1]) + 20%)" 'mover profundidade e deixar ponteiro'
+        }
+    }
+
+    # 4. Os templates que todo projeto herda estao sadios?
+    $gitignoreT2 = Join-Path $raizSkill 'templates\T2-padrao\.gitignore'
+    if (Test-Path $gitignoreT2) {
+        $g = Get-Content $gitignoreT2 -Raw -Encoding UTF8
+        # Regra que engole o proprio modelo: `.env.*` casa com `.env.example`.
+        if ($g -match '(?m)^\.env\.\*' -and $g -notmatch '(?m)^!\.env\.example') {
+            Add-Achado 'VERMELHO' 'Template' 'o .gitignore do T2 tem `.env.*` sem a excecao `!.env.example` - o modelo de variaveis nunca seria versionado' 'acrescentar !.env.example'
+        }
+    }
+
+    # 5. Guardas do template sem procedencia (Lei 1 aplicada a si mesma).
+    $guardas = Join-Path $raizSkill 'templates\T2-padrao\.harness\guardas.json'
+    if (Test-Path $guardas) {
+        try {
+            $cfg = Get-Content $guardas -Raw -Encoding UTF8 | ConvertFrom-Json
+            foreach ($g in @($cfg.arquivos_protegidos) + @($cfg.comandos_proibidos)) {
+                if ($g -and -not $g.procedencia) {
+                    Add-Achado 'VERMELHO' 'Procedencia' "guarda '$($g.nome)' do template nao tem procedencia (Lei 1)" 'registrar o caso real ou abater'
+                }
+            }
+        } catch {
+            Add-Achado 'VERMELHO' 'Mecanica' 'guardas.json do template nao e JSON valido' ''
+        }
+    }
+
+    $vS = @($achados | Where-Object { $_.severidade -eq 'VERMELHO' })
+    $aS = @($achados | Where-Object { $_.severidade -eq 'AMARELO'  })
+    $zS = @($achados | Where-Object { $_.severidade -eq 'AZUL'     })
+    $versaoS = 'desconhecida'
+    try { $versaoS = (Get-Content (Join-Path $raizSkill 'VERSAO.json') -Raw | ConvertFrom-Json).versao } catch { }
+
+    if ($Json) {
+        [pscustomobject]@{
+            alvo = 'skill'; versao = $versaoS
+            totais = @{ vermelho=$vS.Count; amarelo=$aS.Count; azul=$zS.Count }
+            achados = $achados
+        } | ConvertTo-Json -Depth 6
+        exit 0
+    }
+
+    Write-Output "DOCTOR (auto-exame) | a propria skill | v$versaoS"
+    Write-Output "$($rotas.Count) rota(s) | $(@(Get-ChildItem (Join-Path $raizSkill 'scripts') -Filter *.ps1).Count) script(s)"
+    Write-Output ''
+    if ($achados.Count -eq 0) {
+        Write-Output 'OK - a skill passa no proprio exame.'
+    } else {
+        foreach ($grupo in @(@('VERMELHO',$vS), @('AMARELO',$aS), @('AZUL',$zS))) {
+            if ($grupo[1].Count -gt 0) {
+                Write-Output "$($grupo[0]) ($($grupo[1].Count))"
+                foreach ($it in $grupo[1]) {
+                    Write-Output "  - [$($it.familia)] $($it.mensagem)"
+                    if ($it.correcao) { Write-Output "      -> $($it.correcao)" }
+                }
+                Write-Output ''
+            }
+        }
+    }
+    exit 0
+}
+
+if (-not $Projeto) { Write-Output 'ERRO: informe -Projeto <caminho> ou use -Skill'; exit 1 }
 if (-not (Test-Path $Projeto)) { Write-Output "ERRO: projeto nao encontrado -> $Projeto"; exit 1 }
 
 $nome      = Split-Path $Projeto -Leaf

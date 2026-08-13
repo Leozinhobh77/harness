@@ -144,9 +144,62 @@
   só recebe texto. O P006 resolveu o caso do `cd` porque ali havia sinal estrutural; aqui não há.
   **A mitigação é o contorno normal**, não um regex melhor: passar dado por arquivo (ferramenta
   de escrita) em vez de pela linha de comando.
+- **Quarta ocorrência (2026-08-13, evolve v1.8.0):** a armadura da Forge de novo, duas vezes
+  seguidas, bloqueando comandos que **testavam a própria guarda** — os casos de teste continham
+  a string proibida como dado. A segunda tentativa montava a string em pedaços
+  (`'git push ' + '--f' + 'orce'`) e **foi bloqueada mesmo assim**: a armadura remonta a
+  concatenação antes de casar. Confirma o limite abaixo — não é falta de regex melhor.
+- **Quinta ocorrência (2026-08-13), e é a melhor ilustração que o padrão já teve:** a armadura
+  bloqueou o **commit que documentava a correção da guarda**, porque a mensagem do commit
+  explicava que `git reset --hard` deixara de passar batido. Nenhum reset ia acontecer — o texto
+  era a documentação do conserto. **Uma guarda impedindo o registro do próprio aprendizado.**
+- **O limite honesto:** este caso **não tem conserto por regex**. Distinguir "vai executar um
+  push --force" de "a string aparece como dado" exige interpretar o shell, e o hook só recebe
+  texto. O P006 resolveu o caso do `cd` porque ali havia sinal estrutural; aqui não há.
+  **A mitigação é o contorno normal**, não um regex melhor: passar dado por arquivo (ferramenta
+  de escrita) em vez de pela linha de comando.
 - **Promovido ao template:** não — o `guarda.ps1` do T2 já está correto desde o P006. Registrado
-  porque as ocorrências seguintes **confirmam o padrão** (regra dos 2 casos, aqui com 3) e porque
+  porque as ocorrências seguintes **confirmam o padrão** (regra dos 2 casos, aqui com 4) e porque
   a armadura da Forge é do usuário: vale a correção lá, quando ele quiser.
+
+### P012 — Guarda que só cobre UMA ferramenta não guarda nada, e ninguém percebe
+- **Visto em:** template T2 da skill /harness (2026-08-13) — **os 4 projetos ao mesmo tempo**
+- **Nível da solução:** 2 (hook que bloqueia)
+- **O padrão:** o `guarda.ps1` verificava `$ferramenta -eq 'Bash'` antes de aplicar os
+  `comandos_proibidos`. No Windows, **a maioria dos comandos passa pela ferramenta PowerShell** —
+  então `git reset --hard` por lá **nunca foi bloqueado**, em nenhum dos quatro projetos, desde
+  que a guarda existe.
+- **Por que passou tanto tempo despercebido:** a guarda *existia*, *aparecia* no `guardas.json`,
+  *aparecia* na tabela 🔴 do `AGENTS.md` e **disparava de vez em quando** — pelo caminho do Bash.
+  Um mecanismo meio ligado é mais perigoso que um desligado: ele produz a sensação de proteção
+  e o log até mostra disparos, o que confirma a sensação.
+- **Como reconhecer em outro lugar:** toda condição que filtra por **nome de ferramenta, canal
+  ou ambiente** antes de aplicar uma regra de segurança. Pergunte: *por quantos caminhos
+  diferentes essa ação pode chegar aqui?* Se a resposta for mais de um, o filtro está errado
+  por construção.
+- **Corrigido na v1.8.0:** `$ferramenta -match '^(Bash|PowerShell)$'`, com 9 casos de teste.
+- **Promovido ao template:** sim.
+
+### P013 — Pedido escrito ao agente não é mecanismo: vira dado falso com cara de verdade
+- **Visto em:** skill /harness — `uso.json` (2026-08-12 e 2026-08-13, dois ciclos de evolve)
+- **Nível da solução:** abate (era nível 4, o pior)
+- **O padrão:** o `SKILL.md` pedia, por escrito, que o agente registrasse cada execução de
+  comando num `uso.json`. O `/menu-harness` lia esse arquivo e mostrava "último uso".
+  **O registro não acontecia.** Em 13/08 o `criticar` rodou **duas vezes** e continuou marcado
+  como "nunca usado"; o `learn` idem, por dois ciclos seguidos.
+- **O que torna isto pior que não ter o recurso:** o menu não dizia "não sei" — dizia
+  **"nunca usado"**, com confiança, sobre um comando usado horas antes. **Dado errado é pior
+  que dado nenhum**, porque dado nenhum ninguém usa para decidir e dado errado sim. Foi
+  inclusive por confiar nesse número que o evolve anterior abriu uma investigação sobre o
+  `learn` "nunca usado" — investigando o instrumento, não o mundo.
+- **A raiz é a Lei 2:** era um pedido educado ocupando o lugar de um mecanismo. E a Lei 2 já
+  avisa que isso é o anti-padrão nº 1. A skill violou a própria lei, por escrito, no próprio
+  roteador.
+- **Como reconhecer em outro lugar:** toda instrução da forma *"depois de X, lembre-se de
+  atualizar Y"* onde Y é lido por outra coisa como se fosse verdade. Ou vira mecânico, ou o
+  consumidor de Y precisa admitir que o dado é aproximado.
+- **Abatido na v1.8.0:** `uso.json` apagado, o passo saiu do `SKILL.md`, a coluna saiu do menu.
+- **Promovido ao template:** não se aplica — é lição sobre a própria skill.
 
 ### P003 — `.hidden` não existe em SVGElement, só em HTMLElement
 - **Visto em:** skill /harness (2026-07-26)

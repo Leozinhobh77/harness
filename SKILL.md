@@ -35,19 +35,9 @@ description: Cria, audita, mantém e evolui o harness de governança de qualquer
 | "atualizar este projeto", `upgrade` | `comandos/upgrade.md` | Traz melhorias da skill pro projeto |
 | "manual", "ajuda", "como usa" | `comandos/manual.md` | Manual navegável por número |
 | "exportar o manual", "publicar", `--exportar` | `comandos/exportar.md` | Publica o manual (web / Notion) |
-| "menu", "menu harness", "quais comandos existem" | `comandos/menu.md` | Lançador com último uso de cada comando |
+| "menu", "menu harness", "quais comandos existem" | `comandos/menu.md` | Lançador: escolha um número e ele executa |
 
 **Não carregue mais de um comando por vez.** Se o pedido couber em dois, pergunte qual.
-
-## Registrar uso (toda vez que um comando roda — não só pelo menu)
-
-Depois de carregar qualquer `comandos/<nome>.md` desta tabela **e terminar de executá-lo**,
-atualize `memoria/uso.json`: `{"<nome>": {"data": "<hoje, AAAA-MM-DD>", "projeto": "<nome do
-projeto atual, ou null>"}}`. Isso alimenta o `/menu-harness` — sem esse passo, o menu mostra
-"nunca usado" pra tudo, mesmo em comando que acabou de rodar. **Exceção: não registre o próprio
-`menu`** — ele é o painel que exibe os outros, registrar ele mesmo seria autorreferente e sem
-sinal nenhum (a data seria sempre "agora"). `status` é registrado normalmente como qualquer
-outro comando.
 
 ## As 3 regras que você nunca quebra
 
@@ -75,7 +65,7 @@ harness/
 ├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1 · sombra.ps1
 ├── manual/               MANUAL.md — 📌 fonte única do manual
 ├── docs/                 index.html — página publicada (GitHub Pages), saída do --exportar
-└── memoria/              REGISTRO · PADROES · CHANGELOG · uso.json (p/ /menu-harness)
+└── memoria/              REGISTRO · PADROES · CHANGELOG
 ```
 
 > **Esta árvore é a fonte única da estrutura.** O `README.md` aponta para cá em vez de manter

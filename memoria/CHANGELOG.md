@@ -8,6 +8,88 @@
 
 ---
 
+## v1.8.0 — 2026-08-13  ·  🧬 o `evolve` que nasceu de um projeto construído do zero
+
+**A rodada mais rica até agora, e por um motivo que vale registrar:** o usuário criou um projeto
+novo (**Vórtex**, jogo 3D) com o único propósito de *testar a skill*. Construir de verdade — do
+`init` ao deploy, com 5 planos e 22 commits — expôs em um dia quatro defeitos que nenhum dos
+outros três projetos tinha revelado em três semanas.
+
+### Como foi a varredura
+
+4 projetos vivos · Finanças 1 🟡, Zenith 2 🟡, Central e Vórtex limpos · guardas dispararam
+24 vezes somadas. Pesquisa externa **pulada** (a última foi no dia anterior; o prazo é 45 dias).
+
+**Nenhuma guarda qualificou para abate** — as três do template (`protege-estado-gerado`,
+`sem-push-force`, `sem-reset-hard`) já dispararam em algum projeto. Dito explicitamente porque a
+etapa 4 manda desconfiar de quem não acha nada para remover. O abate desta rodada veio de outro
+lugar, e é o item 5.
+
+### 🔧 Corrigido
+
+**1. O `init` não tirava a foto de nascimento da sombra.**
+O hook nascia certo, mas só dispara na **sessão seguinte**. O projeto passava todo o dia do
+parto — quando mais se mexe nele — sem uma única foto, e o `/harness voltar` não tinha para onde
+voltar. *Procedência: o `doctor` acusou "Sem sombra" no Vórtex recém-criado.*
+→ o `init` agora chama `sombra.ps1 -Snapshot` à mão, no passo 4.
+
+**2. O `.gitignore` do template engolia o próprio `.env.example`.**
+A regra `.env.*` casa com `.env.example`. Todo projeto com credencial nascia sem o modelo, e
+ninguém descobriria quais variáveis existem. *Procedência: aconteceu no Vórtex; o usuário foi
+quem notou que faltava o `.env`.*
+→ exceção `!.env.example` no template · `init` passa a **perguntar sobre credencial** (segunda
+pergunta obrigatória) · novo `templates/comum/env-example.tpl` · e o `doctor --skill` **reprova**
+qualquer template que volte a ter `.env.*` sem a exceção.
+
+**3. A guarda só cobria a ferramenta `Bash` (P012).**
+No Windows a maioria dos comandos passa pelo **PowerShell** — então `git reset --hard` por lá
+**nunca foi bloqueado**, nos quatro projetos, desde que a guarda existe. Um mecanismo meio ligado
+é pior que um desligado: ele produz sensação de proteção, e o log até mostra disparos (pelo
+caminho do Bash), o que confirma a sensação.
+→ `$ferramenta -match '^(Bash|PowerShell)$'`, com 9 casos de teste, 9/9.
+
+**4. `doctor --skill` estava documentado e não existia.**
+A etapa 6 do `evolve` manda rodar o auto-exame desde a v1.6.0. O parâmetro nunca foi
+implementado — a instrução mandava rodar um comando inexistente. *Achado executando o próprio
+ritual.*
+→ implementado. Confere: parser e ASCII dos scripts · toda rota tem arquivo · todo arquivo está
+roteado · orçamento dos documentos de sessão · **a armadilha do `.env.example`** · guarda de
+template sem procedência (Lei 1 contra si mesma).
+Na primeira execução ele **achou sozinho o item 2**.
+
+### 📉 Abatido (P013)
+
+**5. O `uso.json` e a coluna "último uso" do menu.**
+O `SKILL.md` pedia, por escrito, que o agente registrasse cada execução. **Não acontecia:** em
+13/08 o `criticar` rodou **duas vezes** e continuou marcado como "nunca usado"; o `learn` idem,
+por dois ciclos.
+
+O problema não é a falta do recurso — é que o menu **não dizia "não sei"**, dizia *"nunca usado"*
+com confiança, sobre comando usado horas antes. **Dado errado é pior que dado nenhum.** Tanto que
+o `evolve` anterior abriu uma investigação sobre o `learn` "nunca usado" — investigando o
+instrumento, achando que era o mundo.
+
+E a raiz é a **Lei 2**: um pedido educado ocupando o lugar de um mecanismo, escrito no próprio
+roteador da skill que prega a lei. → `uso.json` apagado, passo removido do `SKILL.md`, coluna
+removida do menu. Se um dia houver como registrar mecanicamente, volta.
+
+### 🪞 Auto-doctor
+
+✅ passou depois das correções · 13 rotas, todas com arquivo · 4 scripts com parser limpo e ASCII
+puro · zero órfãos em `comandos/`.
+
+### O que **não** entrou, e por quê
+
+Eu tinha levantado um quinto item — *"a fronteira de teste do template está errada: diz `core/`
+quando o certo é 'precisa de navegador?'"*. Fui conferir antes de propor: **o template só tem
+`{{VERIFICACAO}}`**. Aquela regra fui eu que escrevi para o Vórtex, não é da skill. Saiu do
+relatório antes de virar mudança.
+
+> Os projetos existentes **só recebem isto quando você rodar `/harness upgrade` neles**.
+> O item 3 é correção de segurança e vale a pena rodar logo.
+
+---
+
 ## v1.7.0 — 2026-08-12  ·  🧬 primeira rodada completa de `evolve`
 
 **A skill varreu os 3 projetos, achou uma convergência real, promoveu, abateu, e passou no
