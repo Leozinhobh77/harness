@@ -180,6 +180,34 @@
 - **Corrigido na v1.8.0:** `$ferramenta -match '^(Bash|PowerShell)$'`, com 9 casos de teste.
 - **Promovido ao template:** sim.
 
+### P014 — `$'` na substituição do `-replace` não é literal: é "todo o texto depois do casamento"
+- **Visto em:** upgrade do projeto Central (2026-08-13)
+- **Nível da solução:** 3 (o parser do `pos-edicao` pega — e pegou)
+- **O padrão:** no `-replace` do PowerShell, a string de substituição passa por **expansão de
+  regex do .NET**, não é literal. Ali, `$'` significa *"tudo que vem depois do casamento"*,
+  `` $` `` significa *"tudo que vem antes"* e `$&` é *"o casamento inteiro"* — mesmo que a
+  string esteja entre aspas simples, e mesmo que na origem você tenha escapado o `$` com crase.
+- **O que aconteceu:** eu queria trocar `$ferramenta -eq 'Bash'` por
+  `$ferramenta -match '^(Bash|PowerShell)$'`. O `$'` no fim do meu padrão foi lido como token,
+  engoliu o resto da linha e **colou o fim do arquivo no meio dela**. O arquivo passou de 127
+  para uma coisa que não compilava.
+- **Por que é traiçoeiro:** a crase (`` `$ ``) resolve a expansão **do PowerShell**, e dá a
+  sensação de que o `$` está seguro. Não está — falta ainda escapar para o **regex**, que é
+  outra camada, e que age depois.
+- **A regra:** para trocar texto que contém `$`, use **`.Replace()` de string** (literal, sem
+  regex nenhum) ou, quando precisar de regex, `[Regex]::Replace(...)` com
+  `[Regex]::Escape()` no padrão e `$$` na substituição. **`-replace` com `$` na substituição é
+  para nunca mais.**
+- **O que salvou:** o check de parser. Ele acusou o arquivo quebrado no mesmo minuto, e a
+  restauração foi um `git checkout` do arquivo — porque ele estava commitado. Sem o check, uma
+  guarda **desligada por erro de sintaxe** teria ficado no projeto sem ninguém notar: hook que
+  não compila simplesmente não roda.
+- **Ironia registrada:** o arquivo que eu quebrei era justamente a guarda que eu estava
+  consertando.
+- **Promovido ao template:** não se aplica — é regra de como editar, não de conteúdo.
+  Relacionado ao **P002** (`$var:` em string), da mesma família: `$` no PowerShell tem mais de
+  uma camada de interpretação.
+
 ### P013 — Pedido escrito ao agente não é mecanismo: vira dado falso com cara de verdade
 - **Visto em:** skill /harness — `uso.json` (2026-08-12 e 2026-08-13, dois ciclos de evolve)
 - **Nível da solução:** abate (era nível 4, o pior)
