@@ -8,6 +8,89 @@
 
 ---
 
+## v1.9.0 — 2026-08-14  ·  🛰️ a skill adota o próprio harness, e a auditoria alcança os satélites
+
+**A rodada em que a skill parou de ser exceção da própria regra.** Não foi um `evolve`: nasceu
+de um `/harness init` rodado **na própria skill**, a pedido do usuário — *"vamos ver como está a
+estrutura, o que precisa organizar, o que falta"*. O exame mecânico dizia `OK`. Os quatro
+achados estavam todos fora do campo de visão dele.
+
+### 🌑 A skill ganhou sombra (adoção, não criação)
+
+A skill exigia sombra de **todo** projeto que cria — *"não é funcionalidade de tier, é chão"*
+(`criterios/TIERS.md`) — e não tinha a sua. O buraco importa porque o `evolve` reescreve estes
+arquivos **em lote**, que é precisamente o caso que o `/rewind` nativo não desfaz.
+
+Caminho de **adoção** (`comandos/init.md`, seção final): nenhum template despejado por cima. Os
+papéis do T2 já existiam sob nomes próprios — `SKILL.md`+`CONSTITUICAO.md` fazem o `AGENTS.md`,
+`memoria/` faz o `DECISOES.md`, `criterios/` faz o `GOVERNANCA.md`. Duplicar isso seria a Lei 3
+quebrada pela ferramenta que a escreveu. Faltava só a espinha mecânica:
+
+```
+.claude/hooks/sombra.ps1    cópia byte-idêntica de templates/comum/ (conferida por hash)
+.claude/settings.json       SessionStart + PreToolUse — só a sombra, nenhuma outra guarda
+.gitignore                  sombra.git/ fora do repo real
+.harness/manifesto.json     tier T1, adotado:true, satélites mapeados
+```
+
+**Tier T1 é a forma real, não rebaixamento:** mecanicamente a skill tem gitignore + settings +
+hook da sombra, e nada mais — que é o T1 da tabela. Guarda de processo aqui seria regra sem
+procedência (Lei 1): a skill não tem build, nem plano com baixa, nem dado sensível.
+
+Duas notas que só aparecem construindo:
+
+- **O manifesto é versionado de propósito.** Tudo dentro de `.harness/` está ignorado, então sem
+  ele a pasta não existe num clone — e o hook sai na linha 41 sem fotografar nada. O manifesto é
+  o que mantém `.harness/` vivo no git.
+- **O hook só vale na sessão seguinte.** O Claude Code lê as configurações no início da sessão.
+  Por isso a foto de nascimento manual é obrigatória no ritual e não zelo — confirmado ao vivo:
+  depois de criado, o hook não disparou uma vez sequer nas edições seguintes.
+
+### 🛰️ Check novo — os satélites entraram no auto-exame
+
+**Procedência:** ao abrir o menu, o `Read` de `memoria/uso.json` falhou na frente do usuário. O
+`menu-harness` — que mora **fora** deste repositório — ainda mandava ler o arquivo abatido na
+v1.8.0, e executar o passo "Registrar uso" que já não existia no `SKILL.md`. Ver `P015`.
+
+**Alargou guarda existente, não empilhou nova.** O check 2 do auto-exame já era *"rota aponta
+para arquivo que existe"* — só enxergava o `SKILL.md` daqui. Escopo estreito, não guarda
+ausente; `comandos/learn.md` seção 2 manda consertar **ela**.
+
+Descoberta dinâmica (varre as pastas irmãs, não uma lista fixa — [P012] um nível acima), e só
+casa referência qualificada, para menção em prosa não virar alarme falso.
+
+**Provado:** injetada a referência morta, o exame acusou 🔴 com a mensagem exata; removida,
+voltou a `OK`.
+
+### 🔧 O `menu-harness` parou de mentir
+
+Além das 2 linhas mortas, a **`description`** — que é o que o roteador lê — prometia *"data do
+último uso"* (abatida na v1.8.0) e listava *"os 9 comandos"*, sem `voltar`, `criticar` nem
+`gauntlet`, nascidos nas v1.4–v1.6. São 12. O pior era qual ficou de fora: **`voltar` é o de
+emergência**, e estava invisível para quem chega gritando "socorro".
+
+### 🧹 Fora do repo, mas do mesmo mal
+
+Uma pasta `harness - Copia de backup` (cópia byte-idêntica, feita como backup manual antes de um
+upgrade) estava registrada como **segunda skill viva**, com gatilhos idênticos. Renomear a pasta
+não desregistra: o roteador lê o `description:` de dentro. Risco concreto — se o roteador
+escolhesse a cópia, o `evolve` gravaria o aprendizado nela. Resolvido pelo usuário, movendo para
+fora de `~/.claude/skills/`.
+
+**É a terceira aparição do mesmo padrão**, em três camadas: dentro do arquivo (v1.3.3, o
+`README.md` com cópia da árvore), ao lado do repo (esta cópia) e fora dele (o satélite). Está
+registrado no `P015` como **fonte única não é regra de documento, é regra de sistema.**
+
+### O que **não** entrou, e por quê
+
+- **A lista dos 6 checks do auto-exame no `CHECKS.md`.** Ficou só um ponteiro. Copiar a lista
+  para o doc fabricaria a duplicata que desatualiza sozinha — o próprio `P015` sendo cometido no
+  ato de documentá-lo.
+- **Manual e página continuam na v1.7.0.** Achado registrado, não corrigido — é trabalho de
+  escrita e rende mais numa sessão dedicada.
+
+---
+
 ## v1.8.0 — 2026-08-13  ·  🧬 o `evolve` que nasceu de um projeto construído do zero
 
 **A rodada mais rica até agora, e por um motivo que vale registrar:** o usuário criou um projeto

@@ -122,3 +122,24 @@ Sempre nesta ordem, e **sempre com o comando exato de correção**:
 
 **Se estiver tudo verde, diga em uma linha e pare.** Sucesso é silencioso — não liste os 34
 checks que passaram só para parecer trabalhoso.
+
+---
+
+## O auto-exame — quando o alvo é a própria skill
+
+As 6 famílias acima descrevem o exame de um **projeto**. A skill também se examina:
+
+```
+powershell -File scripts/doctor.ps1 -Skill
+```
+
+**A lista do que ele checa mora no código, não aqui.** É uma escolha, não esquecimento: manter
+uma segunda cópia dela neste arquivo é fabricar a duplicata que desatualiza sozinha — o modo de
+falha do `P015`, que nasceu exatamente disso. Cada check está comentado no lugar onde roda, com
+a procedência anexada. Para saber o que ele cobre, leia `scripts/doctor.ps1`, seção
+`AUTO-EXAME (-Skill)`.
+
+⚠️ **A fronteira do auto-exame é maior que este repositório.** Ele também confere as
+**skills-satélite** (`menu-harness`, `manual-harness`) — que moram em `~/.claude/skills/` e
+mandam ler arquivos daqui. Regra geral: *tudo que depende de você entra no seu exame, mesmo
+que não seja seu arquivo.*

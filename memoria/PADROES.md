@@ -229,6 +229,39 @@
 - **Abatido na v1.8.0:** `uso.json` apagado, o passo saiu do `SKILL.md`, a coluna saiu do menu.
 - **Promovido ao template:** não se aplica — é lição sobre a própria skill.
 
+### P015 — Abate podado só dentro do repo deixa vivo o satélite que mora fora
+- **Visto em:** skill /harness — `menu-harness` (2026-08-14), na sessão seguinte ao abate
+- **Nível da solução:** 3 (detecção) — **alargando guarda existente, não criando outra**
+- **O padrão:** o abate do [P013] na v1.8.0 apagou o `uso.json`, tirou o passo do `SKILL.md` e
+  tirou a coluna do `comandos/menu.md`. Os três são deste repositório. Mas o `/menu-harness` é
+  uma skill-atalho que mora em `~/.claude/skills/menu-harness/` — **fora daqui** — e continuou
+  mandando ler `memoria/uso.json` e executar o passo "Registrar uso". Ninguém percebeu por um
+  dia inteiro, até o usuário abrir o menu e o `Read` falhar na frente dele.
+- **Por que a guarda existente não pegou:** o check 2 do auto-exame já era exatamente *"rota
+  aponta para arquivo que existe"*. Ele não faltava — **enxergava só o `SKILL.md` daqui**. O
+  problema era escopo, não ausência. Por isso a correção alargou o check em vez de empilhar um
+  novo, como manda `comandos/learn.md`, seção 2. Guarda nova aqui seria a segunda regra dizendo
+  a mesma coisa, que é como harness vira monstro.
+- **A raiz, em uma frase:** *a fronteira da auditoria estava menor que a fronteira da
+  dependência.* Tudo que depende de você entra no seu exame — mesmo que não seja seu arquivo.
+- **Descoberta dinâmica de propósito:** a varredura olha as pastas irmãs em `~/.claude/skills/`,
+  não uma lista fixa de satélites. Lista fixa apodrece e para de guardar sem ninguém perceber —
+  é o [P012] um nível acima. Satélite futuro já nasce coberto.
+- **Só casa referência qualificada** (`~/.claude/skills/harness/...`), que é a forma de "manda
+  ler X". Menção em prosa a caminho relativo não dispara — foi assim que a nota explicativa que
+  eu mesmo deixei no `menu-harness` citando `memoria/uso.json` não virou alarme falso.
+- **A terceira vez do mesmo erro:** duplicata fora do alcance da poda já tinha mordido em
+  v1.3.3 (o `README.md` mantinha uma cópia da árvore de estrutura e desatualizou) e de novo em
+  14/08/2026 (a pasta `harness - Copia de backup` virou uma segunda skill viva disputando os
+  mesmos gatilhos). Três ocorrências, três camadas: dentro do arquivo, ao lado do repo, e fora
+  dele. **Fonte única não é regra de documento — é regra de sistema.**
+- **Provado:** injetei de volta a referência morta no `menu-harness`, o auto-exame acusou
+  🔴 `menu-harness/SKILL.md manda ler memoria/uso.json, que nao existe`; removida a injeção,
+  voltou a `OK`.
+- **Promovido ao template:** não se aplica — projeto não tem satélite. Mas a lição da fronteira
+  vale para o `evolve` avaliar se algum projeto do `REGISTRO.md` depende de arquivo fora da
+  própria raiz.
+
 ### P003 — `.hidden` não existe em SVGElement, só em HTMLElement
 - **Visto em:** skill /harness (2026-07-26)
 - **Nível da solução:** 3 (teste Playwright pegou antes de publicar)

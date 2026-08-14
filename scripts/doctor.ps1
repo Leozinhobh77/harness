@@ -138,6 +138,45 @@ if ($Skill) {
         }
     }
 
+    # 6. Os SATELITES apontam para coisa que ainda existe?
+    #
+    #    Satelite = skill-atalho que mora FORA deste repo (menu-harness,
+    #    manual-harness) e manda ler arquivo daqui de dentro.
+    #
+    #    PROCEDENCIA: 14/08/2026. O menu-harness mandava ler
+    #    memoria/uso.json e executar o passo "Registrar uso" - os dois
+    #    abatidos na v1.8.0 (P013). O abate podou o comandos/menu.md e o
+    #    SKILL.md, que sao daqui, e ninguem olhou o satelite. O Read falhou
+    #    na frente do usuario ao abrir o menu.
+    #
+    #    POR QUE AQUI, e nao numa guarda nova: o check 2 acima ja e "rota
+    #    aponta para arquivo que existe". Ele nao faltava - enxergava so o
+    #    SKILL.md daqui. Escopo estreito, nao guarda ausente (learn.md,
+    #    secao 2: se a guarda existia e nao pegou, conserte ELA).
+    #
+    #    DESCOBERTA DINAMICA de proposito: varre as pastas irmas em vez de
+    #    ler uma lista fixa. Lista fixa apodrece e para de guardar sem
+    #    ninguem perceber (P012), que e o mesmo erro um nivel acima.
+    #
+    #    So casa referencia QUALIFICADA (~/.claude/skills/harness/...), que
+    #    e a forma de "manda ler X". Mencao em prosa a um caminho relativo
+    #    nao dispara - e assim que se evita alarme falso em nota explicativa.
+    $dirSkills = Split-Path $raizSkill -Parent
+    foreach ($sat in (Get-ChildItem $dirSkills -Directory -ErrorAction SilentlyContinue)) {
+        if ($sat.FullName -eq $raizSkill) { continue }
+        $satMd = Join-Path $sat.FullName 'SKILL.md'
+        if (-not (Test-Path -LiteralPath $satMd)) { continue }
+        $txtSat = Get-Content $satMd -Raw -Encoding UTF8
+        foreach ($m in [regex]::Matches($txtSat, '~/\.claude/skills/harness/([A-Za-z0-9_\-./]+)')) {
+            $rel = $m.Groups[1].Value.TrimEnd('.', ',', ')')
+            if (-not $rel) { continue }
+            $alvoSat = Join-Path $raizSkill ($rel -replace '/', '\')
+            if (-not (Test-Path -LiteralPath $alvoSat)) {
+                Add-Achado 'VERMELHO' 'Integridade' "$($sat.Name)/SKILL.md manda ler $rel, que nao existe" 'corrigir o satelite ou recriar o alvo'
+            }
+        }
+    }
+
     $vS = @($achados | Where-Object { $_.severidade -eq 'VERMELHO' })
     $aS = @($achados | Where-Object { $_.severidade -eq 'AMARELO'  })
     $zS = @($achados | Where-Object { $_.severidade -eq 'AZUL'     })
