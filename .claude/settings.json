@@ -1,0 +1,26 @@
+{
+  "_leia": "So a sombra, nenhuma outra guarda. A skill nao e um projeto de codigo: ela nao tem build, nao tem plano, nao tem dado sensivel - entao guarda de processo aqui seria regra sem procedencia (Lei 1) e custo sem retorno (Lei 5). A sombra e a excecao porque nao e funcionalidade de tier, e chao (criterios/TIERS.md). Procedencia: a skill exigia sombra de todo projeto que cria e nao tinha a sua; o evolve reescreve estes arquivos em lote, que e justamente o que o /rewind nativo nao desfaz. 14/08/2026.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra.ps1\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra.ps1\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,3 +1,12 @@
+# A sombra — as fotos da própria skill (máquina do tempo local).
+# Rede de segurança da máquina, não histórico do projeto.
+# Procedência: a skill exigia sombra de todo projeto que cria ("é chão",
+# criterios/TIERS.md) e não tinha a sua. O `evolve` reescreve estes arquivos
+# em lote — exatamente o caso que o /rewind nativo não desfaz. 14/08/2026.
+.harness/sombra.git/
+.harness/.sombra-ultima
+.harness/log-guardas.jsonl
+
 # Sistema operacional
 Thumbs.db
 .DS_Store

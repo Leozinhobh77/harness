@@ -1,0 +1,41 @@
+{
+  "_leia": "Identidade do harness da PROPRIA skill. Lido por /harness doctor, status e upgrade.",
+
+  "projeto": "harness (a propria skill)",
+  "tier": "T1",
+  "versao_skill": "1.8.0",
+  "criado_em": "2026-08-14",
+  "atualizado_em": "2026-08-14",
+  "adotado": true,
+
+  "_adotado": "A skill ja tinha governanca propria antes deste manifesto. O init NAO despejou template: acrescentou so a espinha mecanica que faltava (a sombra), como manda comandos/init.md secao 'Se o projeto JA TEM estrutura'.",
+
+  "_tier": "T1 e a forma real, nao um rebaixamento: mecanicamente a skill tem .gitignore + settings.json + hook da sombra, e nada mais - que e exatamente o T1 de criterios/TIERS.md. Guarda de processo aqui seria regra sem procedencia (Lei 1): a skill nao tem build, nao tem plano com baixa, nao tem dado sensivel.",
+
+  "_equivalentes": "Os papeis do T2 ja existem sob nomes proprios, e por isso NAO foram duplicados: AGENTS.md -> SKILL.md + CONSTITUICAO.md | docs/DECISOES.md -> memoria/CHANGELOG.md + memoria/PADROES.md | docs/GOVERNANCA.md -> criterios/TIERS.md + ORCAMENTOS.md + CHECKS.md | ESTADO.md -> scripts/versao.ps1. Criar os do T2 por cima seria duplicata, ou seja, a Lei 3 quebrada pela ferramenta que a escreveu.",
+
+  "arquivos": [
+    "SKILL.md",
+    "CONSTITUICAO.md",
+    "VERSAO.json",
+    ".gitignore",
+    ".claude/settings.json",
+    ".claude/hooks/sombra.ps1",
+    "criterios/TIERS.md",
+    "criterios/ORCAMENTOS.md",
+    "criterios/CHECKS.md",
+    "memoria/CHANGELOG.md",
+    "memoria/PADROES.md",
+    "memoria/REGISTRO.md",
+    "manual/MANUAL.md"
+  ],
+
+  "satelites": [
+    "../menu-harness/SKILL.md",
+    "../manual-harness/SKILL.md"
+  ],
+  "_satelites": "Skills-atalho que moram FORA deste repo e apontam para dentro dele. Nada as audita hoje - o doctor so olha para dentro. Em 14/08/2026 o menu-harness estava mandando ler memoria/uso.json, abatido na v1.8.0, e ninguem percebeu ate o Read falhar na frente do usuario. Ver achado 5 / item 5 da adocao.",
+
+  "customizados": [],
+  "_customizados": "Arquivos que o usuario editou a mao. /harness upgrade NUNCA sobrescreve nada listado aqui."
+}
