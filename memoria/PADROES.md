@@ -262,6 +262,37 @@
   vale para o `evolve` avaliar se algum projeto do `REGISTRO.md` depende de arquivo fora da
   própria raiz.
 
+### P017 — A documentação é a última duplicata a ganhar mecanismo, e a que mente por mais tempo
+- **Visto em:** skill /harness — `manual/MANUAL.md` + `docs/index.html` (2026-08-14), **4 versões
+  atrasados**; mesma família do [P013] e do [P015], **terceira ocorrência do padrão-mãe**
+- **Nível da solução:** 3 (check no `doctor --skill`) — era **5** (só o olho do usuário)
+- **O padrão:** todo mundo aceita que código precisa de teste, mas documentação a gente ainda
+  "lembra de atualizar". O manual passou da v1.7.0 à v1.10.0 sem uma linha nova — e não era
+  cosmético: escondia **duas correções de segurança** (a guarda que só cobria `Bash`, o
+  `.gitignore` que engolia o `.env.example`) que o usuário precisava ler para saber que tinha de
+  rodar `/harness upgrade` nos projetos antigos. Pior: ele **anunciava como viva** uma coluna
+  abatida na v1.8.0. Documento desatualizado não fica neutro — ele **mente com confiança**.
+- **A raiz, e é a parte que dói:** o `comandos/exportar.md` **já mandava** conferir o carimbo
+  antes de publicar. A regra existia, escrita, no lugar certo, na skill que prega a Lei 2. E não
+  adiantou nada. *Pedido educado no lugar de mecanismo é exatamente o que o [P013] abateu em
+  outro canto — e aqui a própria skill repetiu o erro que documentou.*
+- **Solução:** o auto-exame passou a conferir, mecanicamente:
+  1. carimbo do `MANUAL.md` **=** `VERSAO.json`
+  2. carimbo do topo **e** do rodapé de `docs/index.html` **=** `VERSAO.json`
+  3. todo `/harness <cmd>` que o manual ensina existe em `comandos/`
+- **Carimbo não encontrado também é achado (amarelo).** Se o desenho da página mudar e a âncora
+  sumir, o check **grita que ficou cego** em vez de passar em silêncio — a lição do [P016]:
+  guarda que falha parecendo sucesso é a que some do radar.
+- **Um falso positivo achado pelo próprio check, na primeira execução:** a regex usava `\s+`
+  entre `/harness` e o comando, e a "colinha" do manual alinha a descrição em coluna
+  (`/harness              onde estamos`). Ele leu *"onde"* como nome de comando. Corrigido para
+  **um espaço só**. Guarda nova nasce testada, inclusive contra si mesma.
+- **Provado nos quatro caminhos:** carimbo velho → 🔴 com a versão exata · comando inventado →
+  🔴 · âncora do carimbo removida → 🟡 "o check ficou cego" · tudo em dia → `OK`.
+- **Promovido ao template:** não — projeto de usuário não tem manual publicado. Mas a lição é
+  geral e o `evolve` deve reler as três juntas: **[P013] + [P015] + [P017] são a mesma doença em
+  camadas diferentes — fonte única não é regra de documento, é regra de sistema.**
+
 ### P016 — O mesmo diretório tem várias grafias: comparar caminho como texto dá "não é" no que é
 - **Visto em:** skill /harness — `guarda.ps1` (2026-07-26, ver [P006] segunda camada), hook
   `sombra-satelites.ps1` (2026-08-14) — **duas ocorrências independentes: é padrão, não acaso**

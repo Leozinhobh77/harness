@@ -177,6 +177,71 @@ if ($Skill) {
         }
     }
 
+    # 7. O MANUAL e a PAGINA dizem a verdade?
+    #
+    #    PROCEDENCIA: 14/08/2026. O manual estava carimbado v1.7.0 com a skill
+    #    ja na v1.10.0 - QUATRO rodadas de atraso, e entre elas duas correcoes
+    #    de SEGURANCA (P012: a guarda so cobria Bash) que o usuario precisava
+    #    ler para saber que tinha de rodar o upgrade nos projetos antigos.
+    #
+    #    POR QUE VIROU MECANISMO: o comandos/exportar.md JA MANDAVA, por
+    #    escrito, conferir o carimbo antes de publicar. Nao adiantou - pedido
+    #    educado no lugar de mecanismo e exatamente o que a Lei 2 proibe, e o
+    #    que o P013 abateu noutro canto. Enquanto ninguem executa, e so uma
+    #    frase bonita. O manual e a terceira camada do P015: MANUAL.md e a
+    #    fonte, docs/index.html e copia, e copia sem mecanismo deriva.
+    #
+    #    CARIMBO NAO ENCONTRADO TAMBEM E ACHADO: se o desenho da pagina mudar
+    #    e a ancora sumir, o check tem que gritar - e nao passar em silencio,
+    #    que e como uma guarda morre sem ninguem notar (P016).
+    $versaoDeclarada = ''
+    try { $versaoDeclarada = [string](Get-Content (Join-Path $raizSkill 'VERSAO.json') -Raw | ConvertFrom-Json).versao } catch { }
+
+    if ($versaoDeclarada) {
+        $carimbos = @(
+            @{ arq = 'manual\MANUAL.md'; rot = 'MANUAL.md';       pat = '\*\*Vers[^0-9]{0,12}([0-9]+\.[0-9]+\.[0-9]+)\*\*' },
+            @{ arq = 'docs\index.html';  rot = 'pagina (topo)';   pat = 'class="brand-meta">Manual[^0-9]{0,12}([0-9]+\.[0-9]+\.[0-9]+)' },
+            @{ arq = 'docs\index.html';  rot = 'pagina (rodape)'; pat = 'MANUAL /HARNESS[^0-9]{0,12}([0-9]+\.[0-9]+\.[0-9]+)' }
+        )
+        foreach ($c in $carimbos) {
+            $caminho = Join-Path $raizSkill $c.arq
+            if (-not (Test-Path -LiteralPath $caminho)) {
+                Add-Achado 'VERMELHO' 'Integridade' "$($c.rot) nao existe, mas o exportar aponta para ele" 'recriar ou tirar a rota'
+                continue
+            }
+            $txt = Get-Content -LiteralPath $caminho -Raw -Encoding UTF8
+            $m = [regex]::Match($txt, $c.pat)
+            if (-not $m.Success) {
+                Add-Achado 'AMARELO' 'Deriva' "$($c.rot): nao achei o carimbo de versao - o check ficou cego" 'restaurar o carimbo no formato esperado'
+            }
+            elseif ($m.Groups[1].Value -ne $versaoDeclarada) {
+                Add-Achado 'VERMELHO' 'Deriva' "$($c.rot) diz v$($m.Groups[1].Value), a skill esta na v$versaoDeclarada" 'atualizar o manual e rodar /harness manual --exportar'
+            }
+        }
+    }
+
+    #    E o manual promete comando que existe? Mesma regra do check 2 - "rota
+    #    aponta para arquivo que existe" - com o escopo alargado ao manual, que
+    #    e onde o usuario le a promessa. Alargar guarda existente, nao empilhar
+    #    outra (comandos/learn.md secao 2).
+    $arqManual = Join-Path $raizSkill 'manual\MANUAL.md'
+    if (Test-Path -LiteralPath $arqManual) {
+        $txtMan = Get-Content -LiteralPath $arqManual -Raw -Encoding UTF8
+        $existentes = @(Get-ChildItem (Join-Path $raizSkill 'comandos') -Filter *.md -ErrorAction SilentlyContinue |
+                        ForEach-Object { $_.BaseName })
+        # UM espaco so, nao \s+ : na colinha o texto e alinhado em coluna
+        # ("/harness              onde estamos"), e \s+ atravessava o
+        # alinhamento e lia a descricao como se fosse nome de comando. Achado
+        # na primeira execucao deste proprio check.
+        $citados = @([regex]::Matches($txtMan, '/harness ([a-z][a-z-]{2,})') |
+                     ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+        foreach ($cit in $citados) {
+            if ($existentes -notcontains $cit) {
+                Add-Achado 'VERMELHO' 'Integridade' "o manual ensina '/harness $cit', que nao existe em comandos/" 'corrigir o manual ou criar o comando'
+            }
+        }
+    }
+
     $vS = @($achados | Where-Object { $_.severidade -eq 'VERMELHO' })
     $aS = @($achados | Where-Object { $_.severidade -eq 'AMARELO'  })
     $zS = @($achados | Where-Object { $_.severidade -eq 'AZUL'     })

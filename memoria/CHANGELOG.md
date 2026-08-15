@@ -8,6 +8,59 @@
 
 ---
 
+## v1.11.0 — 2026-08-14  ·  📖 o manual sai de 4 versões de atraso, e o atraso vira guarda
+
+**Pedido do usuário: auditoria completa do manual e da página, "sem deixar nada para trás".** O
+manual estava carimbado **v1.7.0** com a skill na v1.10.0 — quatro rodadas perdidas.
+
+### 🩹 O que ele estava **mentindo**
+
+Pior que o atraso: o manual anunciava como vivo o que já tinha sido abatido.
+
+- A colinha e o FAQ vendiam a coluna **"último uso"** do menu, abatida na v1.8.0 pelo [P013] —
+  o mesmo dado falso que o abate existiu para matar, sobrevivendo no documento que ensina.
+- Os dois diziam **"os 10 comandos"** do menu. São **12** desde a v1.6.0.
+
+### ➕ O que estava **faltando** (v1.8.0 → v1.10.0)
+
+- **A segunda pergunta obrigatória do `init`** (credencial) e a armadilha do `.gitignore`: a
+  regra `.env.*` casa com o próprio `.env.example`.
+- **A foto de nascimento da sombra** — e o porquê: o hook só vale na sessão seguinte.
+- **O auto-exame `--skill`**: o que ele confere, que ele passou duas versões *documentado e
+  inexistente*, e o check dos **satélites** com a lição da fronteira.
+- 🚨 **O aviso de segurança do [P012]** com chamada para ação: a guarda escutava só `Bash`, e
+  `git reset --hard` por PowerShell nunca foi bloqueado em nenhum projeto. Quem tem projeto
+  anterior a 13/08 precisa rodar `/harness upgrade` — e não tinha como saber lendo o manual.
+- **A skill adotada** (v1.9.0) e a sombra dos satélites (v1.10.0), com a moral virada para o
+  leitor: *a peça em que você mais confia é a que ninguém lembra de proteger.*
+
+### 🔒 E o ciclo fechou — [P017]
+
+O `comandos/exportar.md` **já mandava**, por escrito, conferir o carimbo antes de publicar. A
+regra existia, no lugar certo, na skill que prega a Lei 2 — e o manual ficou quatro versões
+atrasado mesmo assim. **Pedido educado no lugar de mecanismo é o erro que o [P013] abateu noutro
+canto, repetido pela própria skill contra si mesma.**
+
+O auto-exame agora confere sozinho: carimbo do `MANUAL.md` · carimbo do **topo e do rodapé** da
+página · e todo `/harness <cmd>` que o manual ensina existe em `comandos/`. **Carimbo não
+encontrado é achado amarelo** — se o desenho mudar e a âncora sumir, o check grita que ficou
+cego, em vez de passar calado ([P016]).
+
+**Provado nos quatro caminhos** (carimbo velho 🔴 · comando inventado 🔴 · âncora removida 🟡 ·
+tudo em dia `OK`), com o arquivo real restaurado byte a byte depois de cada injeção. E o check
+achou **um falso positivo dele mesmo** na estreia: `\s+` atravessava o alinhamento em coluna da
+colinha e lia *"onde estamos"* como nome de comando.
+
+### O que **não** entrou, e por quê
+
+- **Bump dos exemplos de saída** que mostram `harness v1.7.0` dentro dos blocos de código. São
+  ilustração de uma execução passada, não afirmação sobre o presente — trocar o número não
+  acrescenta verdade nenhuma.
+- **A seção "Os dez comandos" da página.** O número está certo: a referência documenta 10 dos 12
+  (o `menu`, o `manual` e o `exportar` são meta-comandos, ensinados fora dela).
+
+---
+
 ## v1.10.0 — 2026-08-14  ·  🌒 a sombra alcança os satélites (e um buraco no gatilho)
 
 **A v1.9.0 mandou o auto-exame olhar os satélites. Esta rodada dá a eles o que faltava depois de

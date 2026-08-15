@@ -18,10 +18,16 @@
 ## Antes de qualquer destino
 
 1. Leia `manual/MANUAL.md` — é a fonte.
-2. Leia `VERSAO.json` e confira: o carimbo do manual bate com a versão atual da skill?
-   - **Não bate** → atualize o cabeçalho e a tabela "Histórico deste manual" no `MANUAL.md` **antes**
+2. **Rode `/harness doctor --skill`.** Ele confere sozinho o carimbo do manual **e** os dois da
+   página contra o `VERSAO.json`, e acusa comando que o manual ensina e não existe.
+   - **Acusou** → atualize o cabeçalho e a tabela "Histórico deste manual" no `MANUAL.md` **antes**
      de exportar. Manual publicado com carimbo errado é pior que manual desatualizado, porque mente
      com confiança.
+
+   > **Isto aqui era um pedido escrito, e por isso não funcionou.** Até a v1.11.0 esta linha dizia
+   > *"confira se o carimbo bate"* — e o manual mesmo assim ficou **quatro versões** atrasado,
+   > escondendo duas correções de segurança do usuário. Lei 2: pedido educado no lugar de
+   > mecanismo é o mesmo erro que o `P013` abateu noutro canto. Virou check.
 3. Todo destino recebe o carimbo: `v<versão> · gerado em <data>` + a linha de fonte única.
 
 ---

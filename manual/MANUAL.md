@@ -1,6 +1,6 @@
-# 📖 MANUAL `/harness`
+﻿# 📖 MANUAL `/harness`
 
-> **Versão 1.7.0** · gerado em **12/08/2026**
+> **Versão 1.11.0** · gerado em **14/08/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -25,7 +25,7 @@
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
 /manual-harness       este manual — ENSINA, não executa
-/menu-harness         lista os comandos com último uso — ESCOLHE e já EXECUTA
+/menu-harness         os 12 comandos em lista — ESCOLHE por número e já EXECUTA
 
 Rotina saudável:
   ao criar projeto ......... init
@@ -188,14 +188,43 @@ Cria a estrutura — ou **adota** um projeto que já tem a sua.
 
 Se você já explicou o projeto na conversa, ele **não repergunta** — infere e confirma numa frase.
 
-### A pergunta obrigatória
+### As duas perguntas obrigatórias
 
-Existe uma que ele faz **sempre**, em qualquer tier:
+Essas ele faz **sempre**, em qualquer tier, mesmo no T1:
 
 > *"O que neste projeto nunca pode ser tocado ou commitado?"*
+> *"Vai entrar chave, senha ou token?"*
 
-É a única exceção da Lei 1 (procedência): guarda de dado entra preventivamente, porque perder
-ou vazar dado não tem desfazer.
+São a única exceção da Lei 1 (procedência): guarda de dado entra preventivamente, porque perder
+— ou vazar — dado não tem desfazer.
+
+**A segunda entrou na v1.8.0, e a história dela ensina mais que a regra.** Num projeto real o
+usuário avisou que usaria uma chave de API paga. A skill protegeu a chave em quatro lugares
+diferentes… e **esqueceu de criar o arquivo onde ela mora**. Foi o usuário quem notou. Proteção
+sem o lugar certo para guardar empurra a pessoa a colar o segredo em qualquer canto — que é
+exatamente o acidente que a proteção existia para impedir.
+
+Se a resposta for sim, ele gera os dois arquivos:
+
+| Arquivo | O que é | Vai pro git? |
+|---|---|---|
+| `.env` | onde a chave mora de verdade — nasce **vazio**, com um comentário dizendo onde pegar cada valor | **nunca** |
+| `.env.example` | o modelo: os nomes das variáveis, sem os valores | **sim** — é ele que conta ao próximo (ou a você em 3 meses) quais variáveis o projeto precisa |
+
+> ⚠️ **A armadilha do `.gitignore`, que mordeu de verdade.** A regra `.env.*` — que parece a
+> coisa certa a escrever — **casa também com `.env.example`**. O modelo ia para o `.gitignore`
+> junto com o segredo, e todo projeto nascia sem ele. Por isso o template hoje traz a exceção
+> `!.env.example`, e o `doctor --skill` **reprova** qualquer template que volte a esquecê-la.
+> Uma regra de proteção larga demais não protege mais: ela come o que não devia.
+
+### A foto de nascimento
+
+No passo 4, logo depois de criar a sombra, o `init` **tira uma foto à mão** — e isso não é zelo.
+
+O hook da sombra só entra em vigor na **sessão seguinte**: o Claude Code lê as configurações
+quando a sessão abre. Sem essa foto manual, o projeto atravessaria todo o dia do parto — que é
+justamente quando mais se mexe nele — **sem uma única foto**, e o `/harness voltar` não teria
+para onde voltar. *Procedência: o `doctor` acusou "Sem sombra" num projeto recém-criado.*
 
 ### Modo adoção
 
@@ -285,7 +314,32 @@ limite de um só é erro de categoria — foi exatamente o erro que originou a r
 |---|---|
 | `/harness doctor` | tudo |
 | `/harness doctor --rapido` | só os checks mecânicos (segundos) |
-| `/harness doctor --skill` | roda o doctor **na própria skill** |
+| `/harness doctor --skill` | roda o doctor **na própria skill** (é o auto-exame) |
+
+### O auto-exame — quando a ferramenta se aponta para si
+
+O `--skill` é o `doctor` virado para dentro: em vez de auditar o seu projeto, audita a skill.
+Ele confere parser e ASCII dos scripts · toda rota tem arquivo · todo arquivo está roteado ·
+orçamento dos documentos de sessão · a armadilha do `.env.example` · guarda de template sem
+procedência (a Lei 1 aplicada contra a própria skill) · e os **satélites**.
+
+**Duas coisas aqui valem mais que a lista.**
+
+A primeira: até a v1.8.0 esse modo estava **documentado e não existia**. O ritual do `evolve`
+mandava rodá-lo desde a v1.6.0, e o parâmetro nunca tinha sido implementado — a instrução
+mandava executar um comando inexistente, e ninguém notou por duas versões. Foi achado rodando o
+próprio ritual. Assim que passou a existir, **ele achou sozinho** um bug de segurança do
+template. Instrução escrita não é mecanismo: enquanto ninguém executa, ela é só uma frase bonita.
+
+A segunda: o check dos **satélites** (v1.9.0). Satélite é uma skill-atalho que mora **fora** do
+repositório da skill e manda ler arquivo de dentro dele — `/menu-harness` e `/manual-harness` são
+os dois. Quando a v1.8.0 abateu um arquivo, a poda passou em tudo que era do repositório e
+deixou vivo o satélite, que continuou mandando ler o arquivo apagado. O usuário abriu o menu e a
+leitura falhou na frente dele.
+
+> **A lição, que vale para qualquer projeto seu:** *a fronteira da auditoria estava menor que a
+> fronteira da dependência.* Tudo que depende de você entra no seu exame — mesmo que não seja
+> seu arquivo, mesmo que more em outra pasta.
 
 ### A pegadinha
 
@@ -954,6 +1008,15 @@ Detalhe de desenho que vale saber: o hook que tira as fotos é **autocontido**. 
 skill. Se você desinstalar o `/harness` amanhã, o projeto **continua sendo fotografado** — só o
 `voltar` (ler e restaurar) é que precisa da skill.
 
+> **A skill demorou a fazer o que exigia dos outros.** Até a v1.9.0 ela cobrava sombra de todo
+> projeto que criava e **não tinha a sua** — e era o pior lugar para faltar, porque o `evolve`
+> reescreve os arquivos dela em lote, que é exatamente o caso que o `/rewind` não desfaz. Hoje
+> ela tem, e na v1.10.0 os satélites também ganharam a deles.
+>
+> Guardo isso aqui porque a lição é sua também: **a peça que você mais confia é a que ninguém
+> lembra de proteger.** Quando for procurar o buraco no seu projeto, comece pelo que parece
+> óbvio demais para checar.
+
 ### `referencias/` — a categoria que faltava
 
 Todo o resto do harness é sobre o que o projeto **decidiu**. Esta pasta é sobre o que ele **quer
@@ -1282,6 +1345,18 @@ justamente o que o `/rewind` nativo não desfaz. Ver [§4.8](#48-harness-voltar-
 Lê `.harness/guardas.json` e barra arquivo protegido ou comando proibido. Testado: barrou
 `git push`, barrou edição do `ESTADO.md`, liberou `AGENTS.md`.
 
+> 🚨 **Correção de segurança da v1.8.0 — se o seu projeto é anterior a 13/08/2026, rode
+> `/harness upgrade` nele.** A guarda escutava só a ferramenta `Bash`. No Windows a maioria dos
+> comandos passa pelo **PowerShell** — ou seja, `git reset --hard` por lá **nunca foi
+> bloqueado**, em nenhum projeto, desde que a guarda existe. Hoje ela escuta as duas
+> (`^(Bash|PowerShell)$`, com 9 casos de teste).
+>
+> **Por que isso é pior que não ter guarda nenhuma:** um mecanismo meio ligado *produz sensação
+> de proteção* — e o log ainda mostrava disparos, pelo caminho do Bash, o que confirmava a
+> sensação. Você confia e baixa a atenção justamente onde não está coberto. É o padrão `P012`, e
+> ele voltou a morder em 14/08/2026 num lugar diferente: o gatilho da **sombra** também listava
+> `Bash` sem `PowerShell`, e comando destrutivo por lá não gerava foto. Mesmo erro, outra peça.
+
 ### `pos-edicao` — o retorno mais rápido que existe
 
 Roda depois de cada Write/Edit e devolve o problema pro modelo, que se corrige antes de seguir.
@@ -1323,8 +1398,17 @@ Serve. O `init` detecta e vira modo adoção: audita o que tem e propõe melhori
 
 **Qual a diferença entre `/manual-harness` e `/menu-harness`?**
 O manual **ensina** — você escolhe um tópico e ele explica a fundo, com exemplo. O menu
-**lança** — mostra os 10 comandos com descrição curta e a data do último uso de cada um, e
-escolher um número já executa aquele comando. Use o manual pra entender; o menu pra agir.
+**lança** — mostra os 12 comandos com uma descrição de uma linha cada, e escolher um número já
+executa aquele comando. Use o manual pra entender; o menu pra agir.
+
+**O menu não mostrava a data do último uso de cada comando?**
+Mostrava, e foi **abatido na v1.8.0** — de propósito. A skill pedia por escrito que o agente
+registrasse cada execução, e isso simplesmente não acontecia: o `criticar` rodou duas vezes num
+dia e continuou aparecendo como *"nunca usado"*. O problema não era a falta do recurso — era o
+menu **não dizer "não sei"** e dizer *"nunca usado"* com confiança sobre um comando usado horas
+antes. **Dado errado é pior que dado nenhum**: o `evolve` chegou a abrir uma investigação sobre
+um comando "nunca usado", investigando o instrumento achando que era o mundo. Se um dia houver
+como registrar mecanicamente, volta.
 
 **Se a IA apagar um arquivo meu, dá pra recuperar?**
 Dá — é pra isso que a sombra existe. `/harness voltar` lista as fotos e devolve o arquivo, a
@@ -1488,6 +1572,10 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| **1.11.0** | **2026-08-14** | **Este manual saiu da 1.7.0 e o atraso virou guarda** 📖 — auditoria completa das quatro rodadas que ele tinha perdido (1.8.0 → 1.10.0). Corrigido o que **mentia**: a colinha e o FAQ anunciavam a coluna "último uso" do menu, abatida na 1.8.0, e diziam "10 comandos" quando são 12. Acrescentado o que **faltava**: a segunda pergunta obrigatória do `init` (credencial) com a armadilha do `.env.example`, a foto de nascimento da sombra, o auto-exame `--skill` e o check dos satélites, e o aviso de segurança do `P012`. **E o ciclo fechou:** o `exportar` *pedia por escrito* que se conferisse o carimbo antes de publicar — pedido é exatamente o que a Lei 2 proíbe no lugar de mecanismo, e foi assim que o manual passou 4 versões atrasado. Agora o auto-exame confere sozinho: carimbo do manual **e** da página contra o `VERSAO.json`, e todo comando que existe está documentado. |
+| **1.10.0** | **2026-08-14** | **A sombra alcança os satélites** 🌒 — `/menu-harness` e `/manual-harness` moram fora do repositório da skill e eram o único pedaço do sistema **sem volta**: um arquivo cada, sem git, sem foto. Agora cada um tem a sua sombra, alimentada pela sessão da skill (hook só dispara na pasta onde a sessão abriu — então a rede fica onde a mão passa, não onde o objeto está). **Buraco achado de raspão:** o gatilho listava `Bash` e esquecia `PowerShell`, o shell principal do Windows — comando destrutivo por lá não gerava foto nenhuma desde que a sombra nasceu. O código já tratava o caso; a ferramenta é que nunca chegava nele. **P016:** comparar caminho como texto — o Windows tem duas grafias para a mesma pasta (`Usuário` e `USURIO~2`), e a guarda se desligava sozinha, em silêncio, com `exit 0`. |
+| **1.9.0** | **2026-08-14** | **A skill adota o próprio harness** 🛰️ — ela exigia sombra de *todo* projeto que cria e não tinha a sua, justamente onde o risco é maior: o `evolve` reescreve arquivos em lote, que é o caso que o `/rewind` nativo não desfaz. Adoção, não despejo de template: os papéis já existiam sob nomes próprios (`SKILL.md`+`CONSTITUICAO.md` fazem o `AGENTS.md`), então só entrou a espinha mecânica que faltava. **Check novo:** o auto-exame passou a enxergar os **satélites** — as skills-atalho que moram fora do repositório e apontam para dentro dele. Procedência: o menu mandava ler um arquivo abatido na 1.8.0 e o `Read` falhou na frente do usuário. *A fronteira da auditoria estava menor que a fronteira da dependência.* |
+| **1.8.0** | **2026-08-13** | **O `evolve` que nasceu de um projeto construído do zero** 🧬 — um jogo 3D criado só para testar a skill expôs em um dia quatro defeitos que três semanas nos outros projetos não revelaram. **Segurança:** a guarda cobria só `Bash`, e no Windows quase tudo passa pelo PowerShell — `git reset --hard` por lá nunca foi bloqueado, em nenhum projeto (`P012`). **Segurança:** a regra `.env.*` do template engolia o próprio `.env.example`, e todo projeto com credencial nascia sem o modelo. **Buraco:** o `init` não tirava a foto de nascimento da sombra, e o projeto passava o dia do parto sem nada para onde voltar. **Existia só no papel:** `doctor --skill` estava documentado desde a 1.6.0 e nunca tinha sido implementado. **Abatido (`P013`):** o `uso.json` e a coluna "último uso" — a skill *pedia* que o agente registrasse cada execução, não acontecia, e o menu dizia "nunca usado" com confiança sobre comando usado horas antes. **Dado errado é pior que dado nenhum.** |
 | **1.7.0** | **2026-08-12** | **Primeira rodada completa de `evolve`** 🧬 — a skill varreu os 3 projetos, achou convergência real, promoveu, abateu e passou no próprio doctor. **Promovido:** `sem-push` sai do template, `sem-push-force` entra — dois projetos independentes rejeitaram a guarda larga em datas e por motivos diferentes (P011: *guarda larga demais não é conservadora, é frágil — vira desligada, e o abate leva junto a proteção que importava*). **Promovido:** o `ESTADO.md` passa a se regenerar sozinho no início da sessão (Lei 2 — o `doctor` acusava a deriva em 2 de 3 projetos e ninguém rodava o `fix`). **Abatido:** `templates/T3-completo/` deixou de existir — tinha um arquivo só, e nem era do T3; `REGRAS-DE-NEGOCIO.md` foi para `comum/`, onde o T2+ o alcança. **Observado sem mexer:** `learn` marca "nunca usado" e mesmo assim guarda customizada nasceu em 2 projetos — investigar no próximo uso real. |
 | **1.6.0** | **2026-08-12** | **O loop com freios: `/harness gauntlet`** 🏟️ — fecha o ciclo que o `criticar` deixou aberto: builder corrige o gap → portão determinístico → crítico cego → repete, até vencer a barra ou um freio parar. Os cinco freios são passos obrigatórios, não conselhos: vitória · teto de rodadas (padrão 3) · **platô** (mesmo gap 2× → para) · **regressão** (portão quebrou → rollback pela foto da sombra + para) · você. Anti-reward-hacking fixo: uma mutação por rodada, builder nunca vê o transcript do crítico, nunca nota nem score em arquivo, nada roda sem OK explícito. Zero mudança nos projetos — todas as peças (crítico, sombra, portão, barra) já existiam das v1.4–1.5. |
 | **1.5.0** | **2026-08-12** | **A barra: `referencias/` e o crítico cego** 🔍 — o harness ganha uma categoria que não tinha: **material de entrada** (o que o projeto quer parecer), separado de documento de governança (o que ele decidiu). Prateleira de 8 pastas + `INDICE.md` com os 3 critérios de entrada (**Nomeada · Buscável · Inspecionável**) + ficha de consistência de personagem. Comando novo `/harness criticar`: portão determinístico primeiro, depois um **subagente crítico com contexto limpo** compara o resultado real contra a barra **às cegas**, decisão binária sem nota, e **não conserta**. Nasceu de pesquisa sobre o **Gauntlet Loop** — que entrou pela metade de propósito: entrou o crítico (ganho medido de ~78% dos defeitos), **não entrou o loop autônomo** (LoopsBench: 25% de resolução e regressões em todos os perfis; reward hacking de juiz medido em 0,72→0,94 com acurácia real em 0,20). Prateleira nasce inteira mesmo vazia — custo zero, e *o que não é visto não é lembrado*. |

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -662,7 +662,7 @@
     <div class="nav-top">
       <div class="brand">
         <div class="brand-mark">/<span>harness</span></div>
-        <div class="brand-meta">Manual · v1.7.0 · 12.08.2026</div>
+        <div class="brand-meta">Manual · v1.11.0 · 14.08.2026</div>
       </div>
       <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
@@ -747,7 +747,7 @@
 /harness evolve       a skill melhora a si mesma           ← a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
 /manual-harness       este manual — ENSINA, não executa
-/menu-harness         lista os comandos com último uso — ESCOLHE e já EXECUTA
+/menu-harness         os 12 comandos em lista — ESCOLHE por número e já EXECUTA
 
 Rotina saudável:
   ao criar projeto ......... init
@@ -874,9 +874,38 @@ Saúde: 0 vermelho · 2 amarelo     → /harness doctor  para ver</code></pre>
 4. GERA        → só o que aquele tier pede, tudo preenchido de verdade
 5. REGISTRA    → anota na memória da skill e roda o doctor no que criou</code></pre>
       <p>
-        Existe uma pergunta que ele faz <strong>sempre</strong>, em qualquer tier:
-        <em>“o que neste projeto nunca pode ser tocado ou commitado?”</em> É a única exceção da
-        Lei 1 — guarda de dado entra preventivamente, porque vazar dado não tem desfazer.
+        Existem <strong>duas</strong> perguntas que ele faz <strong>sempre</strong>, em qualquer
+        tier: <em>“o que neste projeto nunca pode ser tocado ou commitado?”</em> e
+        <em>“vai entrar chave, senha ou token?”</em> São a única exceção da Lei 1 — guarda de
+        dado entra preventivamente, porque perder ou vazar dado não tem desfazer.
+      </p>
+      <p>
+        <strong>A segunda entrou na v1.8.0, e a história dela ensina mais que a regra.</strong>
+        Num projeto real o usuário avisou que usaria uma chave de API paga. A skill protegeu a
+        chave em quatro lugares e <strong>esqueceu de criar o arquivo onde ela mora</strong> — foi
+        o usuário quem notou. Proteção sem o lugar certo para guardar empurra a pessoa a colar o
+        segredo em qualquer canto, que é o acidente que a proteção existia para impedir. Se a
+        resposta for sim, ele gera o <code>.env</code> (vazio, fora do git) e o
+        <code>.env.example</code> (o modelo versionado, que conta ao próximo quais variáveis
+        existem).
+      </p>
+      <div class="note warn">
+        <span class="note-tag">A armadilha do .gitignore</span>
+        <p>
+          A regra <code>.env.*</code> — que parece a coisa certa a escrever — <strong>casa também
+          com <code>.env.example</code></strong>. O modelo ia para o <code>.gitignore</code> junto
+          com o segredo, e todo projeto com credencial nascia sem ele. Hoje o template traz a
+          exceção <code>!.env.example</code>, e o auto-exame <strong>reprova</strong> qualquer
+          template que volte a esquecê-la. <strong>Regra de proteção larga demais não protege
+          mais: ela come o que não devia.</strong>
+        </p>
+      </div>
+      <p>
+        <strong>A foto de nascimento.</strong> Logo depois de criar a sombra, o <code>init</code>
+        tira uma foto à mão — e isso não é zelo. O hook só entra em vigor na <strong>sessão
+        seguinte</strong>, porque o Claude Code lê as configurações quando a sessão abre. Sem essa
+        foto, o projeto atravessaria todo o dia do parto — justamente quando mais se mexe nele —
+        sem uma única foto, e o <code>/harness voltar</code> não teria para onde voltar.
       </p>
       <p>
         <strong>Projeto que já existe não é sobrescrito.</strong> Ele vira modo adoção: roda o
@@ -947,6 +976,37 @@ Custo do harness: ~2.700 tokens/sessão (alvo T2: 2.500)
         seu teto</strong>: somar dois documentos diferentes e comparar o total com o limite de um só é erro
         de categoria.
       </p>
+
+      <h4>O auto-exame — quando a ferramenta se aponta para si</h4>
+      <p>
+        <code>/harness doctor --skill</code> é o doctor virado para dentro: em vez do seu projeto,
+        audita a própria skill. Confere parser e ASCII dos scripts · toda rota tem arquivo · todo
+        arquivo está roteado · orçamento dos documentos · a armadilha do <code>.env.example</code>
+        · guarda de template sem procedência (a Lei 1 contra a própria skill) · e os
+        <strong>satélites</strong>.
+      </p>
+      <p>
+        <strong>Duas coisas aqui valem mais que a lista.</strong> A primeira: até a v1.8.0 esse
+        modo estava <strong>documentado e não existia</strong> — o ritual mandava rodá-lo desde a
+        v1.6.0 e o parâmetro nunca tinha sido implementado. Assim que passou a existir, achou
+        sozinho um bug de segurança do template. <strong>Instrução escrita não é mecanismo:</strong>
+        enquanto ninguém executa, é só uma frase bonita.
+      </p>
+      <p>
+        A segunda: o check dos <strong>satélites</strong> (v1.9.0). Satélite é uma skill-atalho que
+        mora <strong>fora</strong> do repositório e manda ler arquivo de dentro dele. Quando a
+        v1.8.0 abateu um arquivo, a poda passou em tudo que era do repositório e deixou vivo o
+        satélite, que continuou mandando ler o arquivo apagado — até a leitura falhar na frente do
+        usuário.
+      </p>
+      <div class="note">
+        <span class="note-tag">A lição, que vale pro seu projeto</span>
+        <p>
+          <em>A fronteira da auditoria estava menor que a fronteira da dependência.</em> Tudo que
+          depende de você entra no seu exame — mesmo que não seja seu arquivo, mesmo que more em
+          outra pasta.
+        </p>
+      </div>
 
       <h3><code>/harness fix</code> — corrigir</h3>
       <p>O braço; o cérebro é o doctor. Se ele descobrir um problema novo durante o conserto, ele <strong>para e reporta</strong>.</p>
@@ -1659,6 +1719,35 @@ Desce por desuso (não se provou)</code></pre>
           fotografado.
         </p>
       </div>
+      <div class="note warn">
+        <span class="note-tag">Segurança — projeto anterior a 13.08.2026 precisa de upgrade</span>
+        <p>
+          A <code>guarda</code> escutava só a ferramenta <code>Bash</code>. No Windows a maioria dos
+          comandos passa pelo <strong>PowerShell</strong> — ou seja, <code>git reset --hard</code>
+          por lá <strong>nunca foi bloqueado</strong>, em nenhum projeto, desde que a guarda existe.
+          Hoje ela escuta as duas. Se o seu projeto é anterior a essa data, rode
+          <code>/harness upgrade</code> nele.
+        </p>
+        <p>
+          <strong>Por que isso é pior que não ter guarda nenhuma:</strong> um mecanismo meio ligado
+          produz <em>sensação</em> de proteção — e o log ainda mostrava disparos, pelo caminho do
+          Bash, o que confirmava a sensação. Você confia e baixa a atenção justamente onde não está
+          coberto. É o padrão <code>P012</code>, e ele voltou a morder em 14.08.2026 noutra peça: o
+          gatilho da <strong>sombra</strong> também listava <code>Bash</code> sem
+          <code>PowerShell</code>, e comando destrutivo por lá não gerava foto.
+        </p>
+      </div>
+      <div class="note">
+        <span class="note-tag">A skill demorou a fazer o que exigia</span>
+        <p>
+          Até a v1.9.0 ela cobrava sombra de todo projeto que criava e <strong>não tinha a
+          sua</strong> — o pior lugar para faltar, porque o <code>evolve</code> reescreve os
+          arquivos dela em lote, que é exatamente o caso que o <code>/rewind</code> não desfaz. Hoje
+          ela tem, e na v1.10.0 os satélites também ganharam a deles. <strong>A peça em que você
+          mais confia é a que ninguém lembra de proteger</strong> — quando for procurar o buraco no
+          seu projeto, comece pelo que parece óbvio demais para checar.
+        </p>
+      </div>
       <p>
         <code>pos-edicao</code> é o retorno mais rápido que existe: roda depois de cada escrita e
         devolve o problema, que o modelo corrige antes de seguir. Hoje confere JSON válido, sintaxe
@@ -1700,7 +1789,8 @@ Desce por desuso (não se provou)</code></pre>
           <tr><td>A pasta <code>referencias/</code> vazia não é inchaço?</td><td>Não, e a conta é literal: pasta vazia custa <strong>zero token</strong>; o <code>INDICE.md</code> é leitura sob demanda. O ponteiro no <code>AGENTS.md</code> custa 13 tokens medidos.</td></tr>
           <tr><td>Por que o <code>criticar</code> não roda em loop sozinho?</td><td>Loop é decisão de orçamento, e ela é sua. Para o ciclo completo existe o <code>gauntlet</code> — com portão, rollback, platô e teto.</td></tr>
           <tr><td><strong>O <code>gauntlet</code> pode rodar a noite toda sozinho?</strong></td><td>Não. Teto de rodadas (padrão 3), parada por platô, rollback em regressão — e nada começa sem o seu OK explícito. Você continua sendo o freio final.</td></tr>
-          <tr><td>Diferença entre <code>/manual-harness</code> e <code>/menu-harness</code>?</td><td>O manual <strong>ensina</strong> — você escolhe um tópico e ele explica. O menu <strong>lança</strong> — mostra os 10 comandos com último uso e já executa o que você escolher.</td></tr>
+          <tr><td>Diferença entre <code>/manual-harness</code> e <code>/menu-harness</code>?</td><td>O manual <strong>ensina</strong> — você escolhe um tópico e ele explica. O menu <strong>lança</strong> — mostra os 12 comandos com uma descrição de uma linha cada, e já executa o que você escolher.</td></tr>
+          <tr><td>O menu não mostrava a data do último uso?</td><td>Mostrava, e foi <strong>abatido na v1.8.0</strong>, de propósito. A skill <em>pedia por escrito</em> que o agente registrasse cada execução, e não acontecia: um comando rodou duas vezes num dia e seguiu marcado como “nunca usado”. O erro não era a falta do recurso — era o menu não dizer “não sei” e dizer “nunca usado” com confiança. <strong>Dado errado é pior que dado nenhum.</strong></td></tr>
           <tr><td>Por que ela insiste em ser pequena?</td><td>Acima de ~150 linhas o custo sobe 20–23% sem ganho, e regra genérica chega a piorar o resultado.</td></tr>
           <tr><td>Como eu apago tudo?</td><td>Apague <code>.harness/</code> e os documentos. Nada fica escondido no sistema.</td></tr>
           <tr><td>Funciona com outras IAs?</td><td>Os documentos sim — <code>AGENTS.md</code> é padrão aberto. Os hooks são do Claude Code.</td></tr>
@@ -1792,7 +1882,7 @@ Desce por desuso (não se provou)</code></pre>
     </section>
 
     <div class="foot">
-      MANUAL /HARNESS · V1.7.0 · 12.08.2026<br>
+      MANUAL /HARNESS · V1.11.0 · 14.08.2026<br>
       FONTE ÚNICA: manual/MANUAL.md · <a href="https://github.com/Leozinhobh77/harness">github.com/Leozinhobh77/harness</a><br>
       ATUALIZE COM /harness manual --exportar
     </div>
