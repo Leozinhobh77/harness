@@ -294,6 +294,45 @@
   vale para o `evolve` avaliar se algum projeto do `REGISTRO.md` depende de arquivo fora da
   própria raiz.
 
+### P018 — Correção propagada à mão não escala: quem descobre a pendência tem que ser o consumidor
+- **Visto em:** skill /harness (2026-08-15), na rodada seguinte a patchear 4 projetos na mão
+- **Nível da solução:** 2 (mecanismo que avisa sozinho) — era **5** (eu, abrindo projeto por projeto)
+- **O padrão:** quando o produtor (a skill) corrige algo que vive dentro dos consumidores (os
+  projetos), o instinto é **empurrar**: sair aplicando em todos. Funciona com 4. Com 20 ou 30,
+  **inverte o propósito da ferramenta** — mexer na skill vira um dia de manutenção alheia, e o
+  trabalho que você queria fazer não acontece. Palavras do usuário: *"eu tô aqui só para
+  atualizar a skill; quando eu usar ela para mexer nos programas, ela tem que reconhecer a
+  estrutura"*.
+- **A inversão que resolve:** **pull, não push.** O produtor nunca empurra; publica **o que
+  mudou, em formato que a máquina lê** (`memoria/MIGRACOES.json`). O consumidor descobre sozinho
+  **no momento em que é aberto** — e projeto que ninguém abre não paga nada e fica parado, que é
+  o comportamento certo, não uma falha.
+- **Três regras que fazem a diferença entre isso funcionar e virar ruído:**
+  1. **Silêncio é o padrão.** Versão diferente **não** gera aviso; só gera aviso migração
+     pendente. Sem isso, todo patch da skill incomodaria 30 projetos à toa — e alarme falso vira
+     alarme desligado ([P011]).
+  2. **Confere no disco, não no número.** O `versao_skill` do manifesto é indício, não prova: o
+     usuário pode ter aplicado a correção à mão. Acusar pendência inexistente é o [P013] de novo
+     — dado errado é pior que dado nenhum.
+  3. **Só interrompe por segurança.** Pendência de rotina informa e não atrapalha. Guarda que
+     interrompe à toa é guarda desligada.
+- **O canal não precisou ser criado:** o hook da sombra de todo projeto **já chamava** o
+  `estado.ps1` da skill no início da sessão, e o `ESTADO.md` **já era lido** toda sessão. O aviso
+  custou **zero arquivo novo dentro dos projetos** — o que também evitou o ovo-e-galinha: um hook
+  novo só chegaria no projeto por uma migração, que é justamente o que ele deveria anunciar.
+- **Uma fonte, dois leitores:** `scripts/_migracoes.ps1` responde a pergunta *"o que falta aqui?"*
+  para o `estado.ps1` (aviso passivo, início de sessão) e para o `doctor.ps1` (resposta ativa,
+  quando o usuário audita). Duas cópias da mesma regra seriam a duplicata que já mordeu três
+  vezes nesta skill ([P015], [P017]).
+- **E o mecanismo se protege:** o auto-exame valida o `MIGRACOES.json` (JSON, campos
+  obrigatórios, gravidade válida, id repetido, e **versão acima da atual** — que geraria alarme
+  falso permanente em todo projeto). Provado nos quatro modos de apodrecimento.
+- **Provado:** projeto de mentira em v1.7.0 → avisa 3 pendências, 3 de segurança; as mesmas
+  correções aplicadas **no disco** com o manifesto ainda em v1.7.0 → **silêncio**; os 4 projetos
+  reais → silêncio.
+- **Promovido ao template:** não se aplica — é arquitetura da skill. Mas a lição vale para
+  qualquer produtor/consumidor: *publique o diff, não empurre a correção.*
+
 ### P017 — A documentação é a última duplicata a ganhar mecanismo, e a que mente por mais tempo
 - **Visto em:** skill /harness — `manual/MANUAL.md` + `docs/index.html` (2026-08-14), **4 versões
   atrasados**; mesma família do [P013] e do [P015], **terceira ocorrência do padrão-mãe**

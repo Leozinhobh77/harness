@@ -8,6 +8,83 @@
 
 ---
 
+## v1.13.0 — 2026-08-15  ·  📡 pull em vez de push: o projeto descobre sozinho que está atrasado
+
+**Correção de rumo pedida pelo usuário, e é das que mudam a arquitetura.** Nesta mesma rodada eu
+patcheei 4 projetos na mão. Ele viu o que isso vira em escala:
+
+> *"daqui a pouco eu vou construir uns 20, 30 aplicativo com a skill, e toda hora que eu atualizar
+> ela eu vou ter que ficar atualizando 20, 30… o intuito não é esse. Eu tô aqui só para atualizar
+> a skill. Quando eu usar ela para mexer nos programas, ela tem que reconhecer a estrutura."*
+
+Ele está certo, e o erro era meu: **empurrar correção funciona com 4 projetos e inverte o
+propósito da ferramenta com 30.** Mexer na skill viraria manutenção alheia.
+
+### A inversão
+
+```
+ANTES (push)                          AGORA (pull)
+  skill v1.13.0                         skill v1.13.0
+       |                                     |  (não empurra nada)
+       |--> projeto 1  <- na mão             v
+       |--> projeto 2  <- na mão        manifesto do projeto: v1.7.0
+       |--> projeto 3  <- na mão             |
+       +--> projeto 30 <- impossivel         +-> ao ABRIR o projeto:
+                                                 "ESTRUTURA DESATUALIZADA,
+                                                  1 de SEGURANCA -> upgrade"
+```
+
+### As três peças
+
+| Peça | Arquivo | O que faz |
+|---|---|---|
+| **A lista** | `memoria/MIGRACOES.json` | a face **acionável** do CHANGELOG: por versão, o que um projeto precisa aplicar, com `gravidade` e como **verificar no disco** |
+| **O aviso** | `scripts/estado.ps1` + `templates/comum/ESTADO-pendencias.tpl.md` | bloco no topo do `ESTADO.md`, no início da sessão daquele projeto |
+| **A trava** | `SKILL.md` | pediu trabalho num projeto com pendência de **segurança** → a skill diz **antes** de começar |
+
+Mais um leitor: o `doctor` ganhou a família **`Migracao`** — porque ele não pode responder
+*"tudo ok"* com uma correção de segurança pendente, e porque o **T1 não tem `ESTADO.md`**.
+
+### O canal já existia — e isso não é detalhe
+
+O hook da sombra de **todo** projeto já chamava o `estado.ps1` da skill no início da sessão, e o
+`ESTADO.md` já era lido toda sessão. **O aviso custou zero arquivo novo dentro dos projetos.**
+
+Isso resolveu de graça um ovo-e-galinha que teria matado a ideia: um hook novo só chegaria ao
+projeto **por uma migração** — justamente o que ele deveria anunciar. Projeto nunca atualizado
+nunca receberia o aviso de que precisa atualizar.
+
+### As três regras que separam isto de virar ruído
+
+1. **Silêncio é o padrão.** Versão diferente **não** gera aviso — só gera aviso migração
+   pendente. Sem isso, todo patch incomodaria 30 projetos à toa, e alarme falso vira alarme
+   desligado ([P011]).
+2. **Confere no disco, não no número.** O `versao_skill` é indício, não prova. Provado: as
+   correções aplicadas no disco com o manifesto ainda em v1.7.0 → **silêncio**.
+3. **Só interrompe por segurança.** Rotina informa e não atrapalha.
+
+**Uma fonte, dois leitores:** `scripts/_migracoes.ps1` responde *"o que falta aqui?"* para o
+`estado.ps1` e para o `doctor.ps1`. Duas cópias da mesma regra seriam a duplicata que já mordeu
+três vezes nesta skill ([P015], [P017]).
+
+**E o mecanismo se protege:** o auto-exame valida o `MIGRACOES.json` — JSON, campos obrigatórios,
+gravidade válida, id repetido e **versão acima da atual** (que geraria alarme falso permanente em
+todo projeto). Provado nos quatro modos de apodrecimento, com o arquivo restaurado byte a byte.
+
+### Um bug meu, achado antes de rodar
+
+O check novo comparava contra `$versaoS`, que só era lida **34 linhas depois** — teria comparado
+contra `$null` e passado **calado**, como se tivesse conferido. Movida para o topo do bloco, com
+o porquê escrito ao lado. É o [P016] outra vez: *falha que se parece com sucesso.*
+
+### O que **não** entrou, e por quê
+
+- **Aviso para T1 via `ESTADO.md`**: T1 não tem esse arquivo, por desenho. O `doctor` cobre.
+- **Aplicar migração automaticamente ao abrir o projeto.** Seria push com outro nome. **O aviso
+  informa; quem decide é o usuário** — e adiar é resposta legítima.
+
+---
+
 ## v1.12.0 — 2026-08-15  ·  🔌 a porta do hook entrou no exame
 
 **A v1.11.1 consertou os 4 projetos à mão. Esta rodada impede que aconteça de novo** — porque

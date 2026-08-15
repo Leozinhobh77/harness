@@ -3,6 +3,8 @@
 > ⚠️ **Arquivo gerado.** Não edite à mão — rode `/harness fix` para regenerar.
 > Gerado em {{DATA}} · tier {{TIER}} · harness v{{VERSAO}}
 
+{{PENDENCIAS}}
+
 ## Planos ativos
 
 {{PLANOS}}

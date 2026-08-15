@@ -3,7 +3,7 @@
 
   "projeto": "harness (a propria skill)",
   "tier": "T1",
-  "versao_skill": "1.12.0",
+  "versao_skill": "1.13.0",
   "criado_em": "2026-08-14",
   "atualizado_em": "2026-08-14",
   "adotado": true,
@@ -27,6 +27,7 @@
     "criterios/CHECKS.md",
     "memoria/CHANGELOG.md",
     "memoria/PADROES.md",
+    "memoria/MIGRACOES.json",
     "memoria/REGISTRO.md",
     "manual/MANUAL.md",
     "docs/index.html"

@@ -39,6 +39,27 @@ description: Cria, audita, mantém e evolui o harness de governança de qualquer
 
 **Não carregue mais de um comando por vez.** Se o pedido couber em dois, pergunte qual.
 
+## 🔌 A trava de estrutura desatualizada
+
+**Antes de construir, corrigir ou implantar qualquer coisa num projeto**, olhe o `ESTADO.md`
+dele. Se trouxer o bloco **ESTRUTURA DESATUALIZADA com item `[SEGURANCA]`**, diga isso **antes**
+de começar o que foi pedido:
+
+> *"Antes: a estrutura deste projeto está na v1.7.0 e tem 1 correção de segurança pendente —
+> `<título>`. Aplico o `upgrade` primeiro? (leva segundos e não mexe no seu código)"*
+
+Depois faça o que ele decidir. **Ele pode dizer "depois", e "depois" é resposta legítima** — o
+aviso informa, não obriga.
+
+**Por que esta regra existe (15/08/2026):** a skill evolui aqui; os projetos ficam onde estão.
+Sair aplicando correção em 20 ou 30 projetos a cada versão inverteria o propósito — mexer na
+skill viraria manutenção alheia. O modelo é **pull**: a skill nunca empurra, o projeto descobre
+sozinho ao ser aberto (`memoria/MIGRACOES.json` → `scripts/_migracoes.ps1` → aviso no `ESTADO.md`
+e achado no `doctor`). Esta linha é só o que o **agente faz** com o aviso que o mecanismo já deu.
+
+⚠️ **Só vale para item de segurança.** Pendência de rotina não interrompe trabalho nenhum —
+guarda que interrompe à toa é guarda que o usuário desliga.
+
 ## As 3 regras que você nunca quebra
 
 1. **`doctor` nunca escreve. `fix` nunca decide.** Diagnóstico e tratamento são separados —
@@ -60,12 +81,14 @@ harness/
 ├── comandos/             a instrução de cada comando
 ├── criterios/            TIERS · ORCAMENTOS · CHECKS
 ├── templates/            T1-leve · T2-padrao (não existe T3 — ver TIERS.md)
-│                        comum/ ESTADO.tpl · sombra.ps1 · critico-cego.md
-│                               REGRAS-DE-NEGOCIO.md (T2+) · referencias/
+│                        comum/ ESTADO.tpl · ESTADO-pendencias.tpl · sombra.ps1
+│                               critico-cego.md · REGRAS-DE-NEGOCIO.md (T2+) · referencias/
 ├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1 · sombra.ps1
+│                        _migracoes.ps1 — "o que este projeto ainda não aplicou"
 ├── manual/               MANUAL.md — 📌 fonte única do manual
 ├── docs/                 index.html — página publicada (GitHub Pages), saída do --exportar
 └── memoria/              REGISTRO · PADROES · CHANGELOG
+                          MIGRACOES.json — 📌 o que um PROJETO precisa aplicar (modelo pull)
 ```
 
 > **Esta árvore é a fonte única da estrutura.** O `README.md` aponta para cá em vez de manter

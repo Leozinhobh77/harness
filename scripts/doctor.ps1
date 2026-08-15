@@ -67,6 +67,13 @@ function Get-EstadoComparavel {
 if ($Skill) {
     $raizSkill = Split-Path $PSScriptRoot -Parent
 
+    # A versao vem PRIMEIRO: dois checks abaixo comparam contra ela (o carimbo
+    # do manual e a versao das migracoes). Lida depois, seria $null na hora da
+    # comparacao - e a comparacao sairia calada, passando como se tivesse
+    # conferido. Falha que se parece com sucesso e a pior especie (P016).
+    $versaoS = 'desconhecida'
+    try { $versaoS = [string](Get-Content (Join-Path $raizSkill 'VERSAO.json') -Raw | ConvertFrom-Json).versao } catch { }
+
     # 1. Os scripts compilam?
     foreach ($s in (Get-ChildItem (Join-Path $raizSkill 'scripts') -Filter *.ps1)) {
         $errs = $null
@@ -146,6 +153,51 @@ if ($Skill) {
         }
     }
 
+    # 4c. O MIGRACOES.json esta sadio?
+    #
+    #     Ele e o coracao do modelo pull: e dele que sai o aviso dentro do
+    #     projeto, o achado do doctor e a lista que o upgrade aplica. Se
+    #     apodrecer em silencio, os tres viram teatro - projeto atrasado
+    #     recebendo "tudo ok" e a pior mentira que esta skill pode contar.
+    $arqMig = Join-Path $raizSkill 'memoria\MIGRACOES.json'
+    if (-not (Test-Path -LiteralPath $arqMig)) {
+        Add-Achado 'VERMELHO' 'Estrutura' 'memoria/MIGRACOES.json nao existe - nenhum projeto saberia o que aplicar' 'recriar'
+    } else {
+        try {
+            $migs = @((Get-Content -LiteralPath $arqMig -Raw -Encoding UTF8 | ConvertFrom-Json).migracoes)
+            $vAtual = $null
+            try { $vAtual = [version]$versaoS } catch { }
+            $ids = @()
+            foreach ($mg in $migs) {
+                $idm = [string]$mg.id
+                if (-not $idm) { $idm = '(sem id)' }
+                foreach ($campo in @('id', 'versao', 'gravidade', 'titulo', 'acao', 'verificar')) {
+                    if (-not [string]$mg.$campo) {
+                        Add-Achado 'VERMELHO' 'Integridade' "migracao '$idm' sem o campo obrigatorio '$campo'" 'completar em memoria/MIGRACOES.json'
+                    }
+                }
+                if (@('seguranca', 'rotina') -notcontains [string]$mg.gravidade) {
+                    Add-Achado 'VERMELHO' 'Integridade' "migracao '$idm' com gravidade invalida - use seguranca ou rotina" 'corrigir'
+                }
+                if ($ids -contains $idm) {
+                    Add-Achado 'VERMELHO' 'Integridade' "migracao com id repetido: '$idm'" 'renomear'
+                }
+                $ids += $idm
+                # Migracao de versao que ainda nao existe acusaria pendencia
+                # em TODO projeto, para sempre - alarme falso permanente.
+                try {
+                    if ($vAtual -and ([version]([string]$mg.versao)) -gt $vAtual) {
+                        Add-Achado 'VERMELHO' 'Integridade' "migracao '$idm' aponta v$($mg.versao), acima da versao atual da skill (v$versaoS)" 'corrigir a versao'
+                    }
+                } catch {
+                    Add-Achado 'VERMELHO' 'Integridade' "migracao '$idm' com versao ilegivel: '$($mg.versao)'" 'usar o formato X.Y.Z'
+                }
+            }
+        } catch {
+            Add-Achado 'VERMELHO' 'Integridade' 'memoria/MIGRACOES.json nao e JSON valido' 'corrigir'
+        }
+    }
+
     # 5. Guardas do template sem procedencia (Lei 1 aplicada a si mesma).
     $guardas = Join-Path $raizSkill 'templates\T2-padrao\.harness\guardas.json'
     if (Test-Path $guardas) {
@@ -218,7 +270,7 @@ if ($Skill) {
     #    e a ancora sumir, o check tem que gritar - e nao passar em silencio,
     #    que e como uma guarda morre sem ninguem notar (P016).
     $versaoDeclarada = ''
-    try { $versaoDeclarada = [string](Get-Content (Join-Path $raizSkill 'VERSAO.json') -Raw | ConvertFrom-Json).versao } catch { }
+    if ($versaoS -ne 'desconhecida') { $versaoDeclarada = $versaoS }   # lida no topo do bloco
 
     if ($versaoDeclarada) {
         $carimbos = @(
@@ -268,8 +320,6 @@ if ($Skill) {
     $vS = @($achados | Where-Object { $_.severidade -eq 'VERMELHO' })
     $aS = @($achados | Where-Object { $_.severidade -eq 'AMARELO'  })
     $zS = @($achados | Where-Object { $_.severidade -eq 'AZUL'     })
-    $versaoS = 'desconhecida'
-    try { $versaoS = (Get-Content (Join-Path $raizSkill 'VERSAO.json') -Raw | ConvertFrom-Json).versao } catch { }
 
     if ($Json) {
         [pscustomobject]@{
@@ -323,6 +373,30 @@ try {
     if ($m.arquivos)     { $declarados  = @($m.arquivos) }
 } catch {
     Add-Achado 'VERMELHO' 'Integridade' 'manifesto.json invalido (JSON quebrado)' '/harness fix'
+}
+
+# ============ F6 Migracao: a estrutura esta atras da skill? ============
+#
+# O modelo e PULL (memoria/MIGRACOES.json): a skill nunca empurra nada, o
+# projeto descobre sozinho. O ESTADO.md ja avisa no inicio da sessao - mas o
+# T1 nao tem ESTADO.md, e sobretudo: o doctor nao pode responder "tudo ok"
+# com uma correcao de SEGURANCA pendente. Seria a mesma mentira confiante do
+# P013.
+#
+# Mesma FONTE do aviso do ESTADO.md, lida pela mesma funcao (_migracoes.ps1).
+# Dois leitores, uma fonte - se cada um tivesse a sua copia da regra, uma
+# apodrecia (P015).
+$libMig = Join-Path $PSScriptRoot '_migracoes.ps1'
+if (Test-Path $libMig) {
+    . $libMig
+    foreach ($mg in @(Get-MigracoesPendentes -Projeto $Projeto -RaizSkill (Split-Path -Parent $PSScriptRoot) `
+                                             -VersaoProjeto $versaoSkill -Tier $tier)) {
+        if ([string]$mg.gravidade -eq 'seguranca') {
+            Add-Achado 'VERMELHO' 'Migracao' "[SEGURANCA] $($mg.titulo) - corrigido na v$($mg.versao), este projeto ainda nao aplicou" '/harness upgrade'
+        } else {
+            Add-Achado 'AZUL' 'Migracao' "$($mg.titulo) - disponivel desde a v$($mg.versao)" '/harness upgrade'
+        }
+    }
 }
 
 # ============ F1 Integridade ============

@@ -11,12 +11,26 @@
 
 ## Modo padrão — sincronizar com a skill
 
-### 1. Compare
-Leia a versão em `.harness/manifesto.json` × `VERSAO.json` da skill.
-Igual → *"já está na v1.2.0, nada a trazer"* e pare. Uma linha.
+### 1. Pergunte ao mecanismo, não ao CHANGELOG
+
+```
+powershell -File scripts/doctor.ps1 -Projeto "<raiz>"
+```
+
+Os achados da família **`Migracao`** são a lista exata do que falta — vêm de
+`memoria/MIGRACOES.json`, lida por `scripts/_migracoes.ps1`.
+
+**Nenhum achado de `Migracao` → *"já está sincronizado"* e pare. Uma linha.** Mesmo que o número
+da versão esteja diferente: versão diferente **não é** trabalho pendente. Só é pendente o que
+exige ação dentro deste projeto.
+
+> **Por que não ler o CHANGELOG:** ele é narrativa, e interpretar prosa a cada upgrade é lento,
+> caro e sujeito a erro — com 20 ou 30 projetos, inviável. O `MIGRACOES.json` é a face acionável
+> dele. E o mecanismo **confere no disco**: se você já aplicou a correção à mão, ele não acusa.
 
 ### 2. Monte o diff
-Leia `memoria/CHANGELOG.md` de cada versão intermediária. Para cada mudança, decida:
+Para cada migração pendente, leia `acao` (o que fazer) no `MIGRACOES.json`. Se precisar do
+contexto completo, aí sim vá ao `memoria/CHANGELOG.md` daquela versão. Para cada mudança, decida:
 
 | Situação | O que fazer |
 |---|---|

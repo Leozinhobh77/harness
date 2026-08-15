@@ -1,6 +1,6 @@
 ﻿# 📖 MANUAL `/harness`
 
-> **Versão 1.12.0** · gerado em **15/08/2026**
+> **Versão 1.13.0** · gerado em **15/08/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -504,6 +504,55 @@ propósito: projeto estável não deve mudar sozinho porque a skill mudou.
 /harness upgrade --tier 2+    # sobe de tier
 /harness upgrade --tier 2     # desce de tier (raro, mas existe)
 ```
+
+### Você não precisa sair atualizando seus projetos
+
+Esta é a parte que muda como você trabalha, então vale ler inteira.
+
+**O problema:** você vai ter 20, 30 projetos com harness. Se toda melhoria da skill exigisse
+sair aplicando em todos, mexer na skill viraria um dia de manutenção nos outros — o contrário do
+que a ferramenta existe para fazer.
+
+**A solução tem nome: `pull` em vez de `push`.**
+
+```
+push (errado em escala)              pull (como funciona desde a v1.13.0)
+
+  skill nova                            skill nova
+      │                                     │   ← não empurra nada, para ninguém
+      ├──► projeto 1                        │
+      ├──► projeto 2   ← você, na mão       ▼
+      ├──► projeto 3                    cada projeto descobre sozinho,
+      └──► projeto 30  ← inviável        no dia em que VOCÊ abrir ele
+```
+
+Na prática: quando você abre um projeto atrasado, o `ESTADO.md` dele nasce com este bloco no
+topo — e a IA lê isso antes de qualquer coisa:
+
+```
+⚠️ ESTRUTURA DESATUALIZADA — 1 pendência(s), 1 de SEGURANCA
+
+Este projeto está na v1.8.0 · a skill instalada está na v1.13.0.
+
+- [SEGURANCA] O matcher do settings.json não encaminhava PowerShell (v1.11.1)
+
+Aplicar: /harness upgrade.
+```
+
+**Projeto que você não abrir não paga nada** e fica parado na versão dele. Isso é o certo, não
+uma falha — e ficar atrasado de propósito é uma decisão legítima.
+
+**Três detalhes que fazem isso ser útil em vez de chato:**
+
+| Regra | Por quê |
+|---|---|
+| **Versão diferente não gera aviso** — só pendência real gera | senão todo ajuste da skill incomodaria 30 projetos à toa, e alarme que grita à toa é alarme que você desliga |
+| **Confere no disco, não no número** | se você já aplicou a correção à mão, ele cala. O número da versão é indício, não prova |
+| **Só interrompe por segurança** | pendência de rotina aparece e não atrapalha o trabalho |
+
+E quando você pedir *"implementa tal coisa"* num projeto com pendência de **segurança**, a skill
+avisa **antes** de começar: *"a estrutura está atrasada e tem 1 correção de segurança — aplico
+primeiro?"*. Você pode dizer "depois". Ela informa, não obriga.
 
 ### A regra mais importante deste comando
 
@@ -1600,6 +1649,7 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| **1.13.0** | **2026-08-15** | **Pull em vez de push: o projeto descobre sozinho** 📡 — correção de rumo pedida pelo usuário, e das que mudam a arquitetura. Eu tinha acabado de patchear 4 projetos na mão; ele apontou o que isso vira com 30: *"eu tô aqui só para atualizar a skill"*. Agora a skill **nunca empurra nada** — publica o que mudou em `memoria/MIGRACOES.json`, e cada projeto descobre **no dia em que você abrir ele**, pelo bloco de pendências no `ESTADO.md` e pela família `Migracao` do `doctor`. **O canal já existia** (o hook da sombra já chamava o gerador do `ESTADO.md`), então o aviso custou **zero arquivo novo dentro dos projetos** — e isso resolveu um ovo-e-galinha: hook novo só chegaria por migração, que é o que ele deveria anunciar. Três regras contra virar ruído: silêncio é o padrão · confere no disco, não no número · só interrompe por segurança. |
 | **1.12.0** | **2026-08-15** | **A porta do hook entrou no exame** 🔌 — a v1.11.1 consertou os 4 projetos à mão; esta rodada impede que volte. O `doctor` passou a conferir o **`matcher`** — a peça que decide se o hook é chamado — em duas camadas: no seu projeto (🔴 **nomeando o hook** afetado) e nos templates T1/T2 (para projeto novo não nascer torto). Sem a segunda, consertar os existentes seria enxugar gelo. A regra é genérica — *"quem escuta `Bash` tem de escutar `PowerShell`"* — e não comparação com a string exata do template, que quebraria em qualquer customização legítima e viraria alarme falso. **Alargou o check que já existia**, não empilhou família nova. O `P012` sobe de nível 5 para 3. |
 | **1.11.1** | **2026-08-15** | **A correção de segurança da v1.8.0 nunca tinha rodado** 🩸 — o que era para ser um `upgrade` de rotina nos 4 projetos virou achado. A v1.8.0 corrigiu o **código** do `guarda.ps1` e não corrigiu o **`matcher`** do `settings.json`, que é quem decide se o hook é chamado: por dois dias, em todos os projetos, `git reset --hard` por PowerShell continuou passando, e comando destrutivo por lá não gerava foto da sombra. **Guarda certa, do lado de dentro de uma porta fechada.** Corrigido no template (T1 e T2) e nos quatro projetos, com foto da sombra antes e `doctor` depois. Registrado como **segunda camada do `P012`**: *o alcance de uma guarda é o do seu ponto mais estreito, e o ponto mais estreito quase nunca é o código.* Achado por leitura arquivo a arquivo — nenhum mecanismo pegou. |
 | **1.11.0** | **2026-08-14** | **Este manual saiu da 1.7.0 e o atraso virou guarda** 📖 — auditoria completa das quatro rodadas que ele tinha perdido (1.8.0 → 1.10.0). Corrigido o que **mentia**: a colinha e o FAQ anunciavam a coluna "último uso" do menu, abatida na 1.8.0, e diziam "10 comandos" quando são 12. Acrescentado o que **faltava**: a segunda pergunta obrigatória do `init` (credencial) com a armadilha do `.env.example`, a foto de nascimento da sombra, o auto-exame `--skill` e o check dos satélites, e o aviso de segurança do `P012`. **E o ciclo fechou:** o `exportar` *pedia por escrito* que se conferisse o carimbo antes de publicar — pedido é exatamente o que a Lei 2 proíbe no lugar de mecanismo, e foi assim que o manual passou 4 versões atrasado. Agora o auto-exame confere sozinho: carimbo do manual **e** da página contra o `VERSAO.json`, e todo comando que existe está documentado. |

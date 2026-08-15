@@ -1,0 +1,48 @@
+{
+  "_leia": "O que um PROJETO precisa aplicar quando a skill evolui. Esta e a face acionavel do CHANGELOG.md: la mora a narrativa, aqui mora a lista que a maquina le. Consumido por scripts/estado.ps1 (o aviso dentro do projeto), scripts/doctor.ps1 e comandos/upgrade.md.",
+
+  "_por_que_existe": "PROCEDENCIA (15/08/2026): a v1.11.1 corrigiu um buraco de seguranca em 4 projetos, na mao, um por um. Com 20 ou 30 projetos isso e impossivel - e inverte o proposito: mexer na skill viraria um dia de manutencao nos outros. O modelo certo e PULL: a skill nunca empurra nada; cada projeto descobre sozinho, quando e aberto, que esta atrasado. Palavras do usuario: 'eu to aqui so para atualizar a skill; quando eu usar ela para mexer nos programas, ela tem que reconhecer a estrutura'.",
+
+  "_regra_de_ouro": "SO entra aqui o que exige acao DENTRO do projeto. Check novo do doctor NAO entra - o doctor le os criterios em tempo real, entao ele ja vale no projeto antigo sem tocar em nada (comandos/upgrade.md, tabela do passo 2). Mudanca so da skill (manual, satelites, auto-exame) tambem nao entra. Lista curta e lista que alguem le.",
+
+  "_silencio_e_o_padrao": "Versao diferente NAO gera aviso. So gera aviso migracao PENDENTE. Sem isso, todo patch da skill incomodaria 30 projetos a toa - e alarme falso vira alarme desligado (P011). Projeto pode ficar atrasado de proposito: o aviso informa, nao obriga.",
+
+  "migracoes": [
+    {
+      "id": "guarda-cobre-powershell",
+      "versao": "1.8.0",
+      "data": "2026-08-13",
+      "gravidade": "seguranca",
+      "titulo": "A guarda so bloqueava comando vindo do Bash",
+      "por_que": "No Windows a maioria dos comandos passa pela ferramenta PowerShell. O descarte forcado do git por la nunca foi bloqueado, em nenhum projeto, desde que a guarda existe. Um mecanismo meio ligado e pior que um desligado: produz sensacao de protecao. Ver P012.",
+      "acao": "Trocar .claude/hooks/guarda.ps1 pelo de templates/T2-padrao/. Se o arquivo do projeto foi customizado, NAO sobrescreva - mostre lado a lado e aplique so a linha da ferramenta.",
+      "verificar": "arquivo:.claude/hooks/guarda.ps1:contem:Bash|PowerShell",
+      "tiers": "T2+",
+      "automatico": true
+    },
+    {
+      "id": "gitignore-preserva-env-example",
+      "versao": "1.8.0",
+      "data": "2026-08-13",
+      "gravidade": "seguranca",
+      "titulo": "A regra .env.* engolia o proprio .env.example",
+      "por_que": "O modelo de variaveis ia para o .gitignore junto com o segredo, e o projeto nascia sem ele - ninguem descobre quais variaveis existem. Regra de protecao larga demais come o que nao devia.",
+      "acao": "Acrescentar a excecao !.env.example logo abaixo da regra .env.* no .gitignore. Se o projeto nao usa credencial, nao ha o que fazer.",
+      "verificar": "arquivo:.gitignore:contem:!.env.example",
+      "tiers": "todos",
+      "automatico": true
+    },
+    {
+      "id": "matcher-roteia-powershell",
+      "versao": "1.11.1",
+      "data": "2026-08-15",
+      "gravidade": "seguranca",
+      "titulo": "O matcher do settings.json nao encaminhava PowerShell ao hook",
+      "por_que": "SEGUNDA CAMADA do P012, e pior que a primeira: a v1.8.0 corrigiu o codigo do guarda.ps1 e nao mexeu no matcher, que e quem decide se o hook e CHAMADO. Por dois dias, nos 4 projetos, a linha corrigida nunca rodou. A sombra tinha a mesma falta: comando destrutivo por PowerShell nao gerava foto.",
+      "acao": "Em .claude/settings.json, toda entrada PreToolUse cujo matcher cite Bash precisa citar PowerShell tambem. Trocar Write|Edit|NotebookEdit|Bash por Write|Edit|NotebookEdit|Bash|PowerShell.",
+      "verificar": "arquivo:.claude/settings.json:contem:Bash|PowerShell",
+      "tiers": "todos",
+      "automatico": true
+    }
+  ]
+}

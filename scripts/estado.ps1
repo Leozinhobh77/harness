@@ -122,8 +122,69 @@ if ($ehRepo) {
     $blocoStatus  = '[!] Sem git = sem ponto de restauracao. Considere rodar git init.'
 }
 
+# ---------- migracoes pendentes: o aviso do modelo PULL ----------
+#
+# PROCEDENCIA (15/08/2026): a v1.11.1 corrigiu um buraco de seguranca em 4
+# projetos, na mao, um por um. Com 20 ou 30 projetos isso e impossivel - e
+# inverte o proposito, porque mexer na skill viraria manutencao nos outros.
+#
+# O modelo e PULL: a skill NUNCA empurra nada. Cada projeto descobre sozinho,
+# quando e aberto, que esta atrasado. Projeto que ninguem abre nao paga nada e
+# fica parado na versao dele, que e o comportamento desejado.
+#
+# POR QUE AQUI, e nao num hook novo: o hook da sombra de TODO projeto ja chama
+# este script no inicio da sessao, e o ESTADO.md ja e lido toda sessao. Ou
+# seja - o canal ja existe, e o aviso custa ZERO arquivo novo dentro dos
+# projetos. Hook novo teria o problema do ovo e da galinha: para receber o
+# aviso, o projeto precisaria antes receber o hook que da o aviso.
+#
+# SILENCIO E O PADRAO: versao diferente nao gera aviso; so gera aviso migracao
+# PENDENTE. Sem isso todo patch da skill incomodaria 30 projetos a toa, e
+# alarme falso vira alarme desligado (P011).
+#
+# E CONFERE NO DISCO antes de acusar: o numero da versao no manifesto e
+# indicio, nao prova - o usuario pode ter aplicado a correcao a mao. Dado
+# errado e pior que dado nenhum (P013).
+$blocoPend = ''
+try {
+    $arqVer = Join-Path $raizSkill 'VERSAO.json'
+    $lib    = Join-Path $PSScriptRoot '_migracoes.ps1'
+    if ((Test-Path $arqVer) -and (Test-Path $lib)) {
+        . $lib
+        $verInstalada = [string](Get-Content $arqVer -Raw -Encoding UTF8 | ConvertFrom-Json).versao
+        $pend = @(Get-MigracoesPendentes -Projeto $Projeto -RaizSkill $raizSkill `
+                                         -VersaoProjeto $versaoSkill -Tier $tier)
+
+        if ($pend.Count -gt 0) {
+            $fragmento = Join-Path $raizSkill 'templates\comum\ESTADO-pendencias.tpl.md'
+            if (Test-Path $fragmento) {
+                $qtdSeg = @($pend | Where-Object { [string]$_.gravidade -eq 'seguranca' }).Count
+                $linhas = New-Object System.Collections.Generic.List[string]
+                foreach ($mg in $pend) {
+                    if ([string]$mg.gravidade -eq 'seguranca') {
+                        $linhas.Add("> - **[SEGURANCA]** $($mg.titulo)  _(v$($mg.versao))_")
+                    } else {
+                        $linhas.Add("> - $($mg.titulo)  _(v$($mg.versao))_")
+                    }
+                }
+                $sufixo = ''
+                if ($qtdSeg -gt 0) { $sufixo = ", $qtdSeg de SEGURANCA" }
+
+                $blocoPend = Get-Content $fragmento -Raw -Encoding UTF8
+                $blocoPend = $blocoPend.Replace('{{QTD}}',          [string]$pend.Count)
+                $blocoPend = $blocoPend.Replace('{{SUFIXO_SEG}}',   $sufixo)
+                $blocoPend = $blocoPend.Replace('{{VER_PROJETO}}',  $versaoSkill)
+                $blocoPend = $blocoPend.Replace('{{VER_SKILL}}',    $verInstalada)
+                $blocoPend = $blocoPend.Replace('{{LISTA}}',        ($linhas -join "`r`n"))
+                $blocoPend = $blocoPend.TrimEnd() + "`r`n"
+            }
+        }
+    }
+} catch { }   # sem a skill instalada, ou JSON quebrado: silencio. Nunca atrapalha.
+
 # ---------- montagem a partir do template ----------
 $conteudo = Get-Content $template -Raw -Encoding UTF8
+$conteudo = $conteudo.Replace('{{PENDENCIAS}}', $blocoPend)
 $conteudo = $conteudo.Replace('{{PROJETO}}',        $nome)
 $conteudo = $conteudo.Replace('{{DATA}}',           $hoje)
 $conteudo = $conteudo.Replace('{{TIER}}',           $tier)

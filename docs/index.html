@@ -662,7 +662,7 @@
     <div class="nav-top">
       <div class="brand">
         <div class="brand-mark">/<span>harness</span></div>
-        <div class="brand-meta">Manual · v1.12.0 · 15.08.2026</div>
+        <div class="brand-meta">Manual · v1.13.0 · 15.08.2026</div>
       </div>
       <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
@@ -1077,6 +1077,44 @@ CICLO 3 — a SKILL aprende     semanas  /harness evolve → todo projeto futuro
         projeto. Separados de propósito: projeto estável não muda sozinho porque a skill mudou.
         Também é como você sobe ou desce a escada.
       </p>
+      <h4>Você não precisa sair atualizando seus projetos</h4>
+      <p>
+        Você vai ter 20, 30 projetos com harness. Se toda melhoria da skill exigisse sair
+        aplicando em todos, mexer na skill viraria um dia de manutenção nos outros — o contrário
+        do que a ferramenta existe para fazer. A solução tem nome: <strong>pull</strong> em vez de
+        <strong>push</strong>.
+      </p>
+      <pre><code>push (errado em escala)              pull (como funciona desde a v1.13.0)
+
+  skill nova                            skill nova
+      │                                     │   ← não empurra nada, para ninguém
+      ├──► projeto 1                        │
+      ├──► projeto 2   ← você, na mão       ▼
+      ├──► projeto 3                    cada projeto descobre sozinho,
+      └──► projeto 30  ← inviável        no dia em que VOCÊ abrir ele</code></pre>
+      <p>
+        Na prática: ao abrir um projeto atrasado, o <code>ESTADO.md</code> dele nasce com um bloco
+        no topo — e a IA lê isso antes de qualquer coisa:
+      </p>
+      <pre><code>⚠️ ESTRUTURA DESATUALIZADA — 1 pendência(s), 1 de SEGURANCA
+
+Este projeto está na v1.8.0 · a skill instalada está na v1.13.0.
+
+- [SEGURANCA] O matcher do settings.json não encaminhava PowerShell (v1.11.1)
+
+Aplicar: /harness upgrade.</code></pre>
+      <p>
+        <strong>Projeto que você não abrir não paga nada</strong> e fica parado na versão dele —
+        isso é o certo, não uma falha. Ficar atrasado de propósito é decisão legítima.
+      </p>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Regra</th><th>Por quê</th></tr></thead>
+        <tbody>
+          <tr><td>Versão diferente <strong>não</strong> gera aviso — só pendência real gera</td><td>senão todo ajuste da skill incomodaria 30 projetos à toa, e alarme que grita à toa é alarme que você desliga</td></tr>
+          <tr><td><strong>Confere no disco</strong>, não no número</td><td>se você já aplicou a correção à mão, ele cala. O número da versão é indício, não prova</td></tr>
+          <tr><td>Só <strong>interrompe</strong> por segurança</td><td>pendência de rotina aparece e não atrapalha o trabalho</td></tr>
+        </tbody>
+      </table></div>
       <div class="note warn">
         <span class="note-tag">A regra deste comando</span>
         <p>
@@ -1917,7 +1955,7 @@ Desce por desuso (não se provou)</code></pre>
     </section>
 
     <div class="foot">
-      MANUAL /HARNESS · V1.12.0 · 15.08.2026<br>
+      MANUAL /HARNESS · V1.13.0 · 15.08.2026<br>
       FONTE ÚNICA: manual/MANUAL.md · <a href="https://github.com/Leozinhobh77/harness">github.com/Leozinhobh77/harness</a><br>
       ATUALIZE COM /harness manual --exportar
     </div>
