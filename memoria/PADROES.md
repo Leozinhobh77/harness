@@ -180,6 +180,27 @@
 - **Corrigido na v1.8.0:** `$ferramenta -match '^(Bash|PowerShell)$'`, com 9 casos de teste.
 - **Promovido ao template:** sim.
 
+- 🩸 **SEGUNDA CAMADA, achada em 15/08/2026 — e é pior que a primeira.** A correção da v1.8.0
+  arrumou o **código de dentro** do `guarda.ps1` e **não arrumou o `matcher` do
+  `settings.json`**, que continuou `"Write|Edit|NotebookEdit|Bash"`. O `matcher` é quem decide se
+  o hook é **chamado**. Ou seja: por dois dias, em **todos os 4 projetos**, o `git reset --hard`
+  por PowerShell seguiu passando — a linha corrigida nunca chegou a rodar uma vez sequer.
+  A mesma falta atingia a **sombra**: comando destrutivo por PowerShell não gerava foto nenhuma.
+  ```
+  ferramenta → [matcher do settings.json] → hook roda → [código do hook] → bloqueia
+                        ↑                                      ↑
+                  ficou em Bash                        corrigido na v1.8.0
+                  (a porta estava fechada)             (dentro da sala vazia)
+  ```
+- **A lição nova, que a primeira camada não tinha:** *o alcance de uma guarda é o do seu ponto
+  mais estreito, e o ponto mais estreito quase nunca é o código — é o registro que decide se ele
+  é chamado.* Corrigir a lógica e declarar vitória sem conferir o gatilho é a forma mais fácil de
+  criar uma guarda que existe, testa bem, e nunca roda.
+- **Como isto foi achado:** não por teste nem por doctor — por **eu ir olhar o `settings.json` de
+  cada projeto antes de aplicar o upgrade**. Nenhum mecanismo pegou. É a definição de nível 5.
+- **Corrigido em 15/08/2026 (v1.11.1):** matcher com `|PowerShell` nos 4 projetos e nos dois
+  templates (T1 e T2). Sem check mecânico ainda — **candidato natural a virar um.**
+
 ### P014 — `$'` na substituição do `-replace` não é literal: é "todo o texto depois do casamento"
 - **Visto em:** upgrade do projeto Central (2026-08-13)
 - **Nível da solução:** 3 (o parser do `pos-edicao` pega — e pegou)

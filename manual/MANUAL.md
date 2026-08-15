@@ -1,6 +1,6 @@
 ﻿# 📖 MANUAL `/harness`
 
-> **Versão 1.11.0** · gerado em **14/08/2026**
+> **Versão 1.11.1** · gerado em **15/08/2026**
 >
 > 📌 **Este arquivo é a fonte única do manual.** A página publicada é cópia — nunca edite lá.
 > Mudou algo? Edite este arquivo e rode `/harness manual --exportar`.
@@ -1345,17 +1345,37 @@ justamente o que o `/rewind` nativo não desfaz. Ver [§4.8](#48-harness-voltar-
 Lê `.harness/guardas.json` e barra arquivo protegido ou comando proibido. Testado: barrou
 `git push`, barrou edição do `ESTADO.md`, liberou `AGENTS.md`.
 
-> 🚨 **Correção de segurança da v1.8.0 — se o seu projeto é anterior a 13/08/2026, rode
-> `/harness upgrade` nele.** A guarda escutava só a ferramenta `Bash`. No Windows a maioria dos
-> comandos passa pelo **PowerShell** — ou seja, `git reset --hard` por lá **nunca foi
-> bloqueado**, em nenhum projeto, desde que a guarda existe. Hoje ela escuta as duas
-> (`^(Bash|PowerShell)$`, com 9 casos de teste).
+> 🚨 **Correção de segurança — se o seu projeto é anterior a 15/08/2026, rode `/harness upgrade`
+> nele.** A guarda escutava só a ferramenta `Bash`. No Windows a maioria dos comandos passa pelo
+> **PowerShell** — ou seja, `git reset --hard` por lá **nunca foi bloqueado**, em nenhum projeto,
+> desde que a guarda existe.
 >
 > **Por que isso é pior que não ter guarda nenhuma:** um mecanismo meio ligado *produz sensação
 > de proteção* — e o log ainda mostrava disparos, pelo caminho do Bash, o que confirmava a
-> sensação. Você confia e baixa a atenção justamente onde não está coberto. É o padrão `P012`, e
-> ele voltou a morder em 14/08/2026 num lugar diferente: o gatilho da **sombra** também listava
-> `Bash` sem `PowerShell`, e comando destrutivo por lá não gerava foto. Mesmo erro, outra peça.
+> sensação. Você confia e baixa a atenção justamente onde não está coberto. É o padrão `P012`.
+
+### O detalhe que fez essa correção demorar dois dias a mais
+
+Vale ler devagar, porque é o erro mais fácil de cometer em qualquer sistema com hooks.
+
+Um hook passa por **duas portas** até agir:
+
+```
+ferramenta usada  →  [ matcher ]  →  hook é chamado  →  [ código do hook ]  →  bloqueia
+                          ↑                                     ↑
+                  quem decide SE ele roda              quem decide O QUE fazer
+                  (settings.json)                      (guarda.ps1)
+```
+
+A v1.8.0 corrigiu **o código** (`^(Bash|PowerShell)$`) e parou por aí. O **matcher** continuou
+`"Write|Edit|NotebookEdit|Bash"` — então a ferramenta PowerShell **nunca era encaminhada** ao
+hook, e a linha corrigida jamais rodou. Guarda certa, do lado de dentro de uma porta fechada.
+
+> **A lição, e ela serve para o seu projeto:** *o alcance de uma guarda é o do seu ponto mais
+> estreito — e o ponto mais estreito quase nunca é o código, é o registro que decide se ele é
+> chamado.* Quando consertar uma proteção, confira **as duas portas** antes de dar por resolvido.
+
+Corrigido de verdade na **v1.11.1** (15/08/2026), no template e nos quatro projetos existentes. Mesmo erro, outra peça.
 
 ### `pos-edicao` — o retorno mais rápido que existe
 
@@ -1572,6 +1592,7 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
+| **1.11.1** | **2026-08-15** | **A correção de segurança da v1.8.0 nunca tinha rodado** 🩸 — o que era para ser um `upgrade` de rotina nos 4 projetos virou achado. A v1.8.0 corrigiu o **código** do `guarda.ps1` e não corrigiu o **`matcher`** do `settings.json`, que é quem decide se o hook é chamado: por dois dias, em todos os projetos, `git reset --hard` por PowerShell continuou passando, e comando destrutivo por lá não gerava foto da sombra. **Guarda certa, do lado de dentro de uma porta fechada.** Corrigido no template (T1 e T2) e nos quatro projetos, com foto da sombra antes e `doctor` depois. Registrado como **segunda camada do `P012`**: *o alcance de uma guarda é o do seu ponto mais estreito, e o ponto mais estreito quase nunca é o código.* Achado por leitura arquivo a arquivo — nenhum mecanismo pegou. |
 | **1.11.0** | **2026-08-14** | **Este manual saiu da 1.7.0 e o atraso virou guarda** 📖 — auditoria completa das quatro rodadas que ele tinha perdido (1.8.0 → 1.10.0). Corrigido o que **mentia**: a colinha e o FAQ anunciavam a coluna "último uso" do menu, abatida na 1.8.0, e diziam "10 comandos" quando são 12. Acrescentado o que **faltava**: a segunda pergunta obrigatória do `init` (credencial) com a armadilha do `.env.example`, a foto de nascimento da sombra, o auto-exame `--skill` e o check dos satélites, e o aviso de segurança do `P012`. **E o ciclo fechou:** o `exportar` *pedia por escrito* que se conferisse o carimbo antes de publicar — pedido é exatamente o que a Lei 2 proíbe no lugar de mecanismo, e foi assim que o manual passou 4 versões atrasado. Agora o auto-exame confere sozinho: carimbo do manual **e** da página contra o `VERSAO.json`, e todo comando que existe está documentado. |
 | **1.10.0** | **2026-08-14** | **A sombra alcança os satélites** 🌒 — `/menu-harness` e `/manual-harness` moram fora do repositório da skill e eram o único pedaço do sistema **sem volta**: um arquivo cada, sem git, sem foto. Agora cada um tem a sua sombra, alimentada pela sessão da skill (hook só dispara na pasta onde a sessão abriu — então a rede fica onde a mão passa, não onde o objeto está). **Buraco achado de raspão:** o gatilho listava `Bash` e esquecia `PowerShell`, o shell principal do Windows — comando destrutivo por lá não gerava foto nenhuma desde que a sombra nasceu. O código já tratava o caso; a ferramenta é que nunca chegava nele. **P016:** comparar caminho como texto — o Windows tem duas grafias para a mesma pasta (`Usuário` e `USURIO~2`), e a guarda se desligava sozinha, em silêncio, com `exit 0`. |
 | **1.9.0** | **2026-08-14** | **A skill adota o próprio harness** 🛰️ — ela exigia sombra de *todo* projeto que cria e não tinha a sua, justamente onde o risco é maior: o `evolve` reescreve arquivos em lote, que é o caso que o `/rewind` nativo não desfaz. Adoção, não despejo de template: os papéis já existiam sob nomes próprios (`SKILL.md`+`CONSTITUICAO.md` fazem o `AGENTS.md`), então só entrou a espinha mecânica que faltava. **Check novo:** o auto-exame passou a enxergar os **satélites** — as skills-atalho que moram fora do repositório e apontam para dentro dele. Procedência: o menu mandava ler um arquivo abatido na 1.8.0 e o `Read` falhou na frente do usuário. *A fronteira da auditoria estava menor que a fronteira da dependência.* |

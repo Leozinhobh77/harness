@@ -662,7 +662,7 @@
     <div class="nav-top">
       <div class="brand">
         <div class="brand-mark">/<span>harness</span></div>
-        <div class="brand-meta">Manual · v1.11.0 · 14.08.2026</div>
+        <div class="brand-meta">Manual · v1.11.1 · 15.08.2026</div>
       </div>
       <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
@@ -1720,21 +1720,42 @@ Desce por desuso (não se provou)</code></pre>
         </p>
       </div>
       <div class="note warn">
-        <span class="note-tag">Segurança — projeto anterior a 13.08.2026 precisa de upgrade</span>
+        <span class="note-tag">Segurança — projeto anterior a 15.08.2026 precisa de upgrade</span>
         <p>
           A <code>guarda</code> escutava só a ferramenta <code>Bash</code>. No Windows a maioria dos
           comandos passa pelo <strong>PowerShell</strong> — ou seja, <code>git reset --hard</code>
           por lá <strong>nunca foi bloqueado</strong>, em nenhum projeto, desde que a guarda existe.
-          Hoje ela escuta as duas. Se o seu projeto é anterior a essa data, rode
-          <code>/harness upgrade</code> nele.
+          Se o seu projeto é anterior a essa data, rode <code>/harness upgrade</code> nele.
         </p>
         <p>
           <strong>Por que isso é pior que não ter guarda nenhuma:</strong> um mecanismo meio ligado
           produz <em>sensação</em> de proteção — e o log ainda mostrava disparos, pelo caminho do
           Bash, o que confirmava a sensação. Você confia e baixa a atenção justamente onde não está
-          coberto. É o padrão <code>P012</code>, e ele voltou a morder em 14.08.2026 noutra peça: o
-          gatilho da <strong>sombra</strong> também listava <code>Bash</code> sem
-          <code>PowerShell</code>, e comando destrutivo por lá não gerava foto.
+          coberto. É o padrão <code>P012</code>.
+        </p>
+      </div>
+      <h3>O detalhe que fez essa correção demorar dois dias a mais</h3>
+      <p>
+        Vale ler devagar, porque é o erro mais fácil de cometer em qualquer sistema com hooks. Um
+        hook passa por <strong>duas portas</strong> até agir:
+      </p>
+      <pre><code>ferramenta usada  →  [ matcher ]  →  hook é chamado  →  [ código do hook ]  →  bloqueia
+                          ↑                                     ↑
+                  quem decide SE ele roda              quem decide O QUE fazer
+                  (settings.json)                      (guarda.ps1)</code></pre>
+      <p>
+        A v1.8.0 corrigiu <strong>o código</strong> e parou por aí. O <strong>matcher</strong>
+        continuou <code>"Write|Edit|NotebookEdit|Bash"</code> — então a ferramenta PowerShell nunca
+        era encaminhada ao hook, e a linha corrigida jamais rodou. <strong>Guarda certa, do lado de
+        dentro de uma porta fechada.</strong>
+      </p>
+      <div class="note key">
+        <span class="note-tag">A lição, e ela serve pro seu projeto</span>
+        <p>
+          <em>O alcance de uma guarda é o do seu ponto mais estreito — e o ponto mais estreito quase
+          nunca é o código, é o registro que decide se ele é chamado.</em> Quando consertar uma
+          proteção, confira <strong>as duas portas</strong> antes de dar por resolvido. Corrigido de
+          verdade na v1.11.1, no template e nos quatro projetos existentes.
         </p>
       </div>
       <div class="note">
@@ -1882,7 +1903,7 @@ Desce por desuso (não se provou)</code></pre>
     </section>
 
     <div class="foot">
-      MANUAL /HARNESS · V1.11.0 · 14.08.2026<br>
+      MANUAL /HARNESS · V1.11.1 · 15.08.2026<br>
       FONTE ÚNICA: manual/MANUAL.md · <a href="https://github.com/Leozinhobh77/harness">github.com/Leozinhobh77/harness</a><br>
       ATUALIZE COM /harness manual --exportar
     </div>

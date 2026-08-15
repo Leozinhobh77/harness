@@ -8,6 +8,49 @@
 
 ---
 
+## v1.11.1 — 2026-08-15  ·  🩸 a correção de segurança da v1.8.0 nunca tinha rodado
+
+**Era para ser uma rodada de `upgrade` de rotina nos projetos antigos.** Fui conferir o
+`settings.json` de cada um antes de aplicar, e o que estava lá muda a história do [P012].
+
+A v1.8.0 corrigiu o **código** do `guarda.ps1` (`^(Bash|PowerShell)$`) e declarou vitória. Mas o
+`matcher` do `settings.json` — que é **quem decide se o hook é chamado** — continuou
+`"Write|Edit|NotebookEdit|Bash"`, no template e nos quatro projetos.
+
+```
+ferramenta → [matcher do settings.json] → hook roda → [código do hook] → bloqueia
+                      ↑                                      ↑
+                ficou em Bash                       corrigido na v1.8.0
+                (porta fechada)                     (dentro da sala vazia)
+```
+
+**Consequência real:** por dois dias, em **todos os 4 projetos**, `git reset --hard` por
+PowerShell continuou passando — a linha corrigida nunca rodou uma vez sequer. E a mesma falta
+atingia a **sombra**: comando destrutivo por PowerShell não gerava foto nenhuma.
+
+**A lição nova:** *o alcance de uma guarda é o do seu ponto mais estreito, e o ponto mais estreito
+quase nunca é o código — é o registro que decide se ele é chamado.* Registrado como **segunda
+camada do [P012]**, no mesmo formato que o [P006] usou para a dele.
+
+**Corrigido:** `|PowerShell` no matcher dos **4 projetos** (Finanças, Zenith, Central, Vórtex) e
+dos **2 templates** (T1 e T2) — projeto novo não nasce mais com o buraco. Foto da sombra tirada
+nos quatro antes de encostar, edição literal preservando byte a byte o resto do arquivo
+(inclusive o BOM de dois deles), JSON revalidado, `doctor` rodado nos quatro.
+
+**Como foi achado:** olhando o arquivo, projeto por projeto. Nenhum mecanismo pegou — nível 5.
+
+### O que **não** entrou, e por quê
+
+- **O check mecânico** que impediria a volta disto. É o passo certo e está proposto ao usuário —
+  mas guarda nova é decisão dele, não expansão silenciosa de um `upgrade`.
+- **`ESTADO.md` fora de dia** em Finanças e Zenith (🟡 no doctor). **Se regenera sozinho** no
+  próximo início de sessão de cada projeto desde a v1.7.0 — mexer agora seria trabalho que a
+  máquina já faz.
+- 🔎 **Zenith com `log-guardas.jsonl` vazio.** Pode ser só falta de uso, pode ser hook não
+  rodando. Fica anotado para o próximo `evolve` olhar com dado, em vez de eu adivinhar agora.
+
+---
+
 ## v1.11.0 — 2026-08-14  ·  📖 o manual sai de 4 versões de atraso, e o atraso vira guarda
 
 **Pedido do usuário: auditoria completa do manual e da página, "sem deixar nada para trás".** O
