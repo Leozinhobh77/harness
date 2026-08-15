@@ -3,7 +3,7 @@
 
   "projeto": "harness (a propria skill)",
   "tier": "T1",
-  "versao_skill": "1.9.0",
+  "versao_skill": "1.10.0",
   "criado_em": "2026-08-14",
   "atualizado_em": "2026-08-14",
   "adotado": true,
@@ -21,6 +21,7 @@
     ".gitignore",
     ".claude/settings.json",
     ".claude/hooks/sombra.ps1",
+    ".claude/hooks/sombra-satelites.ps1",
     "criterios/TIERS.md",
     "criterios/ORCAMENTOS.md",
     "criterios/CHECKS.md",
@@ -34,7 +35,7 @@
     "../menu-harness/SKILL.md",
     "../manual-harness/SKILL.md"
   ],
-  "_satelites": "Skills-atalho que moram FORA deste repo e apontam para dentro dele. Nada as audita hoje - o doctor so olha para dentro. Em 14/08/2026 o menu-harness estava mandando ler memoria/uso.json, abatido na v1.8.0, e ninguem percebeu ate o Read falhar na frente do usuario. Ver achado 5 / item 5 da adocao.",
+  "_satelites": "Skills-atalho que moram FORA deste repo e apontam para dentro dele. Procedencia: em 14/08/2026 o menu-harness mandava ler memoria/uso.json, abatido na v1.8.0, e ninguem percebeu ate o Read falhar na frente do usuario (P015). Cobertura hoje: AUDITADOS pelo check 6 do doctor desde a v1.9.0, e FOTOGRAFADOS por .claude/hooks/sombra-satelites.ps1 desde a v1.10.0 - cada um tem sua propria .harness/sombra.git. Esta lista e descritiva: as duas mecanicas descobrem satelite varrendo as pastas irmas, nao lendo daqui (lista fixa apodrece, P012).",
 
   "customizados": [],
   "_customizados": "Arquivos que o usuario editou a mao. /harness upgrade NUNCA sobrescreve nada listado aqui."

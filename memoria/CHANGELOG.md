@@ -8,6 +8,67 @@
 
 ---
 
+## v1.10.0 — 2026-08-14  ·  🌒 a sombra alcança os satélites (e um buraco no gatilho)
+
+**A v1.9.0 mandou o auto-exame olhar os satélites. Esta rodada dá a eles o que faltava depois de
+olhados: volta.** `menu-harness` e `manual-harness` eram um `SKILL.md` cada, sem git, sem sombra,
+sem histórico — o único pedaço do sistema sem retorno. E não são intocados: a própria v1.9.0
+**editou** o `menu-harness` (referências mortas do abate, [P015]). Uma edição errada ali não
+tinha desfazer.
+
+### 🌒 `.claude/hooks/sombra-satelites.ps1`
+
+Fotografa cada satélite no início da sessão, antes de editar arquivo dele, e antes de comando
+destrutivo que o cite. Três decisões que valem registro:
+
+- **O hook mora aqui, não dentro do satélite.** Hook só dispara na sessão aberta *naquela* pasta,
+  e ninguém abre sessão no `menu-harness` — ele é sempre editado a partir de uma sessão desta
+  skill. A rede tem que ficar onde a mão passa, não onde o objeto está.
+- **Arquivo separado do `sombra.ps1` ao lado.** Aquele é cópia byte-idêntica de
+  `templates/comum/` — o mesmo hook que vai para **todo** projeto do usuário. "Fotografar as
+  pastas irmãs" num projeto qualquer seria fotografar o Desktop inteiro. Comportamento desta
+  skill mora só nesta skill.
+- **Mesma definição de satélite do check 6 do `doctor`** (pasta irmã, com `SKILL.md`, que cita
+  `~/.claude/skills/harness/...`), por descoberta dinâmica. Duas definições de "satélite" em dois
+  lugares seriam a duplicata que apodrece calada — o [P015] cometido ao consertá-lo.
+
+### 🕳️ O gatilho listava `Bash` e esquecia `PowerShell`
+
+Achado de raspão, e o pior da rodada: o `sombra.ps1` **já tratava** `PowerShell` no código, mas o
+`matcher` do `settings.json` nunca roteava a ferramenta até ele. Nesta máquina o PowerShell é o
+shell principal — ou seja, **comando destrutivo por ele não gerava foto nenhuma**, nem da skill,
+nem de nada, desde que a sombra nasceu. Capacidade escrita no código não é capacidade ligada.
+Mesma forma do [P015]: a guarda existia e não pegou, então conserte **ela**.
+
+### 🐛 Dois defeitos que só o teste do próprio hook mostrou
+
+Ambos em [P016], que fecha em **duas ocorrências** a família aberta pelo [P006]: *comparar
+caminho como texto*.
+
+1. **Forma curta × longa do Windows.** `Get-ChildItem` devolve `C:\Users\Usuário\...`; o
+   `file_path` chega como `C:\Users\USURIO~2\...`. Mesma pasta, textos diferentes — o
+   `StartsWith` respondia "não é satélite" no satélite.
+2. **A porta de entrada pedia barra antes de `skills`.** Um `cp -r skills/menu-harness` passava
+   batido. Consertado invertendo a ordem: comando de shell entra pelo *padrão destrutivo*, que é
+   raro e barato de checar, sem exigir que ele cite a pasta.
+
+Os dois falhavam **em silêncio, com `exit 0`** — a espécie de falha que se parece com sucesso.
+
+**Provado em viveiro de mentira** (satélite falso + skill irmã sem relação), nos quatro casos:
+edição dentro do satélite fotografa; destrutivo citando o satélite fotografa (via `Bash` e via
+`PowerShell`); destrutivo que não o cita, não; comando inofensivo que o cita, não. Na árvore
+real: **11 skills irmãs, só as 2 satélites ganharam sombra.**
+
+### O que **não** entrou, e por quê
+
+- **Sombra para as outras 8 skills irmãs.** Não são satélites — não dependem deste repo, e
+  fotografá-las seria a skill invadindo vizinho por vizinhança, não por dependência.
+- **Debounce nos satélites.** O `sombra.ps1` tem pausa de 90s porque fotografa a cada edição de
+  qualquer arquivo. Aqui só se chega quando o satélite **é** o alvo, e "nada mudou = nada a
+  fotografar" já basta. Pausa aqui seria mecanismo sem procedência.
+
+---
+
 ## v1.9.0 — 2026-08-14  ·  🛰️ a skill adota o próprio harness, e a auditoria alcança os satélites
 
 **A rodada em que a skill parou de ser exceção da própria regra.** Não foi um `evolve`: nasceu

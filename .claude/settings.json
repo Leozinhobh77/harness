@@ -1,5 +1,7 @@
 {
   "_leia": "So a sombra, nenhuma outra guarda. A skill nao e um projeto de codigo: ela nao tem build, nao tem plano, nao tem dado sensivel - entao guarda de processo aqui seria regra sem procedencia (Lei 1) e custo sem retorno (Lei 5). A sombra e a excecao porque nao e funcionalidade de tier, e chao (criterios/TIERS.md). Procedencia: a skill exigia sombra de todo projeto que cria e nao tinha a sua; o evolve reescreve estes arquivos em lote, que e justamente o que o /rewind nativo nao desfaz. 14/08/2026.",
+  "_satelites": "sombra-satelites.ps1 estende a mesma rede aos satelites (menu-harness, manual-harness), que moram fora deste repo e nao tinham volta nenhuma. Arquivo separado de proposito: sombra.ps1 e copia byte-identica do template que vai para TODO projeto, e 'fotografar as pastas irmas' num projeto qualquer seria fotografar o Desktop inteiro. Hook mora aqui e nao no satelite porque hook so dispara na sessao aberta naquela pasta, e ninguem abre sessao no menu-harness.",
+  "_matcher": "PowerShell entrou no matcher em 14/08/2026: nesta maquina ele e o shell principal, o sombra.ps1 ja tratava o caso no codigo, e o matcher nunca roteava - comando destrutivo via PowerShell passava sem foto. Buraco na rede, nao guarda ausente.",
   "hooks": {
     "SessionStart": [
       {
@@ -7,17 +9,25 @@
           {
             "type": "command",
             "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra.ps1\""
+          },
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra-satelites.ps1\""
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|NotebookEdit|Bash",
+        "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
             "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra.ps1\""
+          },
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra-satelites.ps1\""
           }
         ]
       }

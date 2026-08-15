@@ -262,6 +262,36 @@
   vale para o `evolve` avaliar se algum projeto do `REGISTRO.md` depende de arquivo fora da
   própria raiz.
 
+### P016 — O mesmo diretório tem várias grafias: comparar caminho como texto dá "não é" no que é
+- **Visto em:** skill /harness — `guarda.ps1` (2026-07-26, ver [P006] segunda camada), hook
+  `sombra-satelites.ps1` (2026-08-14) — **duas ocorrências independentes: é padrão, não acaso**
+- **Nível da solução:** 3 (o teste do próprio hook pegou, antes de qualquer uso real)
+- **O padrão:** o Windows dá **mais de um nome verdadeiro** para a mesma pasta, e cada API
+  devolve o seu. `Get-ChildItem` devolve a forma longa (`C:\Users\Usuário\...`); a variável
+  `CLAUDE_PROJECT_DIR` e o `file_path` da ferramenta podem chegar na forma curta 8.3
+  (`C:\Users\USURIO~2\...`). Nenhuma está errada — são a mesma pasta. Mas `-eq` e `StartsWith`
+  comparam **texto**, então respondem "são diferentes", e a guarda desliga sozinha, em silêncio,
+  exatamente no caso que ela existia para pegar.
+- **Solução, em dois níveis:**
+  1. Canonizar antes de comparar — `(Get-Item -LiteralPath $p).FullName` resolve as duas formas
+     para a mesma. Serve quando o caminho **existe**.
+  2. Quando o caminho pode não existir ainda (um `Write` cria o arquivo depois do hook rodar),
+     não comparar caminho: casar pelo **nome da pasta** com fronteira (`[\\/]nome([\\/]|$)`). O
+     nome é o único pedaço idêntico em todas as grafias — curta, longa, com `~`, relativa.
+- **Por que o `-Recurse` de sempre não pega:** não dá erro. Não há exceção, não há log, não há
+  vermelho. O hook sai `exit 0`, contente, sem ter fotografado nada. **Falha de guarda que se
+  parece com sucesso é a pior espécie** — some do radar até o dia em que você precisa da foto.
+- **É a segunda vez na mesma família:** no [P006], o `cd` vinha do Git Bash como `/c/Users/...`,
+  que o `Resolve-Path` não entende — falhava em silêncio e a guarda tratava tudo como "dentro do
+  projeto". Lá era `/c/`, aqui é `USURIO~2`. **A moral já estava escrita e eu repeti o erro:**
+  *testar com o formato que eu digito à mão não basta — tem que testar com o formato que a
+  ferramenta real produz.*
+- **Provado:** viveiro de mentira com um satélite falso e uma skill irmã sem relação. Antes do
+  fix, o `Edit` dentro do satélite não gerava foto; depois, gera — e a irmã sem relação continua
+  sem sombra nenhuma, nas duas versões.
+- **Promovido ao template:** não — nenhum template compara caminho. É lição para todo hook que a
+  skill escreve daqui pra frente, e para o `evolve` reler [P006] junto com este.
+
 ### P003 — `.hidden` não existe em SVGElement, só em HTMLElement
 - **Visto em:** skill /harness (2026-07-26)
 - **Nível da solução:** 3 (teste Playwright pegou antes de publicar)
