@@ -8,6 +8,43 @@
 
 ---
 
+## v1.12.0 — 2026-08-15  ·  🔌 a porta do hook entrou no exame
+
+**A v1.11.1 consertou os 4 projetos à mão. Esta rodada impede que aconteça de novo** — porque
+consertar sem mecanismo é o erro que o [P013] e o [P017] já pegaram duas vezes nesta skill.
+
+O achado de hoje foi encontrado por **leitura arquivo a arquivo**. Nenhum check olhava para o
+`matcher` — a peça que decide se o hook é chamado. Agora olham, nas duas camadas:
+
+| Onde | Regra | Se falhar |
+|---|---|---|
+| `doctor` de projeto | entrada `PreToolUse` que escuta `Bash` sem `PowerShell` | 🔴 **nomeando o hook**: *"matcher de 'guarda' escuta Bash sem PowerShell"* |
+| `doctor --skill` | a mesma regra nos templates T1 e T2 | 🔴 *"todo projeto novo nasceria com o hook cego"* |
+
+**A segunda camada é a que fecha o buraco de verdade.** Sem ela, consertar os quatro projetos
+existentes seria enxugar gelo: o quinto projeto herdaria o defeito do template no dia seguinte.
+
+**A regra é genérica de propósito** — *"quem escuta `Bash` tem de escutar `PowerShell`"* — em vez
+de comparar com a string exata do template. Comparação exata quebraria no primeiro projeto que
+customizasse o matcher por um motivo legítimo, e **guarda que dá alarme falso é guarda que o
+usuário desliga** ([P011] aplicado à forma da regra).
+
+**Alargou check existente, não empilhou família nova:** o bloco *"o `settings.json` está sadio?"*
+já existia e só enxergava "o hook citado existe no disco". Escopo estreito, não guarda ausente —
+`comandos/learn.md`, seção 2.
+
+**Provado nos dois lados**, em projeto de mentira no scratchpad e no template real: com o defeito
+acusa e nomeia o hook afetado; corrigido, silêncio. O `P012` sobe de **nível 5 para 3**.
+
+### Um tropeço meu, que vale registrar
+
+Ao desfazer a injeção de teste no template, restaurei com `Set-Content -Encoding UTF8` — que no
+PowerShell 5.1 **grava BOM**. O arquivo não tinha, e o `git diff` acusou a primeira linha
+alterada. Restaurado pelo commit. *Ferramenta de restauração que não devolve o arquivo idêntico
+não restaurou nada* — foi o `git status` que pegou, não eu.
+
+---
+
 ## v1.11.1 — 2026-08-15  ·  🩸 a correção de segurança da v1.8.0 nunca tinha rodado
 
 **Era para ser uma rodada de `upgrade` de rotina nos projetos antigos.** Fui conferir o

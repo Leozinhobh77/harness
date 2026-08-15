@@ -123,6 +123,29 @@ if ($Skill) {
         }
     }
 
+    # 4b. O matcher dos templates roteia as duas ferramentas de shell?
+    #     Mesma regra do doctor de projeto, aplicada uma etapa antes: aqui ela
+    #     impede que projeto NOVO ja nasca com o buraco. Sem isto, consertar os
+    #     4 projetos existentes (v1.11.1) seria enxugar gelo - o quinto projeto
+    #     herdaria o defeito do template no dia seguinte. Ver P012, 2a camada.
+    foreach ($tpl in @('T1-leve', 'T2-padrao')) {
+        $st = Join-Path $raizSkill "templates\$tpl\.claude\settings.json"
+        if (-not (Test-Path -LiteralPath $st)) { continue }
+        try {
+            $cfgT = Get-Content $st -Raw -Encoding UTF8 | ConvertFrom-Json
+            foreach ($ent in @($cfgT.hooks.PreToolUse)) {
+                if (-not $ent) { continue }
+                $mt = [string]$ent.matcher
+                if (-not $mt) { continue }
+                if ($mt -notmatch 'Bash') { continue }
+                if ($mt -match 'PowerShell') { continue }
+                Add-Achado 'VERMELHO' 'Template' "o matcher do $tpl escuta Bash sem PowerShell - todo projeto novo nasceria com o hook cego para metade dos comandos" 'acrescentar |PowerShell no matcher'
+            }
+        } catch {
+            Add-Achado 'VERMELHO' 'Template' "settings.json do $tpl nao e JSON valido" ''
+        }
+    }
+
     # 5. Guardas do template sem procedencia (Lei 1 aplicada a si mesma).
     $guardas = Join-Path $raizSkill 'templates\T2-padrao\.harness\guardas.json'
     if (Test-Path $guardas) {
@@ -332,12 +355,48 @@ $settings = Join-Path $Projeto '.claude\settings.json'
 if (Test-Path $settings) {
     try {
         $bruto = Get-Content $settings -Raw -Encoding UTF8
-        $null = $bruto | ConvertFrom-Json
+        $cfg = $bruto | ConvertFrom-Json
         foreach ($h in [regex]::Matches($bruto, '\.claude[\\/]hooks[\\/]([A-Za-z0-9_\-]+\.ps1)')) {
             $hp = Join-Path $Projeto (".claude\hooks\" + $h.Groups[1].Value)
             if (-not (Test-Path $hp)) {
                 Add-Achado 'VERMELHO' 'Mecanica' "Hook citado no settings.json nao existe: $($h.Groups[1].Value)" '/harness fix'
             }
+        }
+
+        # O MATCHER roteia as duas ferramentas de shell?
+        #
+        # PROCEDENCIA (15/08/2026, P012 segunda camada): a v1.8.0 corrigiu o
+        # CODIGO do guarda.ps1 para tratar PowerShell e nao mexeu no matcher,
+        # que decide se o hook e CHAMADO. Nos QUATRO projetos, por dois dias, o
+        # descarte forcado do git por PowerShell continuou passando - a linha
+        # corrigida nunca rodou uma vez sequer. A sombra tinha a mesma falta:
+        # comando destrutivo por PowerShell nao gerava foto.
+        #
+        # Achado por leitura arquivo a arquivo, nao por mecanismo nenhum - o
+        # que e a definicao de nivel 5, e a razao deste check existir.
+        #
+        # POR QUE AQUI, e nao numa familia nova: este bloco ja e "o settings
+        # esta sadio?". Escopo estreito, nao guarda ausente (learn.md, secao 2).
+        #
+        # A REGRA E GENERICA de proposito - "quem escuta Bash tem de escutar
+        # PowerShell tambem" - em vez de comparar com a string exata do
+        # template. String exata quebra no primeiro projeto que customizar o
+        # matcher por um motivo legitimo, e guarda que da alarme falso e guarda
+        # que o usuario desliga.
+        foreach ($ent in @($cfg.hooks.PreToolUse)) {
+            if (-not $ent) { continue }
+            $mt = [string]$ent.matcher
+            if (-not $mt) { continue }                       # sem matcher = pega tudo, esta coberto
+            if ($mt -notmatch 'Bash') { continue }           # nao reage a shell, nao e o caso
+            if ($mt -match 'PowerShell') { continue }
+            $quais = @()
+            foreach ($hk in @($ent.hooks)) {
+                $mm = [regex]::Match([string]$hk.command, 'hooks[\\/]([A-Za-z0-9_\-]+)\.ps1')
+                if ($mm.Success) { $quais += $mm.Groups[1].Value }
+            }
+            $rot = 'hook'
+            if ($quais.Count -gt 0) { $rot = ($quais -join ', ') }
+            Add-Achado 'VERMELHO' 'Mecanica' "matcher de '$rot' escuta Bash sem PowerShell - no Windows o hook nao e chamado pela metade dos comandos" '/harness upgrade'
         }
     } catch {
         Add-Achado 'VERMELHO' 'Integridade' '.claude/settings.json nao e JSON valido' '/harness fix'

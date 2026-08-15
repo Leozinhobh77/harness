@@ -199,7 +199,18 @@
 - **Como isto foi achado:** não por teste nem por doctor — por **eu ir olhar o `settings.json` de
   cada projeto antes de aplicar o upgrade**. Nenhum mecanismo pegou. É a definição de nível 5.
 - **Corrigido em 15/08/2026 (v1.11.1):** matcher com `|PowerShell` nos 4 projetos e nos dois
-  templates (T1 e T2). Sem check mecânico ainda — **candidato natural a virar um.**
+  templates (T1 e T2).
+- **Virou mecanismo na v1.12.0 (nível 5 → 3), em duas camadas:**
+  - `doctor` de projeto: entrada `PreToolUse` que escuta `Bash` sem `PowerShell` → 🔴, **nomeando
+    o hook afetado** (*"matcher de 'guarda' escuta Bash sem PowerShell"*).
+  - `doctor --skill`: a mesma regra nos templates T1 e T2 — sem isto, consertar os 4 projetos
+    existentes seria enxugar gelo, porque o **quinto projeto herdaria o defeito** no dia seguinte.
+- **A regra é genérica de propósito** — *"quem escuta `Bash` tem de escutar `PowerShell`"* — e não
+  comparação com a string exata do template. String exata quebra no primeiro projeto que
+  customizar o matcher por um motivo legítimo, e guarda que dá alarme falso é guarda que o
+  usuário desliga (é o [P011] aplicado à forma da regra, não ao alcance dela).
+- **Provado nos dois lados**, em projeto de mentira e no template real: com o defeito acusa e
+  nomeia o hook; corrigido, silêncio.
 
 ### P014 — `$'` na substituição do `-replace` não é literal: é "todo o texto depois do casamento"
 - **Visto em:** upgrade do projeto Central (2026-08-13)
