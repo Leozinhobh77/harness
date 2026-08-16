@@ -12,6 +12,7 @@
 | Zenith Invest | `~/Desktop/Projetos/Zenith Invest` | T2+ | 2026-07-30 | v1.3.2 (nascido) · v1.11.1 (atual) | `ativo` |
 | Central de Projetos e MCPs | `~/Desktop/Projetos/Central de Projetos e MCPs (Computador)` | T2 | 2026-08-11 | v1.3.3 (nascido) · v1.11.1 (atual) | `ativo` |
 | Vórtex | `~/Desktop/Projetos/Vórtex` | T2+ | 2026-08-12 | v1.7.0 (nascido) · v1.11.1 (atual) | `ativo` |
+| Cidade Isométrica | `~/Desktop/Projetos/cidade-isometrica` | T2 | 2026-08-16 | v1.13.0 (nascido) | `ativo` |
 
 > **Varredura do `evolve` de 2026-08-12:** os 3 vivos, 0 🔴, custo entre 2.028 e 2.236
 > tokens/sessão. A convergência achada (P011) saiu de Zenith + Central. Finanças trocou a guarda
@@ -27,6 +28,14 @@
 > **Vórtex** é o primeiro projeto **nascido inteiro na v1.7.0** — e o primeiro criado como teste
 > deliberado da skill, não por necessidade. Serve de linha de base: tudo que doer nele é dor de
 > nascimento, sem herança de versão antiga para culpar.
+
+> **Cidade Isométrica** (2026-08-16) é o primeiro nascido na v1.13.0 e o primeiro **T2 raso** do
+> registro — todos os anteriores são T2+ ou T2 de projeto com dado sensível. Serve para medir se o
+> T2 sem `REGRAS-DE-NEGOCIO.md` é confortável ou se falta algo. Também é o primeiro cuja guarda de
+> nascimento (`sem-overpass-area-grande`) veio de **risco documentado antes da primeira linha de
+> código**, não de erro cometido — a ficha da ideia de origem (`banco-de-ideias`, `2026-08-16#03`)
+> já trazia a seção "onde dói". Vale observar no próximo `evolve` se guarda nascida de risco
+> previsto dispara tanto quanto guarda nascida de erro real, ou se é otimismo que vira desuso.
 
 ## Estados
 
