@@ -53,6 +53,19 @@ function Get-MigracoesPendentes {
             # pior que dado nenhum, e alarme falso vira alarme desligado (P011).
             # Formato do campo: "arquivo:<caminho relativo>:contem:<texto>"
             $jaAplicada = $false
+
+            # PACOTE (v2.0.0): correcao de HOOK chega pelo plugin harness-guardas.
+            # Projeto que liga o pacote ja roda a versao corrigida, mesmo sem a
+            # copia local do arquivo - acusar pendencia ali seria alarme falso
+            # eterno (P011).
+            if ($mg.coberto_pelo_pacote -eq $true) {
+                $stP = Join-Path $Projeto '.claude\settings.json'
+                if (Test-Path -LiteralPath $stP) {
+                    $txtP = Get-Content -LiteralPath $stP -Raw -Encoding UTF8
+                    if ($txtP -and $txtP.Contains('harness-guardas@harness')) { continue }
+                }
+            }
+
             $partes = ([string]$mg.verificar) -split ':', 4
             if ($partes.Count -eq 4 -and $partes[0] -eq 'arquivo' -and $partes[2] -eq 'contem') {
                 $alvo = Join-Path $Projeto ($partes[1].Replace('/', '\'))

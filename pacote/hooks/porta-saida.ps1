@@ -22,6 +22,10 @@ if ($ev -and $ev.stop_hook_active -eq $true) { exit 0 }
 $raiz = $env:CLAUDE_PROJECT_DIR
 if (-not $raiz) { $raiz = (Get-Location).Path }
 
+# PACOTE (v2.0.0): so age em projeto com harness. Uma pasta Planos/ qualquer,
+# num projeto que nao usa harness, nao e da conta desta porta.
+if (-not (Test-Path -LiteralPath (Join-Path $raiz '.harness\manifesto.json'))) { exit 0 }
+
 $dirPlanos = Join-Path $raiz 'Planos'
 if (-not (Test-Path $dirPlanos)) { exit 0 }
 

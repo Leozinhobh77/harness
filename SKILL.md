@@ -78,10 +78,14 @@ harness/
 ├── README.md             vitrine do repositório — não é lido em execução
 ├── VERSAO.json           versão + datas (máquina)
 ├── .gitignore
+├── .claude-plugin/       marketplace.json — a loja "harness" (registrada da pasta local)
+├── pacote/               📌 o plugin harness-guardas: hooks/hooks.json + sombra · guarda ·
+│                        pos-edicao · porta-saida (.ps1). Fonte única dos hooks: projeto
+│                        novo NÃO recebe cópia, só liga o pacote no settings.json
 ├── comandos/             a instrução de cada comando
 ├── criterios/            TIERS · ORCAMENTOS · CHECKS
 ├── templates/            T1-leve · T2-padrao (não existe T3 — ver TIERS.md)
-│                        comum/ ESTADO.tpl · ESTADO-pendencias.tpl · sombra.ps1
+│                        comum/ ESTADO.tpl · ESTADO-pendencias.tpl
 │                               critico-cego.md · REGRAS-DE-NEGOCIO.md (T2+) · referencias/
 ├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1 · sombra.ps1 · testar-guarda.ps1
 │                        _migracoes.ps1 — "o que este projeto ainda não aplicou"

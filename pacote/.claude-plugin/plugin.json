@@ -1,0 +1,7 @@
+{
+  "name": "harness-guardas",
+  "description": "As guardas mecanicas do /harness: sombra (foto antes do risco), guarda (bloqueia o proibido, falha fechada), pos-edicao (valida cada escrita) e porta-saida (nao encerra com plano sem baixa). Ligue so nos projetos com harness, via enabledPlugins no .claude/settings.json do projeto.",
+  "author": { "name": "Leozinhobh77" },
+  "homepage": "https://leozinhobh77.github.io/harness/",
+  "repository": "https://github.com/Leozinhobh77/harness"
+}

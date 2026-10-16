@@ -80,9 +80,12 @@ final. Se você não sabe o que escrever num campo, **corte a seção** em vez d
 
 Ordem de geração:
 1. `.gitignore` e as guardas de dado — **primeiro**, antes de existir risco
-2. **A sombra** — `.claude/hooks/sombra.ps1` (de `templates/comum/`) + a entrada dela no
-   `settings.json`. **Todo tier, inclusive T1.** É a rede de segurança; ela nasce antes de
-   existir o que salvar, senão o primeiro acidente acontece sem foto nenhuma.
+2. **O pacote de guardas** — `.claude/settings.json` do template do tier, que só **liga** o
+   plugin `harness-guardas` (`enabledPlugins`). **Todo tier, inclusive T1**: a sombra vem dele.
+   Os hooks **não** são copiados para o projeto desde a v2.0.0 — moram em `pacote/hooks/` da
+   skill e melhoram em todo projeto de uma vez. **Antes de seguir, rode o `doctor`:** se ele
+   acusar *"loja harness não registrada"*, nenhuma guarda roda — passe ao usuário o comando
+   que o próprio achado mostra.
 
    ⚠️ **E tire a foto de nascimento na hora, à mão:**
    ```
@@ -100,7 +103,7 @@ Ordem de geração:
    `INDICE.md` tem conteúdo, e ele é leitura sob demanda. O motivo é de adoção, não técnico:
    *estrutura que não se vê não é lembrada*, e referência que ninguém lembra de pôr não existe.
    Junto: `.claude/agents/critico-cego.md` (de `templates/comum/`).
-6. `.claude/settings.json` completo + demais hooks (T2+)
+6. *(sem passo: os hooks de T2+ vêm do mesmo pacote do passo 2 e se calam sozinhos em T1)*
 7. `.harness/manifesto.json`
 8. `.env` + `.env.example` — **só se a resposta sobre credencial foi sim** (ver Passo 3)
 9. `ESTADO.md` — **por último**, rodando `scripts/estado.ps1` (ele é gerado, nunca escrito)

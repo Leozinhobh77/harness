@@ -1,56 +1,6 @@
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra.ps1\""
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/sombra.ps1\""
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/guarda.ps1\"",
-            "onFailure": "block"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/pos-edicao.ps1\""
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/porta-saida.ps1\""
-          }
-        ]
-      }
-    ]
+  "_leia": "As guardas (sombra, guarda, pos-edicao, porta-saida) moram no pacote harness-guardas, nao neste projeto. Esta linha liga o pacote aqui. Melhoria na skill vale na proxima sessao, sem copiar nada. Se o doctor acusar 'pacote nao carrega', registre a loja nesta maquina: claude plugin marketplace add \"<pasta da skill harness>\". v2.0.0.",
+  "enabledPlugins": {
+    "harness-guardas@harness": true
   }
 }

@@ -37,7 +37,7 @@ A estrutura pode encolher. Sobe por gatilho, desce por desuso.
 | `/harness learn "<erro>"` | transforma um erro real em guarda permanente |
 | `/harness evolve` | a skill audita e melhora a si mesma |
 | `/harness upgrade` | leva as melhorias da skill para um projeto |
-| `/manual-harness` | manual navegável por número |
+| `/harness manual` | manual navegável por número · `/harness menu` lança qualquer comando por número |
 
 ## Os três tiers
 
@@ -58,7 +58,10 @@ candidata a abate, com base no log de disparos.
 
 ## A espinha mecânica
 
-Quatro hooks. Três impedem o erro; o quarto aceita que um dia um erro passa.
+Quatro hooks. Três impedem o erro; o quarto aceita que um dia um erro passa. Desde a v2.0.0
+eles moram num **plugin** (`pacote/`, chamado `harness-guardas`), não dentro de cada projeto: o
+projeto só liga o pacote no `.claude/settings.json`, e uma correção na skill vale na próxima
+sessão de todos os projetos. Em pasta sem `.harness/` os hooks saem em silêncio.
 
 | Hook | Evento | O que faz | Tier |
 |---|---|---|---|
@@ -91,10 +94,20 @@ lugares. Em resumo: `SKILL.md` roteia · `comandos/` guarda a instrução de cad
 ## Instalação
 
 ```bash
+# 1. a skill (/harness)
 git clone https://github.com/Leozinhobh77/harness.git ~/.claude/skills/harness
+
+# 2. a loja das guardas, registrada DA PASTA LOCAL: o pacote roda no lugar, sem cópia,
+#    e cada melhoria vale na próxima sessão
+claude plugin marketplace add ~/.claude/skills/harness
 ```
 
-Requer Claude Code. Os hooks são PowerShell (Windows); os documentos funcionam em qualquer
+Não instale o pacote "para todos os projetos": cada projeto criado pelo `/harness init` já o
+liga sozinho (`enabledPlugins` no `.claude/settings.json` dele), e nos outros ele fica desligado.
+Para usar só pelo GitHub, sem clonar: `/plugin install harness-guardas --marketplace Leozinhobh77/harness`
+(nesse modo o Claude Code guarda uma cópia, e as melhorias chegam quando ele atualiza o pacote).
+
+Requer Claude Code 2.1.295+ (`onFailure` da guarda). Os hooks são PowerShell (Windows); os documentos funcionam em qualquer
 ferramenta que leia `AGENTS.md`.
 
 ## Base

@@ -21,7 +21,7 @@ param(
 )
 
 $raizSkill = Split-Path $PSScriptRoot -Parent
-if (-not $Guarda)      { $Guarda      = Join-Path $raizSkill 'templates\T2-padrao\.claude\hooks\guarda.ps1' }
+if (-not $Guarda)      { $Guarda      = Join-Path $raizSkill 'pacote\hooks\guarda.ps1' }
 if (-not $GuardasJson) { $GuardasJson = Join-Path $raizSkill 'templates\T2-padrao\.harness\guardas.json' }
 
 $t = Join-Path $env:TEMP ('harness-teste-guarda-' + [guid]::NewGuid().ToString('N').Substring(0, 8))

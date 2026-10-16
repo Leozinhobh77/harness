@@ -28,6 +28,14 @@ exige ação dentro deste projeto.
 > caro e sujeito a erro — com 20 ou 30 projetos, inviável. O `MIGRACOES.json` é a face acionável
 > dele. E o mecanismo **confere no disco**: se você já aplicou a correção à mão, ele não acusa.
 
+### 1b. Projeto de antes da v2.0.0 (hooks copiados dentro dele)
+
+O `doctor` mostra a migração **`guardas-no-pacote`**. Ela é a que mais rende: troca as cópias
+locais dos 4 hooks pelo pacote `harness-guardas` e, com isso, **satisfaz de uma vez** todas as
+migrações de hook marcadas `coberto_pelo_pacote` (guarda, matcher, falha fechada, ESTADO na
+conversa). Proponha-a primeiro; as que sobrarem (`@AGENTS.md`, `.gitignore`) são de documento.
+Nunca apague os `.ps1` locais sem perguntar: depois da troca eles só ficam sem uso.
+
 ### 2. Monte o diff
 Para cada migração pendente, leia `acao` (o que fazer) no `MIGRACOES.json`. Se precisar do
 contexto completo, aí sim vá ao `memoria/CHANGELOG.md` daquela versão. Para cada mudança, decida:

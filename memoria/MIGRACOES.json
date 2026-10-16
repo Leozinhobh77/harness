@@ -15,8 +15,9 @@
       "gravidade": "seguranca",
       "titulo": "A guarda so bloqueava comando vindo do Bash",
       "por_que": "No Windows a maioria dos comandos passa pela ferramenta PowerShell. O descarte forcado do git por la nunca foi bloqueado, em nenhum projeto, desde que a guarda existe. Um mecanismo meio ligado e pior que um desligado: produz sensacao de protecao. Ver P012.",
-      "acao": "Trocar .claude/hooks/guarda.ps1 pelo de templates/T2-padrao/. Se o arquivo do projeto foi customizado, NAO sobrescreva - mostre lado a lado e aplique so a linha da ferramenta.",
+      "acao": "Preferivel: aplicar guardas-no-pacote (v2.0.0), que resolve esta de uma vez. Senao, trocar .claude/hooks/guarda.ps1 pelo de pacote/hooks/. Se o arquivo do projeto foi customizado, NAO sobrescreva - mostre lado a lado e aplique so a linha da ferramenta.",
       "verificar": "arquivo:.claude/hooks/guarda.ps1:contem:Bash|PowerShell",
+      "coberto_pelo_pacote": true,
       "tiers": "T2+",
       "automatico": true
     },
@@ -41,6 +42,7 @@
       "por_que": "SEGUNDA CAMADA do P012, e pior que a primeira: a v1.8.0 corrigiu o codigo do guarda.ps1 e nao mexeu no matcher, que e quem decide se o hook e CHAMADO. Por dois dias, nos 4 projetos, a linha corrigida nunca rodou. A sombra tinha a mesma falta: comando destrutivo por PowerShell nao gerava foto.",
       "acao": "Em .claude/settings.json, toda entrada PreToolUse cujo matcher cite Bash precisa citar PowerShell tambem. Trocar Write|Edit|NotebookEdit|Bash por Write|Edit|NotebookEdit|Bash|PowerShell.",
       "verificar": "arquivo:.claude/settings.json:contem:Bash|PowerShell",
+      "coberto_pelo_pacote": true,
       "tiers": "todos",
       "automatico": true
     },
@@ -65,6 +67,7 @@
       "por_que": "Para o Claude Code, hook que nao abre, estoura o tempo ou sai com codigo inesperado e 'erro nao bloqueante': a acao segue. Desde a v2.1.295 existe onFailure block, que inverte isso. Ver P019.",
       "acao": "Em .claude/settings.json, na entrada do guarda.ps1, acrescentar \"onFailure\": \"block\" ao lado do command. So na guarda: sombra e pos-edicao continuam como estao (falha delas nao deve travar o trabalho).",
       "verificar": "arquivo:.claude/settings.json:contem:onFailure",
+      "coberto_pelo_pacote": true,
       "tiers": "T2+",
       "automatico": true
     },
@@ -75,8 +78,9 @@
       "gravidade": "seguranca",
       "titulo": "Guardas.json quebrado desligava todas as guardas sem aviso",
       "por_que": "O guarda.ps1 terminava em exit 0 (libera) quando nao conseguia ler o pedido ou o .harness/guardas.json. Provado em teste: a versao antiga liberou 3 de 3 casos de falha; a nova bloqueia os 3 e continua liberando a edicao do proprio guardas.json, senao ninguem conseguiria consertar. Ver P019.",
-      "acao": "Trocar .claude/hooks/guarda.ps1 pelo de templates/T2-padrao/. Se o arquivo do projeto foi customizado, NAO sobrescreva - mostre lado a lado e aplique so a funcao Bloquear-PorFalha e os tres pontos que antes faziam exit 0.",
+      "acao": "Preferivel: aplicar guardas-no-pacote (v2.0.0). Senao, trocar .claude/hooks/guarda.ps1 pelo de pacote/hooks/. Se o arquivo do projeto foi customizado, NAO sobrescreva - mostre lado a lado e aplique so a funcao Bloquear-PorFalha e os tres pontos que antes faziam exit 0.",
       "verificar": "arquivo:.claude/hooks/guarda.ps1:contem:falha-fechada",
+      "coberto_pelo_pacote": true,
       "tiers": "T2+",
       "automatico": true
     },
@@ -87,10 +91,23 @@
       "gravidade": "rotina",
       "titulo": "O ESTADO.md entra sozinho na conversa no inicio da sessao",
       "por_que": "O ESTADO.md ja era regenerado no inicio da sessao, mas so era lido se a IA obedecesse ao CLAUDE.md. Agora a sombra imprime o arquivo no SessionStart, e o Claude Code poe isso no contexto - inclusive o bloco de ESTRUTURA DESATUALIZADA. Ver P019.",
-      "acao": "Trocar .claude/hooks/sombra.ps1 pelo de templates/comum/ (o arquivo e byte-identico em todo projeto; se foi customizado, mostre lado a lado). No CLAUDE.md, o item 'Leia ESTADO.md' pode virar 'ja entrou pelo hook de inicio'.",
+      "acao": "Preferivel: aplicar guardas-no-pacote (v2.0.0). Senao, trocar .claude/hooks/sombra.ps1 pelo de pacote/hooks/ (se foi customizado, mostre lado a lado). No CLAUDE.md, o item 'Leia ESTADO.md' pode virar 'ja entrou pelo hook de inicio'.",
       "verificar": "arquivo:.claude/hooks/sombra.ps1:contem:ESTADO-NA-CONVERSA",
+      "coberto_pelo_pacote": true,
       "tiers": "T2+",
       "automatico": true
+    },
+    {
+      "id": "guardas-no-pacote",
+      "versao": "2.0.0",
+      "data": "2026-10-16",
+      "gravidade": "rotina",
+      "titulo": "As guardas passam a vir do pacote harness-guardas (fim da copia local)",
+      "por_que": "Ate a v1.14.0 cada projeto tinha a sua copia dos 4 hooks, e cada correcao precisava ser levada projeto por projeto - o problema que o modelo pull (P018) so avisava, nao resolvia. Agora os hooks moram no pacote, dentro da pasta da skill, carregado no lugar (sem copia): melhoria na skill vale na proxima sessao de todo projeto que liga o pacote. Aplicar esta migracao satisfaz de uma vez todas as migracoes de hook marcadas coberto_pelo_pacote.",
+      "acao": "1) Conferir que a loja esta registrada nesta maquina (o doctor acusa se nao estiver). 2) Em .claude/settings.json, acrescentar \"enabledPlugins\": {\"harness-guardas@harness\": true} e REMOVER as entradas de hooks que apontam para .claude/hooks/sombra.ps1, guarda.ps1, pos-edicao.ps1 e porta-saida.ps1 (senao rodam duas vezes). Manter qualquer outro hook do usuario. 3) Os arquivos em .claude/hooks/ ficam sem uso: perguntar antes de apagar. 4) Tirar os 4 hooks da lista 'arquivos' do .harness/manifesto.json. 5) Abrir sessao nova e conferir que o ESTADO.md aparece no inicio.",
+      "verificar": "arquivo:.claude/settings.json:contem:harness-guardas@harness",
+      "tiers": "todos",
+      "automatico": false
     }
   ]
 }

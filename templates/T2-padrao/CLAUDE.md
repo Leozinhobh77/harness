@@ -21,11 +21,11 @@ Depois disso você sabe o necessário. Evite perguntar ao usuário o que já est
 
 ## Notas do Claude Code (ferramenta, não projeto)
 
-- **Hooks ativos** (`.claude/settings.json`): `guarda` bloqueia o proibido · `pos-edicao` valida
+- **Hooks ativos** (pacote `harness-guardas`, ligado no `.claude/settings.json`): `guarda` bloqueia o proibido · `pos-edicao` valida
   toda escrita · `porta-saida` não deixa encerrar com plano sem baixa. Se um deles te barrar,
   **ele provavelmente está certo** — leia a mensagem antes de contornar.
 - **Planejamento grande:** use `EnterPlanMode`/`ExitPlanMode` para qualquer coisa que vá virar
   um plano em `Planos/`. Não pule direto para o código.
 - **Manutenção do harness:** `/harness doctor` audita · `/harness learn "<erro>"` vira guarda ·
-  `/manual-harness` explica tudo.
+  `/harness manual` explica tudo.
 {{NOTAS_EXTRAS}}

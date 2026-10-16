@@ -17,6 +17,12 @@ try { $ev = $bruto | ConvertFrom-Json } catch { exit 0 }
 $raiz = $env:CLAUDE_PROJECT_DIR
 if (-not $raiz) { $raiz = (Get-Location).Path }
 
+# PACOTE (v2.0.0): o hook mora no plugin, nao no projeto. So age em projeto
+# com harness, e nao no T1 (tier minimo: nenhuma guarda de processo, so a sombra).
+$manif = Join-Path $raiz '.harness\manifesto.json'
+if (-not (Test-Path -LiteralPath $manif)) { exit 0 }
+try { if ([string](Get-Content -LiteralPath $manif -Raw -Encoding UTF8 | ConvertFrom-Json).tier -eq 'T1') { exit 0 } } catch { }
+
 $alvo = ''
 if ($ev.tool_input -and $ev.tool_input.file_path) { $alvo = [string]$ev.tool_input.file_path }
 if (-not $alvo -or -not (Test-Path $alvo)) { exit 0 }

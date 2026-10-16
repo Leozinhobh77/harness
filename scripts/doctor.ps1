@@ -130,36 +130,47 @@ if ($Skill) {
         }
     }
 
-    # 4b. O matcher dos templates roteia as duas ferramentas de shell?
-    #     Mesma regra do doctor de projeto, aplicada uma etapa antes: aqui ela
-    #     impede que projeto NOVO ja nasca com o buraco. Sem isto, consertar os
-    #     4 projetos existentes (v1.11.1) seria enxugar gelo - o quinto projeto
-    #     herdaria o defeito do template no dia seguinte. Ver P012, 2a camada.
-    foreach ($tpl in @('T1-leve', 'T2-padrao')) {
-        $st = Join-Path $raizSkill "templates\$tpl\.claude\settings.json"
-        if (-not (Test-Path -LiteralPath $st)) { continue }
+    # 4b. O matcher dos hooks roteia as duas ferramentas de shell?
+    #     Desde a v2.0.0 os hooks moram no PACOTE (pacote/hooks/hooks.json), nao
+    #     nos templates - entao e ali que a regra vale. Templates que ainda
+    #     declarem hook proprio tambem sao conferidos. Mesma regra do doctor de
+    #     projeto, uma etapa antes: projeto NOVO nao nasce com o buraco (P012).
+    $hooksPacote = Join-Path $raizSkill 'pacote\hooks\hooks.json'
+    $fontesHook = @(
+        @{ rot = 'pacote';    arq = $hooksPacote },
+        @{ rot = 'T1-leve';   arq = (Join-Path $raizSkill 'templates\T1-leve\.claude\settings.json') },
+        @{ rot = 'T2-padrao'; arq = (Join-Path $raizSkill 'templates\T2-padrao\.claude\settings.json') }
+    )
+    foreach ($fh in $fontesHook) {
+        if (-not (Test-Path -LiteralPath $fh.arq)) { continue }
         try {
-            $cfgT = Get-Content $st -Raw -Encoding UTF8 | ConvertFrom-Json
+            $cfgT = Get-Content -LiteralPath $fh.arq -Raw -Encoding UTF8 | ConvertFrom-Json
             foreach ($ent in @($cfgT.hooks.PreToolUse)) {
                 if (-not $ent) { continue }
                 $mt = [string]$ent.matcher
-                if (-not $mt) { continue }
-                if ($mt -notmatch 'Bash') { continue }
-                if ($mt -match 'PowerShell') { continue }
-                Add-Achado 'VERMELHO' 'Template' "o matcher do $tpl escuta Bash sem PowerShell - todo projeto novo nasceria com o hook cego para metade dos comandos" 'acrescentar |PowerShell no matcher'
+                if ($mt -and $mt -match 'Bash' -and $mt -notmatch 'PowerShell') {
+                    Add-Achado 'VERMELHO' 'Template' "o matcher do $($fh.rot) escuta Bash sem PowerShell - o hook fica cego para metade dos comandos" 'acrescentar |PowerShell no matcher'
+                }
+                # 4b2 (parte): a guarda falha fechada? PROCEDENCIA P019 - hook
+                # que nao roda era "erro nao bloqueante" e a acao passava.
+                foreach ($hk in @($ent.hooks)) {
+                    if ([string]$hk.command -match 'guarda\.ps1' -and [string]$hk.onFailure -ne 'block') {
+                        Add-Achado 'VERMELHO' 'Template' "a guarda do $($fh.rot) nao tem onFailure block - se o hook nao rodar, a acao proibida passa" 'acrescentar "onFailure": "block"'
+                    }
+                }
             }
         } catch {
-            Add-Achado 'VERMELHO' 'Template' "settings.json do $tpl nao e JSON valido" ''
+            Add-Achado 'VERMELHO' 'Template' "$($fh.rot): $(Split-Path $fh.arq -Leaf) nao e JSON valido" ''
         }
     }
 
-    # 4b2. O template carrega o AGENTS.md e a guarda falha fechada?
+    # 4b2. O template carrega o AGENTS.md, liga o pacote, e a guarda falha fechada?
     #      PROCEDENCIA (16/10/2026, P019): o Claude Code so le o AGENTS.md
     #      sozinho quando NAO ha CLAUDE.md. O T2 nascia com os dois e o
-    #      CLAUDE.md so PEDIA a leitura - nenhum check via isso, os 5 projetos
-    #      passavam limpos no doctor. E a guarda liberava tudo quando falhava.
-    #      Os projetos antigos sao avisados pelo MIGRACOES.json; este check
-    #      impede o projeto NOVO de nascer com o mesmo buraco.
+    #      CLAUDE.md so PEDIA a leitura - os 5 projetos passavam limpos no
+    #      doctor. E a guarda liberava tudo quando falhava.
+    #      v2.0.0: template que nao liga o pacote nasce SEM guarda nenhuma -
+    #      nem sombra. E o buraco mais silencioso possivel, por isso e vermelho.
     foreach ($tpl in @('T1-leve', 'T2-padrao')) {
         $dirT = Join-Path $raizSkill "templates\$tpl"
         $cmT  = Join-Path $dirT 'CLAUDE.md'
@@ -169,23 +180,43 @@ if ($Skill) {
             }
         }
         $stT = Join-Path $dirT '.claude\settings.json'
-        if (Test-Path -LiteralPath $stT) {
-            try {
-                $cfgT = Get-Content -LiteralPath $stT -Raw -Encoding UTF8 | ConvertFrom-Json
-                foreach ($ent in @($cfgT.hooks.PreToolUse)) {
-                    foreach ($hk in @($ent.hooks)) {
-                        if ([string]$hk.command -notmatch 'guarda\.ps1') { continue }
-                        if ([string]$hk.onFailure -ne 'block') {
-                            Add-Achado 'VERMELHO' 'Template' "a guarda do $tpl nao tem onFailure block - se o hook nao rodar, a acao proibida passa" 'acrescentar "onFailure": "block"'
-                        }
-                    }
-                }
-            } catch { }   # JSON invalido ja e acusado no 4b
+        if (-not (Test-Path -LiteralPath $stT) -or
+            -not (Get-Content -LiteralPath $stT -Raw -Encoding UTF8).Contains('harness-guardas@harness')) {
+            Add-Achado 'VERMELHO' 'Template' "o settings.json do $tpl nao liga o pacote harness-guardas - projeto novo nasceria sem guarda nenhuma, nem sombra" 'acrescentar enabledPlugins harness-guardas@harness'
         }
-        $gdT = Join-Path $dirT '.claude\hooks\guarda.ps1'
-        if ((Test-Path -LiteralPath $gdT) -and -not (Get-Content -LiteralPath $gdT -Raw).Contains('falha-fechada')) {
-            Add-Achado 'VERMELHO' 'Template' "o guarda.ps1 do $tpl libera a acao quando nao consegue conferir (falha aberta)" 'usar Bloquear-PorFalha nos pontos de erro'
+    }
+    $gdP = Join-Path $raizSkill 'pacote\hooks\guarda.ps1'
+    if ((Test-Path -LiteralPath $gdP) -and -not (Get-Content -LiteralPath $gdP -Raw).Contains('falha-fechada')) {
+        Add-Achado 'VERMELHO' 'Template' 'o guarda.ps1 do pacote libera a acao quando nao consegue conferir (falha aberta)' 'usar Bloquear-PorFalha nos pontos de erro'
+    }
+
+    # 4b4. O pacote e a loja estao inteiros? A loja (.claude-plugin/marketplace.json)
+    #      aponta para o pacote; o pacote tem manifesto e hooks.json; todo
+    #      script citado no hooks.json existe. Loja que aponta para o vazio =
+    #      todo projeto v2.0.0 sem guarda, em silencio (so o /plugin mostra).
+    $loja = Join-Path $raizSkill '.claude-plugin\marketplace.json'
+    try {
+        $lj = Get-Content -LiteralPath $loja -Raw -Encoding UTF8 | ConvertFrom-Json
+        $ent = @($lj.plugins | Where-Object { $_.name -eq 'harness-guardas' })
+        if ($ent.Count -eq 0) {
+            Add-Achado 'VERMELHO' 'Pacote' 'a loja nao lista o harness-guardas' 'corrigir .claude-plugin/marketplace.json'
+        } else {
+            $dirP = Join-Path $raizSkill (([string]$ent[0].source) -replace '^\./', '' -replace '/', '\')
+            if (-not (Test-Path -LiteralPath (Join-Path $dirP '.claude-plugin\plugin.json'))) {
+                Add-Achado 'VERMELHO' 'Pacote' "a loja aponta para $($ent[0].source), que nao tem .claude-plugin/plugin.json" 'corrigir o source ou recriar o manifesto'
+            }
         }
+    } catch {
+        Add-Achado 'VERMELHO' 'Pacote' '.claude-plugin/marketplace.json ausente ou JSON invalido' 'recriar'
+    }
+    if (Test-Path -LiteralPath $hooksPacote) {
+        foreach ($m in [regex]::Matches((Get-Content -LiteralPath $hooksPacote -Raw), 'hooks/([A-Za-z0-9_\-]+\.ps1)')) {
+            if (-not (Test-Path -LiteralPath (Join-Path $raizSkill "pacote\hooks\$($m.Groups[1].Value)"))) {
+                Add-Achado 'VERMELHO' 'Pacote' "hooks.json cita $($m.Groups[1].Value), que nao existe em pacote/hooks/" 'recriar ou tirar do hooks.json'
+            }
+        }
+    } else {
+        Add-Achado 'VERMELHO' 'Pacote' 'pacote/hooks/hooks.json nao existe - o pacote nao tem guarda nenhuma' 'recriar'
     }
 
     # 4b3. A guarda do template FUNCIONA? Ler o texto nao basta: o 4b2 confere
@@ -203,14 +234,14 @@ if ($Skill) {
         if ($codT -ne 0) {
             $casos = @($resT | Where-Object { $_ -match '\(esperado \d, veio' })
             foreach ($r in $casos) {
-                Add-Achado 'VERMELHO' 'Template' "a guarda do T2 errou no teste: $r" 'rodar scripts/testar-guarda.ps1 e corrigir'
+                Add-Achado 'VERMELHO' 'Template' "a guarda do pacote errou no teste: $r" 'rodar scripts/testar-guarda.ps1 e corrigir'
             }
             if ($casos.Count -eq 0) {
                 Add-Achado 'VERMELHO' 'Mecanica' 'scripts/testar-guarda.ps1 quebrou antes de terminar' 'rodar o script sozinho e ler o erro'
             }
         }
     } else {
-        Add-Achado 'AMARELO' 'Mecanica' 'scripts/testar-guarda.ps1 nao existe - a guarda do template nao e testada' 'recriar'
+        Add-Achado 'AMARELO' 'Mecanica' 'scripts/testar-guarda.ps1 nao existe - a guarda do pacote nao e testada' 'recriar'
     }
 
     # 4c. O MIGRACOES.json esta sadio?
@@ -537,6 +568,31 @@ if (Test-Path $settings) {
     }
 } elseif ($tier -ne 'T1') {
     Add-Achado 'AMARELO' 'Mecanica' 'Projeto T2+ sem .claude/settings.json (nenhuma guarda mecanica ativa)' '/harness upgrade'
+}
+
+# ============ Pacote harness-guardas (v2.0.0) ============
+# O projeto so DECLARA o pacote; quem o carrega e a loja registrada na
+# maquina. Loja ausente = nenhuma guarda roda, nem a sombra, e o unico lugar
+# que mostra isso e a aba Errors do /plugin. Silencio desse tamanho e o P016:
+# por isso e vermelho e diz o comando exato.
+if ((Test-Path $settings) -and (Get-Content $settings -Raw -Encoding UTF8).Contains('harness-guardas@harness')) {
+    $conhece = $false
+    foreach ($arqLoja in @((Join-Path $env:USERPROFILE '.claude\plugins\known_marketplaces.json'),
+                           (Join-Path $env:USERPROFILE '.claude\settings.json'))) {
+        if (-not (Test-Path -LiteralPath $arqLoja)) { continue }
+        try {
+            $jl = Get-Content -LiteralPath $arqLoja -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($jl.PSObject.Properties.Name -contains 'harness') { $conhece = $true }
+            if ($jl.extraKnownMarketplaces -and ($jl.extraKnownMarketplaces.PSObject.Properties.Name -contains 'harness')) { $conhece = $true }
+        } catch { }
+    }
+    if (-not $conhece) {
+        $pastaSkill = Split-Path -Parent $PSScriptRoot
+        Add-Achado 'VERMELHO' 'Mecanica' 'o projeto liga o pacote harness-guardas, mas a loja harness nao esta registrada nesta maquina - nenhuma guarda roda, nem a sombra' "claude plugin marketplace add `"$pastaSkill`""
+    }
+    if ((Get-Content $settings -Raw) -match 'hooks[\\/](sombra|guarda|pos-edicao|porta-saida)\.ps1') {
+        Add-Achado 'AMARELO' 'Mecanica' 'o projeto liga o pacote E mantem hooks locais das mesmas guardas - cada uma roda duas vezes' '/harness upgrade (migracao guardas-no-pacote)'
+    }
 }
 
 # ============ F1/F2 Planos ============

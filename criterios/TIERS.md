@@ -18,7 +18,7 @@
 ```
 AGENTS.md          ≤ 40 linhas — stack, comandos, o que nunca tocar
 .gitignore
-.claude/settings.json + hooks/sombra.ps1   ← a única guarda de T1
+.claude/settings.json → liga o pacote harness-guardas   ← só a sombra age em T1
 ```
 Sem `docs/`, sem `Planos/`, sem guarda de processo. Um protótipo não precisa de governança —
 precisa que você descubra rápido se a ideia presta.
@@ -33,7 +33,7 @@ AGENTS.md          ≤ 120 linhas — canônico, estilo ponteiro
 CLAUDE.md          ≤ 40 linhas — camada fina, sem estado volátil dentro
 ESTADO.md          ≤ 40 linhas — GERADO por scripts/estado.ps1, nunca escrito à mão
 .gitignore
-.claude/settings.json + hooks/{sombra,guarda,pos-edicao,porta-saida}.ps1
+.claude/settings.json → liga o pacote harness-guardas (sombra · guarda · pos-edicao · porta-saida)
 docs/GOVERNANCA.md · PRD.md · SPEC.md · DECISOES.md
 Planos/MANUAL.md · MODELO-DE-PLANO.md · INDICE.md · Concluídos/
 referencias/INDICE.md + a prateleira (visual · personagens · texto · documentos

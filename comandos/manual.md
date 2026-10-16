@@ -1,6 +1,6 @@
 # `manual` — manual navegável por número
 
-> Chamado por `/manual-harness` ou por "manual", "ajuda", "como usa".
+> Chamado por `/harness manual` ou por "manual", "ajuda", "como usa".
 >
 > **Como funciona:** mostre o índice, o usuário digita um número, você ensina **aquele tópico**
 > a fundo. Nunca despeje o manual inteiro — é exatamente o inchaço que esta skill combate.
@@ -105,7 +105,7 @@ explicado).
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
-/manual-harness       este manual
+/harness manual       este manual
 
 Rotina saudável:
   ao criar projeto ......... init

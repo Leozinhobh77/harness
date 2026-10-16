@@ -69,7 +69,13 @@ try {
         # autocontido. Sem a skill instalada, pula em silencio - a FOTO, que e
         # o que realmente importa aqui, nao depende disto.
         try {
-            $gerador = Join-Path $env:USERPROFILE '.claude\skills\harness\scripts\estado.ps1'
+            # Rodando do pacote (v2.0.0), o gerador esta dois niveis acima
+            # (pacote/hooks -> raiz da skill). Copia antiga dentro de projeto
+            # nao tem isso, e cai no caminho fixo da skill instalada.
+            $gerador = Join-Path $PSScriptRoot '..\..\scripts\estado.ps1'
+            if (-not (Test-Path -LiteralPath $gerador)) {
+                $gerador = Join-Path $env:USERPROFILE '.claude\skills\harness\scripts\estado.ps1'
+            }
             if ((Test-Path -LiteralPath $gerador) -and
                 (Test-Path -LiteralPath (Join-Path $raiz 'ESTADO.md'))) {
                 $null = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $gerador -Projeto $raiz 2>$null

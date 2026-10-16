@@ -1,0 +1,14 @@
+{
+  "name": "harness",
+  "owner": { "name": "Leozinhobh77" },
+  "metadata": {
+    "description": "Loja do /harness. Registrada a partir da pasta local da skill, o pacote roda no lugar (sem copia): melhoria na skill vale na proxima sessao de todo projeto que liga o pacote."
+  },
+  "plugins": [
+    {
+      "name": "harness-guardas",
+      "source": "./pacote",
+      "description": "Guardas mecanicas do /harness (sombra, guarda, pos-edicao, porta-saida)."
+    }
+  ]
+}

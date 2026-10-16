@@ -1,8 +1,8 @@
-﻿# `menu` — o lançador
+# `menu` — o lançador
 
-> Chamado por `/menu-harness` ou por "menu", "menu harness", "quais comandos existem".
+> Chamado por `/harness menu` ou por "menu", "menu harness", "quais comandos existem".
 >
-> Diferença do `/manual-harness`: o manual **ensina**; o menu **lança**. Aqui o usuário escolhe
+> Diferença do `/harness manual`: o manual **ensina**; o menu **lança**. Aqui o usuário escolhe
 > um número e o comando já roda — não se explica antes, a menos que ele peça.
 
 > **O menu não mostra mais "último uso" (abatido na v1.8.0).**
@@ -84,6 +84,6 @@ escolha — não peça pro usuário digitar o comando de novo com o argumento.
 ## Regras
 
 - **Nunca despeje explicação de cada comando aqui.** Se o usuário quiser entender antes de
-  rodar, isso é o `/manual-harness` — ofereça, não substitua.
+  rodar, isso é o `/harness manual` — ofereça, não substitua.
 - **Sucesso é o menu curto.** As 12 linhas cabem numa tela. Não adicione coluna nenhuma —
   a de "último uso" já foi tentada e abatida na v1.8.0 por publicar dado falso.

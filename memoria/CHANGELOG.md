@@ -8,6 +8,76 @@
 
 ---
 
+## v2.0.0 — 2026-10-16  ·  📦 as guardas viram pacote: melhora uma vez, todo projeto recebe
+
+**Etapa 4 do plano de 16/10, aprovada pelo usuário** (*"Topo sim"*, *"Autorizado"*). Major porque
+muda onde os hooks moram: projeto novo **não recebe mais cópia** dos 4 hooks.
+
+### O problema que isto fecha
+
+Até a v1.14.0 cada projeto tinha a sua cópia de `sombra`, `guarda`, `pos-edicao` e
+`porta-saida`. Toda correção de hook precisava ser levada projeto a projeto. O modelo pull
+([P018]) **avisava** a pendência, mas não a resolvia: só nesta rodada, 5 migrações de hook.
+
+### O desenho (escolhido depois de ler a doc oficial de carregamento de plugins)
+
+```
+~/.claude/skills/harness/            a skill continua aqui: /harness igual para todos
+├── .claude-plugin/marketplace.json  a loja "harness", com source relativo ./pacote
+└── pacote/                          o plugin harness-guardas
+    ├── .claude-plugin/plugin.json
+    └── hooks/hooks.json + os 4 .ps1 (fonte única)
+projeto/.claude/settings.json        só "enabledPlugins": {"harness-guardas@harness": true}
+```
+
+- **Loja registrada da pasta local** → plugin de caminho relativo **carrega no lugar**, sem
+  cópia em cache: *"your edits to the source directory take effect at the next session start,
+  and you don't need to increase the version"* (docs, Plugin loading). É o que faz "melhora uma
+  vez, todo projeto recebe" ser verdade **sem publicar nada**.
+- **Ligado por projeto**, não por usuário: em projeto sem harness (o CRM, por exemplo) o pacote
+  nem carrega. E cada script ainda sai em silêncio sem `.harness/` (defesa em profundidade);
+  `pos-edicao` também se cala em T1.
+- **Sem `version` no manifesto, de propósito:** quem instalar pelo GitHub acompanha cada commit.
+- **A skill não virou plugin** (só as guardas). Virar a skill inteira mudaria `/harness` para
+  `/harness:harness` e quebraria o caminho `~/.claude/skills/harness/scripts/estado.ps1` que a
+  sombra **de todo projeto antigo** chama no início da sessão — o canal do aviso pull. Os
+  projetos antigos seguem funcionando sem tocar em nada.
+
+### Provado
+
+- `claude plugin validate` no pacote e na loja: passou (só o aviso de `version`, deliberado).
+- **Sessão real** (`claude -p --plugin-dir`, projeto de mentira): o `SessionStart` do pacote
+  fotografou e regenerou o `ESTADO.md`; pedida a escrita no `ESTADO.md` protegido, a guarda do
+  pacote **bloqueou** e o log registrou `protege-estado-gerado · bloqueou`.
+- `doctor --skill` numa cópia com o pacote quebrado (template sem `enabledPlugins`, loja apontando
+  para pasta errada, guarda sem `onFailure`): acusou os 3. Com o pacote certo: silêncio.
+
+### Mecanismo novo
+
+- `doctor --skill`: 4b/4b2 olham `pacote/hooks/hooks.json`; template que não liga o pacote → 🔴;
+  **4b4** confere loja → pacote → manifesto → scripts citados. `testar-guarda.ps1` roda a guarda
+  do pacote.
+- `doctor` de projeto: liga o pacote mas a loja não está registrada nesta máquina → 🔴 com o
+  comando exato; liga o pacote **e** mantém hooks locais → 🟡 (rodariam duas vezes).
+- `MIGRACOES.json`: `guardas-no-pacote` (rotina, não automática) e o campo
+  **`coberto_pelo_pacote`** — projeto que liga o pacote tem as migrações de hook por aplicadas
+  (`_migracoes.ps1`), senão seria alarme falso eterno ([P011]).
+- Sombra procura o `estado.ps1` relativo ao pacote primeiro, depois o caminho fixo da skill.
+
+### As 3 skills viraram uma
+
+`manual-harness` e `menu-harness` saíram (só o `SKILL.md` de cada; as pastas ficam com o
+histórico da sombra delas, como segurança). `/harness manual` e `/harness menu` já existiam na
+tabela de rotas. Textos atualizados em `comandos/`, `README.md` e no `CLAUDE.md` do T2.
+
+### Preço honesto
+
+O projeto passa a **depender da loja registrada** na máquina. Antes, o hook vinha junto com o
+repositório. Em outra máquina, sem o `claude plugin marketplace add`, nenhuma guarda roda — por
+isso o `doctor` grita vermelho e o `init` manda conferir antes de seguir.
+
+---
+
 ## v1.14.0 — 2026-10-16  ·  🔒 o AGENTS.md volta a carregar e a guarda falha fechada
 
 **Primeira rodada após 64 dias parada, puxada por pesquisa externa** (outubro/2026: docs oficiais
