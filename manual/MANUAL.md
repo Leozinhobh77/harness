@@ -24,8 +24,8 @@
 /harness learn "..."  erro real → guarda permanente        ⭐ o mais valioso
 /harness evolve       a skill melhora a si mesma            ⭐ a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
-/manual-harness       este manual — ENSINA, não executa
-/menu-harness         os 12 comandos em lista — ESCOLHE por número e já EXECUTA
+/harness manual       este manual — ENSINA, não executa
+/harness menu         os 12 comandos em lista — ESCOLHE por número e já EXECUTA
 
 Rotina saudável:
   ao criar projeto ......... init
@@ -331,11 +331,12 @@ mandava executar um comando inexistente, e ninguém notou por duas versões. Foi
 próprio ritual. Assim que passou a existir, **ele achou sozinho** um bug de segurança do
 template. Instrução escrita não é mecanismo: enquanto ninguém executa, ela é só uma frase bonita.
 
-A segunda: o check dos **satélites** (v1.9.0). Satélite é uma skill-atalho que mora **fora** do
-repositório da skill e manda ler arquivo de dentro dele — `/menu-harness` e `/manual-harness` são
-os dois. Quando a v1.8.0 abateu um arquivo, a poda passou em tudo que era do repositório e
+A segunda: o check dos **satélites** (v1.9.0). Satélite era uma skill-atalho que morava **fora** do
+repositório da skill e mandava ler arquivo de dentro dele — `/menu-harness` e `/manual-harness`
+eram os dois. Quando a v1.8.0 abateu um arquivo, a poda passou em tudo que era do repositório e
 deixou vivo o satélite, que continuou mandando ler o arquivo apagado. O usuário abriu o menu e a
-leitura falhou na frente dele.
+leitura falhou na frente dele. *(Na v2.0.0 os dois atalhos deixaram de existir — viraram
+`/harness menu` e `/harness manual`, dentro da skill — mas a lição continua valendo.)*
 
 > **A lição, que vale para qualquer projeto seu:** *a fronteira da auditoria estava menor que a
 > fronteira da dependência.* Tudo que depende de você entra no seu exame — mesmo que não seja
@@ -1374,6 +1375,44 @@ monte — nenhum projeto chegou perto do gatilho, e construir sem caso concreto 
 A espinha mecânica. Quatro, todos testados funcionando. **Três impedem o erro; o quarto aceita
 que um dia um erro passa.**
 
+### Onde eles moram: o pacote `harness-guardas` (desde a v2.0.0) 📦
+
+Até a v1.14.0, cada projeto levava **uma cópia** dos quatro hooks. Melhorar uma guarda
+significava levar a melhoria projeto por projeto. Agora os quatro moram **uma vez só**, num
+plugin do Claude Code chamado `harness-guardas`, dentro da pasta da skill (`pacote/`).
+
+```
+skill harness/
+├── .claude-plugin/marketplace.json     a "loja" local, chamada harness
+└── pacote/
+    ├── .claude-plugin/plugin.json      a identidade do pacote
+    └── hooks/  hooks.json + sombra · guarda · pos-edicao · porta-saida
+
+seu projeto/
+└── .claude/settings.json               só liga:  "harness-guardas@harness": true
+```
+
+- **Melhorou uma vez, vale em todo lugar.** A loja é registrada da pasta da skill, então o pacote
+  carrega **no lugar**, sem cópia. Na próxima sessão de qualquer projeto que o liga, a guarda nova
+  já está valendo.
+- **Projeto sem harness não carrega nada.** O pacote só age onde o `.claude/settings.json` liga
+  ele. O CRM, por exemplo, não é afetado.
+- **Projeto novo (`init`)** não recebe cópia de hook: recebe só a linha que liga o pacote.
+- **Projeto antigo** continua como está. No dia em que você abrir, o `ESTADO.md` mostra a
+  migração `guardas-no-pacote`; `/harness upgrade` troca as cópias locais pelo pacote.
+- **Outra máquina?** Precisa de dois passos: clonar a skill e registrar a loja
+  (`claude plugin marketplace add "<pasta da skill>"`). Se faltar, o `doctor` do projeto mostra
+  🔴 com o comando exato.
+- **A guarda agora falha fechada.** O pacote declara `"onFailure": "block"` no hook da guarda
+  (Claude Code 2.1.295 ou mais novo): se o script não abre, a ação é bloqueada, não liberada.
+- **O exame testa a guarda de verdade.** `doctor --skill` roda `scripts/testar-guarda.ps1`, que
+  monta um projeto de mentira e confere 8 casos (bloqueia o proibido, libera o permitido, bloqueia
+  quando o pedido vem quebrado). Pedido escrito não prova nada; teste que roda, sim.
+
+> **Por que não um pacote desde o início?** Porque plugin com hooks só passou a ser a forma
+> oficial de reaproveitar configuração entre projetos em 2026. A cópia por projeto era o melhor
+> que existia na época; quando o mecanismo do fornecedor mudou, a skill mudou junto (`P019`).
+
 | Hook | Evento | Quando dispara | O que faz | Tier |
 |---|---|---|---|---|
 | **`sombra`** 🕰️ | `PreToolUse` · `SessionStart` | antes do risco | **fotografa** o projeto | todos |
@@ -1473,10 +1512,14 @@ Sua edição vence. O `upgrade` nunca sobrescreve customização — mostra o la
 **Serve pra projeto que já existe?**
 Serve. O `init` detecta e vira modo adoção: audita o que tem e propõe melhoria por melhoria.
 
-**Qual a diferença entre `/manual-harness` e `/menu-harness`?**
+**Qual a diferença entre `/harness manual` e `/harness menu`?**
 O manual **ensina** — você escolhe um tópico e ele explica a fundo, com exemplo. O menu
 **lança** — mostra os 12 comandos com uma descrição de uma linha cada, e escolher um número já
-executa aquele comando. Use o manual pra entender; o menu pra agir.
+executa aquele comando. Use o manual pra entender; o menu pra agir. *(Até a v1.14.0 eram duas
+skills separadas, `/manual-harness` e `/menu-harness`; na v2.0.0 foram juntadas à principal.)*
+
+**Digitei `/menu-harness` e não achei. O que houve?**
+Esse atalho saiu na v2.0.0. Use `/harness menu` (e `/harness manual` no lugar de `/manual-harness`).
 
 **O menu não mostrava a data do último uso de cada comando?**
 Mostrava, e foi **abatido na v1.8.0** — de propósito. A skill pedia por escrito que o agente
@@ -1595,7 +1638,8 @@ planos — provavelmente algum sem baixa.
 
 #### 🗑️ "Quero desinstalar"
 
-Apague `.harness/`, `.claude/hooks/`, e os documentos que não quiser manter. `AGENTS.md` vale a
+Apague `.harness/`, tire a linha `harness-guardas@harness` do `.claude/settings.json` (e `.claude/hooks/`,
+se o projeto for de antes da v2.0.0), e os documentos que não quiser manter. `AGENTS.md` vale a
 pena manter mesmo sem a skill — é padrão aberto e qualquer IA lê.
 
 ---
@@ -1649,7 +1693,7 @@ completa: ela deve crescer a partir dos **seus** erros, não dos meus palpites.
 
 | Versão | Data | O que mudou |
 |---|---|---|
-| **2.0.0** | **2026-10-16** | **As guardas viram pacote** 📦 — os 4 hooks saem dos templates e passam a morar no plugin `harness-guardas` (`pacote/`), dentro da pasta da skill. A loja `harness` é registrada da pasta local, então o pacote **carrega no lugar**: melhora uma vez, vale na próxima sessão de todo projeto que o liga. Projeto novo não recebe cópia — só `enabledPlugins` no `.claude/settings.json`. Projeto sem harness nem carrega o pacote. `/manual-harness` e `/menu-harness` saíram: use `/harness manual` e `/harness menu`. Projetos antigos seguem como estão e veem a migração `guardas-no-pacote` no dia em que forem abertos. *(Seções detalhadas do manual: próxima etapa.)* |
+| **2.0.0** | **2026-10-16** | **As guardas viram pacote** 📦 — os 4 hooks saem dos templates e passam a morar no plugin `harness-guardas` (`pacote/`), dentro da pasta da skill. A loja `harness` é registrada da pasta local, então o pacote **carrega no lugar**: melhora uma vez, vale na próxima sessão de todo projeto que o liga. Projeto novo não recebe cópia — só `enabledPlugins` no `.claude/settings.json`. Projeto sem harness nem carrega o pacote. `/manual-harness` e `/menu-harness` saíram: use `/harness manual` e `/harness menu`. Projetos antigos seguem como estão e veem a migração `guardas-no-pacote` no dia em que forem abertos. O manual ganhou a seção "Onde eles moram" em §7.4 e as menções aos atalhos antigos foram trocadas. |
 | **1.14.0** | **2026-10-16** | **O AGENTS.md volta a carregar e a guarda passa a falhar fechada** 🔒 — pesquisa de outubro/2026: o Claude Code lê o `AGENTS.md` sozinho **só quando não existe `CLAUDE.md`**, e todo projeto T2 tem os dois. O `CLAUDE.md` só *pedia* a leitura, então o documento canônico entrava na sessão só se a IA obedecesse. Agora o `CLAUDE.md` do template começa com `@AGENTS.md` (importação oficial). E a guarda, que **liberava** tudo quando falhava (hook que não abre, pedido ilegível, `guardas.json` quebrado), agora **bloqueia** — com `"onFailure": "block"` no `settings.json` e a função `Bloquear-PorFalha` no script; a edição do próprio `guardas.json` continua liberada, senão ninguém consertaria. Provado nos dois sentidos: a guarda antiga liberou 3 de 3 falhas, a nova bloqueia as 3. Os projetos antigos **não foram tocados**: recebem 3 avisos `[SEGURANCA]` no dia em que forem abertos. |
 | **1.13.0** | **2026-08-15** | **Pull em vez de push: o projeto descobre sozinho** 📡 — correção de rumo pedida pelo usuário, e das que mudam a arquitetura. Eu tinha acabado de patchear 4 projetos na mão; ele apontou o que isso vira com 30: *"eu tô aqui só para atualizar a skill"*. Agora a skill **nunca empurra nada** — publica o que mudou em `memoria/MIGRACOES.json`, e cada projeto descobre **no dia em que você abrir ele**, pelo bloco de pendências no `ESTADO.md` e pela família `Migracao` do `doctor`. **O canal já existia** (o hook da sombra já chamava o gerador do `ESTADO.md`), então o aviso custou **zero arquivo novo dentro dos projetos** — e isso resolveu um ovo-e-galinha: hook novo só chegaria por migração, que é o que ele deveria anunciar. Três regras contra virar ruído: silêncio é o padrão · confere no disco, não no número · só interrompe por segurança. |
 | **1.12.0** | **2026-08-15** | **A porta do hook entrou no exame** 🔌 — a v1.11.1 consertou os 4 projetos à mão; esta rodada impede que volte. O `doctor` passou a conferir o **`matcher`** — a peça que decide se o hook é chamado — em duas camadas: no seu projeto (🔴 **nomeando o hook** afetado) e nos templates T1/T2 (para projeto novo não nascer torto). Sem a segunda, consertar os existentes seria enxugar gelo. A regra é genérica — *"quem escuta `Bash` tem de escutar `PowerShell`"* — e não comparação com a string exata do template, que quebraria em qualquer customização legítima e viraria alarme falso. **Alargou o check que já existia**, não empilhou família nova. O `P012` sobe de nível 5 para 3. |

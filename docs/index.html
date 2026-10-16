@@ -662,7 +662,7 @@
     <div class="nav-top">
       <div class="brand">
         <div class="brand-mark">/<span>harness</span></div>
-        <div class="brand-meta">Manual · v1.13.0 · 15.08.2026</div>
+        <div class="brand-meta">Manual · v2.0.0 · 16.10.2026</div>
       </div>
       <button class="icon-btn nav-close" id="navClose" type="button" aria-label="Fechar menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
@@ -746,8 +746,8 @@
 /harness learn "..."  erro real → guarda permanente        ← o mais valioso
 /harness evolve       a skill melhora a si mesma           ← a cada ~2 semanas
 /harness upgrade      trazer melhorias da skill pro projeto
-/manual-harness       este manual — ENSINA, não executa
-/menu-harness         os 12 comandos em lista — ESCOLHE por número e já EXECUTA
+/harness manual       este manual — ENSINA, não executa
+/harness menu         os 12 comandos em lista — ESCOLHE por número e já EXECUTA
 
 Rotina saudável:
   ao criar projeto ......... init
@@ -993,8 +993,10 @@ Custo do harness: ~2.700 tokens/sessão (alvo T2: 2.500)
         enquanto ninguém executa, é só uma frase bonita.
       </p>
       <p>
-        A segunda: o check dos <strong>satélites</strong> (v1.9.0). Satélite é uma skill-atalho que
-        mora <strong>fora</strong> do repositório e manda ler arquivo de dentro dele. Quando a
+        A segunda: o check dos <strong>satélites</strong> (v1.9.0). Satélite era uma skill-atalho que
+        morava <strong>fora</strong> do repositório e mandava ler arquivo de dentro dele (na v2.0.0
+        os atalhos viraram <code>/harness menu</code> e <code>/harness manual</code>, mas a lição
+        continua). Quando a
         v1.8.0 abateu um arquivo, a poda passou em tudo que era do repositório e deixou vivo o
         satélite, que continuou mandando ler o arquivo apagado — até a leitura falhar na frente do
         usuário.
@@ -1098,7 +1100,7 @@ CICLO 3 — a SKILL aprende     semanas  /harness evolve → todo projeto futuro
       </p>
       <pre><code>⚠️ ESTRUTURA DESATUALIZADA — 1 pendência(s), 1 de SEGURANCA
 
-Este projeto está na v1.8.0 · a skill instalada está na v1.13.0.
+Este projeto está na v1.8.0 · a skill instalada está na v2.0.0.
 
 - [SEGURANCA] O matcher do settings.json não encaminhava PowerShell (v1.11.1)
 
@@ -1748,6 +1750,21 @@ Desce por desuso (não se provou)</code></pre>
           <tr><td><code>porta-saida</code></td><td>Stop</td><td><strong>não deixa fechar</strong> com plano sem baixa</td><td>T2+</td></tr>
         </tbody>
       </table></div>
+      <h3>Onde eles moram: o pacote <code>harness-guardas</code> <small>(desde a v2.0.0)</small></h3>
+      <p>
+        Até a v1.14.0, cada projeto levava <strong>uma cópia</strong> dos quatro hooks. Agora eles
+        moram <strong>uma vez só</strong>, num plugin do Claude Code dentro da pasta da skill
+        (<code>pacote/</code>), e o projeto só <strong>liga</strong>
+        (<code>"harness-guardas@harness": true</code> no <code>.claude/settings.json</code>).
+      </p>
+      <ul>
+        <li><strong>Melhorou uma vez, vale em todo lugar.</strong> O pacote carrega no lugar, sem cópia: na próxima sessão de qualquer projeto que o liga, a guarda nova já vale.</li>
+        <li><strong>Projeto sem harness não carrega nada</strong> (o CRM, por exemplo, não é afetado).</li>
+        <li><strong>Projeto antigo</strong> segue como está; no dia em que for aberto, o <code>ESTADO.md</code> mostra a migração <code>guardas-no-pacote</code> e o <code>/harness upgrade</code> faz a troca.</li>
+        <li><strong>Outra máquina?</strong> Clone a skill e rode <code>claude plugin marketplace add "&lt;pasta da skill&gt;"</code>. Se faltar, o <code>doctor</code> do projeto mostra 🔴 com o comando exato.</li>
+        <li><strong>A guarda falha fechada:</strong> com <code>"onFailure": "block"</code> (Claude Code 2.1.295+), se o script não abre a ação é bloqueada, não liberada.</li>
+        <li><strong>O exame testa a guarda de verdade:</strong> <code>doctor --skill</code> monta um projeto de mentira e confere 8 casos.</li>
+      </ul>
       <div class="note key">
         <span class="note-tag">A sombra nunca bloqueia</span>
         <p>
@@ -1862,7 +1879,7 @@ Desce por desuso (não se provou)</code></pre>
           <tr><td>A pasta <code>referencias/</code> vazia não é inchaço?</td><td>Não, e a conta é literal: pasta vazia custa <strong>zero token</strong>; o <code>INDICE.md</code> é leitura sob demanda. O ponteiro no <code>AGENTS.md</code> custa 13 tokens medidos.</td></tr>
           <tr><td>Por que o <code>criticar</code> não roda em loop sozinho?</td><td>Loop é decisão de orçamento, e ela é sua. Para o ciclo completo existe o <code>gauntlet</code> — com portão, rollback, platô e teto.</td></tr>
           <tr><td><strong>O <code>gauntlet</code> pode rodar a noite toda sozinho?</strong></td><td>Não. Teto de rodadas (padrão 3), parada por platô, rollback em regressão — e nada começa sem o seu OK explícito. Você continua sendo o freio final.</td></tr>
-          <tr><td>Diferença entre <code>/manual-harness</code> e <code>/menu-harness</code>?</td><td>O manual <strong>ensina</strong> — você escolhe um tópico e ele explica. O menu <strong>lança</strong> — mostra os 12 comandos com uma descrição de uma linha cada, e já executa o que você escolher.</td></tr>
+          <tr><td>Diferença entre <code>/harness manual</code> e <code>/harness menu</code>? <small>(até a v1.14.0 eram <code>/manual-harness</code> e <code>/menu-harness</code>, que saíram na v2.0.0)</small></td><td>O manual <strong>ensina</strong> — você escolhe um tópico e ele explica. O menu <strong>lança</strong> — mostra os 12 comandos com uma descrição de uma linha cada, e já executa o que você escolher.</td></tr>
           <tr><td>O menu não mostrava a data do último uso?</td><td>Mostrava, e foi <strong>abatido na v1.8.0</strong>, de propósito. A skill <em>pedia por escrito</em> que o agente registrasse cada execução, e não acontecia: um comando rodou duas vezes num dia e seguiu marcado como “nunca usado”. O erro não era a falta do recurso — era o menu não dizer “não sei” e dizer “nunca usado” com confiança. <strong>Dado errado é pior que dado nenhum.</strong></td></tr>
           <tr><td>Por que ela insiste em ser pequena?</td><td>Acima de ~150 linhas o custo sobe 20–23% sem ganho, e regra genérica chega a piorar o resultado.</td></tr>
           <tr><td>Como eu apago tudo?</td><td>Apague <code>.harness/</code> e os documentos. Nada fica escondido no sistema.</td></tr>
@@ -1903,8 +1920,9 @@ Desce por desuso (não se provou)</code></pre>
 
       <h3>Quero desinstalar</h3>
       <p>
-        Apague <code>.harness/</code>, <code>.claude/hooks/</code> e os documentos que não quiser
-        manter. <strong>O <code>AGENTS.md</code> vale a pena manter mesmo sem a skill</strong> — é
+        Apague <code>.harness/</code>, tire a linha <code>harness-guardas@harness</code> do
+        <code>.claude/settings.json</code> (e <code>.claude/hooks/</code>, se o projeto for de antes
+        da v2.0.0) e os documentos que não quiser manter. <strong>O <code>AGENTS.md</code> vale a pena manter mesmo sem a skill</strong> — é
         padrão aberto e qualquer IA lê.
       </p>
     </section>
@@ -1955,7 +1973,7 @@ Desce por desuso (não se provou)</code></pre>
     </section>
 
     <div class="foot">
-      MANUAL /HARNESS · V1.13.0 · 15.08.2026<br>
+      MANUAL /HARNESS · V2.0.0 · 16.10.2026<br>
       FONTE ÚNICA: manual/MANUAL.md · <a href="https://github.com/Leozinhobh77/harness">github.com/Leozinhobh77/harness</a><br>
       ATUALIZE COM /harness manual --exportar
     </div>
