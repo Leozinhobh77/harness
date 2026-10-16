@@ -83,7 +83,7 @@ harness/
 ├── templates/            T1-leve · T2-padrao (não existe T3 — ver TIERS.md)
 │                        comum/ ESTADO.tpl · ESTADO-pendencias.tpl · sombra.ps1
 │                               critico-cego.md · REGRAS-DE-NEGOCIO.md (T2+) · referencias/
-├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1 · sombra.ps1
+├── scripts/              doctor.ps1 · estado.ps1 · versao.ps1 · sombra.ps1 · testar-guarda.ps1
 │                        _migracoes.ps1 — "o que este projeto ainda não aplicou"
 ├── manual/               MANUAL.md — 📌 fonte única do manual
 ├── docs/                 index.html — página publicada (GitHub Pages), saída do --exportar
