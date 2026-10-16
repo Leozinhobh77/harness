@@ -1,14 +1,14 @@
 {
-  "versao": "1.13.0",
+  "versao": "1.14.0",
   "criada_em": "2026-07-26",
-  "atualizada_em": "2026-08-15",
-  "ultima_evolucao": "2026-08-13",
-  "ultima_pesquisa_web": "2026-08-12",
+  "atualizada_em": "2026-10-16",
+  "ultima_evolucao": "2026-10-16",
+  "ultima_pesquisa_web": "2026-10-16",
   "prazos_dias": {
     "evolucao_sugerir": 14,
     "evolucao_insistir": 30,
     "pesquisa_web_sugerir": 45
   },
-  "projetos_criados": 5,
-  "base_de_pesquisa": "julho/2026 — harness engineering, AGENTS.md, context engineering, spec-driven development, Claude Code hooks · agosto/2026 — checkpointing nativo e shadow git · agosto/2026 — Gauntlet Loop, LoopsBench, evidence-gated control, reward hacking de juízes LLM, skills gauntlet-loop empacotadas"
+  "projetos_criados": 6,
+  "base_de_pesquisa": "julho/2026 — harness engineering, AGENTS.md, context engineering, spec-driven development, Claude Code hooks · agosto/2026 — checkpointing nativo e shadow git · agosto/2026 — Gauntlet Loop, LoopsBench, evidence-gated control, reward hacking de juízes LLM, skills gauntlet-loop empacotadas · outubro/2026 — leitura nativa do AGENTS.md (v2.1.277), onFailure block (v2.1.295), plugins como camada de reuso, .claude/rules por caminho, /doctor e /skill-doctor nativos, State of AI Harness Engineering 2026 (marmelab)"
 }

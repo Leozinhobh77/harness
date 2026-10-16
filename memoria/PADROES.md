@@ -294,6 +294,23 @@
   vale para o `evolve` avaliar se algum projeto do `REGISTRO.md` depende de arquivo fora da
   própria raiz.
 
+### P019 — O mecanismo do fornecedor muda por baixo, e o pedido que ele substituía volta a ser só pedido
+- **Visto em:** Finanças, Zenith Invest, Vórtex, Cidade Isométrica, Mentor24h (todos 2026-10-16,
+  por leitura) — o `CLAUDE.md` de nenhum importava o `AGENTS.md`; e o `guarda.ps1` do template
+  liberava a ação em 3 de 3 casos de falha (provado em scratchpad).
+- **Nível da solução:** 1 (estrutura) — `@AGENTS.md` no template carrega por mecanismo; e 2 —
+  `onFailure: block` + `Bloquear-PorFalha` invertem o padrão da guarda para "na dúvida, bloqueia".
+- **Solução:** template corrigido (v1.14.0), check 4b2 no `doctor --skill`, 3 migrações
+  `seguranca` no `MIGRACOES.json`.
+- **Detalhe:** a skill foi desenhada quando o Claude Code **não** lia `AGENTS.md`; o checklist
+  "leia o AGENTS.md" era o único caminho e ninguém o tratou como risco. Quando o fornecedor criou
+  a leitura nativa, ela veio com uma condição (só sem `CLAUDE.md`) que o nosso desenho viola. O
+  `doctor` passava limpo porque nenhum check perguntava *"o canônico carrega?"*. A lição para o
+  `evolve`: **a pesquisa externa não é enfeite** — mudança de comportamento do fornecedor pode
+  abrir buraco sem nenhuma linha nossa mudar. E guarda que faz `exit 0` no `catch` é guarda que
+  se desliga sozinha.
+- **Promovido ao template:** sim (v1.14.0, T2).
+
 ### P018 — Correção propagada à mão não escala: quem descobre a pendência tem que ser o consumidor
 - **Visto em:** skill /harness (2026-08-15), na rodada seguinte a patchear 4 projetos na mão
 - **Nível da solução:** 2 (mecanismo que avisa sozinho) — era **5** (eu, abrindo projeto por projeto)

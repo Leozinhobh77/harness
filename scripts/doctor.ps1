@@ -153,6 +153,41 @@ if ($Skill) {
         }
     }
 
+    # 4b2. O template carrega o AGENTS.md e a guarda falha fechada?
+    #      PROCEDENCIA (16/10/2026, P019): o Claude Code so le o AGENTS.md
+    #      sozinho quando NAO ha CLAUDE.md. O T2 nascia com os dois e o
+    #      CLAUDE.md so PEDIA a leitura - nenhum check via isso, os 5 projetos
+    #      passavam limpos no doctor. E a guarda liberava tudo quando falhava.
+    #      Os projetos antigos sao avisados pelo MIGRACOES.json; este check
+    #      impede o projeto NOVO de nascer com o mesmo buraco.
+    foreach ($tpl in @('T1-leve', 'T2-padrao')) {
+        $dirT = Join-Path $raizSkill "templates\$tpl"
+        $cmT  = Join-Path $dirT 'CLAUDE.md'
+        if ((Test-Path -LiteralPath $cmT) -and (Test-Path -LiteralPath (Join-Path $dirT 'AGENTS.md'))) {
+            if (-not (Get-Content -LiteralPath $cmT -Raw -Encoding UTF8).Contains('@AGENTS.md')) {
+                Add-Achado 'VERMELHO' 'Template' "o CLAUDE.md do $tpl nao importa @AGENTS.md - com os dois na raiz, o Claude Code carrega so o CLAUDE.md" 'acrescentar a linha @AGENTS.md'
+            }
+        }
+        $stT = Join-Path $dirT '.claude\settings.json'
+        if (Test-Path -LiteralPath $stT) {
+            try {
+                $cfgT = Get-Content -LiteralPath $stT -Raw -Encoding UTF8 | ConvertFrom-Json
+                foreach ($ent in @($cfgT.hooks.PreToolUse)) {
+                    foreach ($hk in @($ent.hooks)) {
+                        if ([string]$hk.command -notmatch 'guarda\.ps1') { continue }
+                        if ([string]$hk.onFailure -ne 'block') {
+                            Add-Achado 'VERMELHO' 'Template' "a guarda do $tpl nao tem onFailure block - se o hook nao rodar, a acao proibida passa" 'acrescentar "onFailure": "block"'
+                        }
+                    }
+                }
+            } catch { }   # JSON invalido ja e acusado no 4b
+        }
+        $gdT = Join-Path $dirT '.claude\hooks\guarda.ps1'
+        if ((Test-Path -LiteralPath $gdT) -and -not (Get-Content -LiteralPath $gdT -Raw).Contains('falha-fechada')) {
+            Add-Achado 'VERMELHO' 'Template' "o guarda.ps1 do $tpl libera a acao quando nao consegue conferir (falha aberta)" 'usar Bloquear-PorFalha nos pontos de erro'
+        }
+    }
+
     # 4c. O MIGRACOES.json esta sadio?
     #
     #     Ele e o coracao do modelo pull: e dele que sai o aviso dentro do

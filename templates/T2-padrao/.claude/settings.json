@@ -25,7 +25,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/guarda.ps1\""
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/guarda.ps1\"",
+            "onFailure": "block"
           }
         ]
       }

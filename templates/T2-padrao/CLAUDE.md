@@ -1,7 +1,9 @@
 # CLAUDE.md — {{PROJETO}}
 
-> **Camada fina.** O documento canônico é **`AGENTS.md`** (raiz) — vale para qualquer IA.
-> Aqui só o checklist de entrada e notas de ferramenta. **Não duplica** regras nem arquitetura.
+@AGENTS.md
+
+> **Camada fina.** O documento canônico é **`AGENTS.md`**, carregado pela linha acima. Sem ela,
+> o Claude Code lê só este arquivo e o `AGENTS.md` fica de fora. **Não duplica** regras nem arquitetura.
 >
 > ⚠️ **Nada de "estado atual" aqui.** Informação que muda toda hora vive em `ESTADO.md`, que é
 > gerado. Meter isso num arquivo estático é anti-padrão conhecido — desatualiza e você paga o
@@ -9,7 +11,7 @@
 
 ## START HERE (antes de qualquer coisa)
 
-1. [ ] Leia **`AGENTS.md`** inteiro — é curto e é a fonte da verdade.
+1. [ ] O **`AGENTS.md`** já chegou pela importação no topo: é a fonte da verdade.
 2. [ ] Leia **`ESTADO.md`** — onde o projeto está agora (1 tela).
 3. [ ] Leia **`docs/GOVERNANCA.md`** — o fluxo obrigatório (as 4 portas).
 4. [ ] Passe os olhos em **`docs/PRD.md`** e **`docs/SPEC.md`**.

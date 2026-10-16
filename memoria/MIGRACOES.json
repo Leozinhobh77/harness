@@ -43,6 +43,42 @@
       "verificar": "arquivo:.claude/settings.json:contem:Bash|PowerShell",
       "tiers": "todos",
       "automatico": true
+    },
+    {
+      "id": "claude-md-importa-agents",
+      "versao": "1.14.0",
+      "data": "2026-10-16",
+      "gravidade": "seguranca",
+      "titulo": "O AGENTS.md nao era carregado: o CLAUDE.md so pedia para le-lo",
+      "por_que": "Desde a v2.1.277 o Claude Code le o AGENTS.md sozinho, mas SO quando nao existe CLAUDE.md. Todo projeto T2 tem os dois, e o CLAUDE.md so pedia 'leia o AGENTS.md'. O documento canonico - regras de ouro e a linha do que e proibido - entrava na sessao so se a IA obedecesse ao pedido. Pedido no lugar de mecanismo, o anti-padrao que a Lei 2 proibe. Visto nos 5 projetos com CLAUDE.md. Ver P019.",
+      "acao": "Acrescentar a linha @AGENTS.md logo abaixo do titulo do CLAUDE.md do projeto (importacao oficial: o AGENTS.md passa a carregar junto, toda sessao). Nao mexer no resto do arquivo. Conferir com /context que os dois aparecem em Memory files.",
+      "verificar": "arquivo:CLAUDE.md:contem:@AGENTS.md",
+      "tiers": "T2+",
+      "automatico": true
+    },
+    {
+      "id": "guarda-falha-fechada-hook",
+      "versao": "1.14.0",
+      "data": "2026-10-16",
+      "gravidade": "seguranca",
+      "titulo": "Se o hook da guarda nem rodasse, a acao proibida passava",
+      "por_que": "Para o Claude Code, hook que nao abre, estoura o tempo ou sai com codigo inesperado e 'erro nao bloqueante': a acao segue. Desde a v2.1.295 existe onFailure block, que inverte isso. Ver P019.",
+      "acao": "Em .claude/settings.json, na entrada do guarda.ps1, acrescentar \"onFailure\": \"block\" ao lado do command. So na guarda: sombra e pos-edicao continuam como estao (falha delas nao deve travar o trabalho).",
+      "verificar": "arquivo:.claude/settings.json:contem:onFailure",
+      "tiers": "T2+",
+      "automatico": true
+    },
+    {
+      "id": "guarda-falha-fechada-script",
+      "versao": "1.14.0",
+      "data": "2026-10-16",
+      "gravidade": "seguranca",
+      "titulo": "Guardas.json quebrado desligava todas as guardas sem aviso",
+      "por_que": "O guarda.ps1 terminava em exit 0 (libera) quando nao conseguia ler o pedido ou o .harness/guardas.json. Provado em teste: a versao antiga liberou 3 de 3 casos de falha; a nova bloqueia os 3 e continua liberando a edicao do proprio guardas.json, senao ninguem conseguiria consertar. Ver P019.",
+      "acao": "Trocar .claude/hooks/guarda.ps1 pelo de templates/T2-padrao/. Se o arquivo do projeto foi customizado, NAO sobrescreva - mostre lado a lado e aplique so a funcao Bloquear-PorFalha e os tres pontos que antes faziam exit 0.",
+      "verificar": "arquivo:.claude/hooks/guarda.ps1:contem:falha-fechada",
+      "tiers": "T2+",
+      "automatico": true
     }
   ]
 }

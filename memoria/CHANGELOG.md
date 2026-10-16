@@ -8,6 +8,80 @@
 
 ---
 
+## v1.14.0 — 2026-10-16  ·  🔒 o AGENTS.md volta a carregar e a guarda falha fechada
+
+**Primeira rodada após 64 dias parada, puxada por pesquisa externa** (outubro/2026: docs oficiais
+do Claude Code 2.1.301, *State of AI Harness Engineering 2026* da marmelab, Addy Osmani, blog
+"Steering Claude Code"). Pedido do usuário: atualizar a skill antes de usá-la para criar o site
+da empresa. Esta é a etapa 1 de 7 do plano combinado; a próxima é a poda.
+
+### 1. O AGENTS.md não era carregado ([P019])
+
+O Claude Code lê o `AGENTS.md` nativamente desde a v2.1.277, mas **só quando não há `CLAUDE.md`**
+(padrão `claude-md-or-agents-md`). O T2 nasce com os dois, e o `CLAUDE.md` dizia *"leia o
+`AGENTS.md` inteiro"*. Ou seja: o documento canônico — regras de ouro e linha 🔴 — dependia de
+**pedido**, o anti-padrão que a Lei 2 proíbe. Conferido nos 5 projetos com `CLAUDE.md`: nenhum
+importava. **O `doctor` passava limpo em todos** — nenhum check olhava isso.
+
+- `templates/T2-padrao/CLAUDE.md`: linha `@AGENTS.md` logo abaixo do título.
+- T1 não muda: nasce só com `AGENTS.md`, que a leitura nativa já pega.
+
+### 2. A guarda falhava aberta ([P019])
+
+Dois buracos, um em cada camada:
+- **Hook que nem roda** (powershell não abre, timeout, código inesperado) era *erro não
+  bloqueante* para o Claude Code: a ação seguia. → `"onFailure": "block"` (v2.1.295+) na entrada
+  da guarda. Só nela: sombra e pós-edição falhando não devem travar o trabalho.
+- **Script que não consegue conferir** fazia `exit 0`: pedido vazio, pedido não-JSON e
+  `guardas.json` quebrado **desligavam todas as guardas em silêncio** (o P016 de novo: falha com
+  cara de sucesso). → função `Bloquear-PorFalha` (exit 2). Exceção deliberada: editar o próprio
+  `guardas.json` continua liberado, senão a IA não consegue consertar o que está travando tudo.
+  `guardas.json` **ausente** segue liberando — é projeto sem guarda, não falha.
+
+**Provado nos dois sentidos**, com projeto de mentira no scratchpad (8 casos): a guarda antiga
+liberou 3 de 3 falhas; a nova bloqueia as 3 e mantém os 5 casos que devem passar/bloquear.
+
+### Mecanismo
+
+- `doctor --skill`, check **4b2**: template com `CLAUDE.md` + `AGENTS.md` sem `@AGENTS.md`, guarda
+  sem `onFailure: block`, `guarda.ps1` sem `falha-fechada` → 🔴. Provado: numa cópia da skill com
+  os templates antigos acusa os 3; com os novos, silêncio.
+- `MIGRACOES.json`: 3 migrações `seguranca` (v1.14.0). **Nenhum projeto foi tocado** — os 6
+  recebem os avisos no dia em que forem abertos (modelo pull, [P018]). Conferido só por leitura.
+
+### Um tropeço meu, que vale registrar
+
+Comecei a aplicar a correção no Vórtex "para o usuário testar com `/context`". Ele parou: *"a
+gente não vai mexer em nenhum projeto antigo… senão eu vou gastar meu token todo nos projetos
+antigos"*. Desfeito com `git restore` nos dois arquivos que eu tinha tocado. É o P018 visto do
+outro lado: **o evolve também não empurra** — nem a título de prova. Prova vai em projeto de
+mentira.
+
+### Poda (etapa 2, mesma data, sem subir versão)
+
+- `manual-harness` e `menu-harness` ganharam `disable-model-invocation: true`: a descrição deles
+  (longa) saiu do contexto de **toda** sessão de **todo** projeto e eles só abrem se o usuário
+  digitar `/manual-harness` ou `/menu-harness`. Pedido em linguagem natural ("menu", "manual")
+  continua coberto pela tabela de rotas do `SKILL.md` principal. Os dois moram fora deste repo.
+- **Nada saiu do `doctor`.** Procurei duplicata do `/doctor` e do `/skill-doctor` nativos: o teto
+  de 40/120 linhas do nosso `doctor` é mais estrito que o "200" do nativo e é checado por script
+  (a nativa só *propõe* enxugar), então não é o mesmo trabalho. Abate por desuso exige o
+  `log-guardas.jsonl` de ≥ 90 dias, que não tenho (Lei 4 não deixa chutar).
+
+### O que a pesquisa trouxe e ficou para as próximas etapas
+
+Poda do que o Claude Code agora faz sozinho (`/doctor` audita o tamanho do `CLAUDE.md`,
+`/skill-doctor` mede skill sem uso; `manual-harness` e `menu-harness` custam descrição em toda
+sessão) · `ESTADO.md` injetado pelo `SessionStart` em vez de pedido de leitura · excesso do
+`AGENTS.md` em `.claude/rules/` por caminho em vez de ponteiro · teste automático das guardas ·
+**virar plugin** (v2.0.0, aprovado pelo usuário em 16/10) — a forma oficial de reaproveitar setup
+entre projetos, que tira a cópia dos hooks de dentro de cada um.
+
+⚠️ `docs/index.html` (página publicada) segue em v1.13.0 até a etapa 6 — o `doctor --skill` acusa
+os 2 carimbos de propósito.
+
+---
+
 ## v1.13.0 — 2026-08-15  ·  📡 pull em vez de push: o projeto descobre sozinho que está atrasado
 
 **Correção de rumo pedida pelo usuário, e é das que mudam a arquitetura.** Nesta mesma rodada eu

@@ -15,10 +15,22 @@ $ErrorActionPreference = 'Stop'
 # "Usuario" virava lixo tipo "Usu[bytes]rio" e quebrava qualquer comparacao de caminho.
 try { [Console]::InputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 
-try { $bruto = [Console]::In.ReadToEnd() } catch { exit 0 }
-if ([string]::IsNullOrWhiteSpace($bruto)) { exit 0 }
+# FALHA FECHADA (v1.14.0). Ate a v1.13.0 todo erro aqui terminava em exit 0 -
+# a guarda que nao conseguia ler o pedido LIBERAVA o pedido. Guarda nao sabe
+# o que esta liberando = guarda desligada com cara de ligada (P016). O par
+# mecanico disto e o "onFailure": "block" no settings.json, que cobre o caso
+# em que este script nem chega a rodar (powershell nao abre, estoura o tempo).
+function Bloquear-PorFalha {
+    param([string]$Motivo)
+    [Console]::Error.WriteLine("BLOQUEADO (falha-fechada): $Motivo")
+    [Console]::Error.WriteLine('A guarda nao conseguiu conferir esta acao, entao nao a liberou.')
+    exit 2
+}
 
-try { $ev = $bruto | ConvertFrom-Json } catch { exit 0 }
+try { $bruto = [Console]::In.ReadToEnd() } catch { Bloquear-PorFalha 'nao consegui ler o pedido da ferramenta.' }
+if ([string]::IsNullOrWhiteSpace($bruto)) { Bloquear-PorFalha 'o pedido da ferramenta chegou vazio.' }
+
+try { $ev = $bruto | ConvertFrom-Json } catch { Bloquear-PorFalha 'o pedido da ferramenta nao e JSON valido.' }
 
 $raiz = $env:CLAUDE_PROJECT_DIR
 if (-not $raiz) { $raiz = (Get-Location).Path }
@@ -45,8 +57,15 @@ if ($ev.tool_input -and $ev.tool_input.command) { $comando = [string]$ev.tool_in
 
 # ---------- carrega as guardas ----------
 $cfg = Join-Path $raiz '.harness\guardas.json'
-if (-not (Test-Path $cfg)) { exit 0 }
-try { $g = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json } catch { exit 0 }
+if (-not (Test-Path $cfg)) { exit 0 }    # sem arquivo = projeto sem guardas, nao e falha
+try { $g = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json } catch {
+    # Arquivo de guardas quebrado desligava TODAS as guardas sem aviso. Agora
+    # bloqueia - menos a edicao do proprio guardas.json, senao a IA nunca
+    # conseguiria consertar o arquivo que esta travando tudo.
+    $alvoCfg = ($alvo.Replace('/', '\')).TrimEnd('\')
+    if ($alvoCfg -and $alvoCfg.EndsWith('.harness\guardas.json', [StringComparison]::OrdinalIgnoreCase)) { exit 0 }
+    Bloquear-PorFalha '.harness/guardas.json esta ilegivel (JSON quebrado). Conserte o arquivo - a edicao dele continua liberada.'
+}
 
 function Escrever-Log {
     param([string]$Guarda, [string]$Acao, [string]$Detalhe)
