@@ -12,7 +12,7 @@
 ## START HERE (antes de qualquer coisa)
 
 1. [ ] O **`AGENTS.md`** já chegou pela importação no topo: é a fonte da verdade.
-2. [ ] Leia **`ESTADO.md`** — onde o projeto está agora (1 tela).
+2. [ ] O **`ESTADO.md`** (onde o projeto está agora) já entrou na conversa pelo hook de início.
 3. [ ] Leia **`docs/GOVERNANCA.md`** — o fluxo obrigatório (as 4 portas).
 4. [ ] Passe os olhos em **`docs/PRD.md`** e **`docs/SPEC.md`**.
 5. [ ] Confira **`Planos/INDICE.md`** antes de propor algo novo.

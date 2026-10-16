@@ -75,6 +75,22 @@ try {
                 $null = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $gerador -Projeto $raiz 2>$null
             }
         } catch { }
+
+        # ESTADO-NA-CONVERSA (v1.14.0). Ate aqui o ESTADO.md ficava em dia, mas
+        # entrar na sessao dependia do CLAUDE.md PEDIR a leitura - pedido, nao
+        # mecanismo (P019). No SessionStart, o que o hook imprime com exit 0 vira
+        # contexto da sessao. Teto de 60 linhas: o orcamento do arquivo e 40, e
+        # um ESTADO.md inchado nao pode virar pedagio silencioso em toda sessao.
+        try {
+            $arqEstado = Join-Path $raiz 'ESTADO.md'
+            if (Test-Path -LiteralPath $arqEstado) {
+                $linhas = @(Get-Content -LiteralPath $arqEstado -Encoding UTF8 -TotalCount 60)
+                if ($linhas.Count -gt 0) {
+                    try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
+                    [Console]::Out.Write((($linhas -join "`n") + "`n"))
+                }
+            }
+        } catch { }
     }
     elseif ($tool -match '^(Write|Edit|NotebookEdit)$') {
         $nome = $alvo

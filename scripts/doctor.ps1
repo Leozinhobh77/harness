@@ -188,6 +188,31 @@ if ($Skill) {
         }
     }
 
+    # 4b3. A guarda do template FUNCIONA? Ler o texto nao basta: o 4b2 confere
+    #      que a palavra esta la; isto RODA a guarda em 8 casos, nos dois
+    #      sentidos (bloqueia o proibido, libera o legitimo, bloqueia quando
+    #      nao consegue conferir). Projeto de mentira em %TEMP%. Ver P019.
+    $teste = Join-Path $PSScriptRoot 'testar-guarda.ps1'
+    if (Test-Path -LiteralPath $teste) {
+        # EAP Continue so aqui: com 'Stop' (topo do script) qualquer linha em
+        # stderr do teste derrubava o doctor inteiro em vez de virar achado.
+        $eapAntes = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+        $resT = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $teste -Silencioso 2>&1 | ForEach-Object { [string]$_ })
+        $codT = $LASTEXITCODE
+        $ErrorActionPreference = $eapAntes
+        if ($codT -ne 0) {
+            $casos = @($resT | Where-Object { $_ -match '\(esperado \d, veio' })
+            foreach ($r in $casos) {
+                Add-Achado 'VERMELHO' 'Template' "a guarda do T2 errou no teste: $r" 'rodar scripts/testar-guarda.ps1 e corrigir'
+            }
+            if ($casos.Count -eq 0) {
+                Add-Achado 'VERMELHO' 'Mecanica' 'scripts/testar-guarda.ps1 quebrou antes de terminar' 'rodar o script sozinho e ler o erro'
+            }
+        }
+    } else {
+        Add-Achado 'AMARELO' 'Mecanica' 'scripts/testar-guarda.ps1 nao existe - a guarda do template nao e testada' 'recriar'
+    }
+
     # 4c. O MIGRACOES.json esta sadio?
     #
     #     Ele e o coracao do modelo pull: e dele que sai o aviso dentro do

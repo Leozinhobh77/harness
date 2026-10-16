@@ -68,6 +68,24 @@ mentira.
   (a nativa só *propõe* enxugar), então não é o mesmo trabalho. Abate por desuso exige o
   `log-guardas.jsonl` de ≥ 90 dias, que não tenho (Lei 4 não deixa chutar).
 
+### Pedido vira mecanismo + teste da guarda (etapa 3, mesma data)
+
+- **ESTADO.md na conversa.** A sombra já regenerava o `ESTADO.md` no `SessionStart`; agora também
+  o **imprime** (teto de 60 linhas), e o Claude Code põe o que o hook imprime no contexto. O
+  `CLAUDE.md` do T2 deixou de pedir a leitura. Efeito colateral bom: o bloco de **ESTRUTURA
+  DESATUALIZADA** chega na conversa sozinho quando um projeto antigo é aberto — é o modelo pull
+  falando direto com a IA. Provado em projeto de mentira (acentos íntegros; evento de edição não
+  imprime nada). Migração `estado-na-conversa` (rotina). Cópia da skill em `.claude/hooks/`
+  sincronizada.
+- **Regra por caminho antes do ponteiro.** `criterios/ORCAMENTOS.md`: excesso do `AGENTS.md` que
+  vale só para um tipo de arquivo vai para `.claude/rules/<area>.md` com `paths:` — carrega
+  sozinho quando a IA abre o arquivo. Ponteiro para `docs/` fica para conceito.
+- **`scripts/testar-guarda.ps1`** + check **4b3** do `doctor --skill`: roda a guarda do template em
+  8 casos, nos dois sentidos, em `%TEMP%`. Provado: guarda antiga → o exame acusa os 3 casos.
+  Tropeço registrado: `Rename-Item` recusa o nome curto do `%TEMP%` (`USURIO~2`) mesmo com
+  `-LiteralPath`; trocado por `[IO.File]::Move`. E o doctor (EAP `Stop`) morria com qualquer
+  stderr do teste — isolado com EAP `Continue` só naquela chamada.
+
 ### O que a pesquisa trouxe e ficou para as próximas etapas
 
 Poda do que o Claude Code agora faz sozinho (`/doctor` audita o tamanho do `CLAUDE.md`,

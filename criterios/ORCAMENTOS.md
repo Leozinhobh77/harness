@@ -46,6 +46,24 @@ Estourou o orçamento, **não corte informação — mude de lugar.**
 ✅ certo:   mover para o documento de profundidade + deixar 1 linha de ponteiro
 ```
 
+**Antes do ponteiro, pergunte: essa regra vale só para um tipo de arquivo?** (só `.sql`, só a
+pasta `app/`, só `.css`). Se sim, ela vai para **`.claude/rules/<area>.md`** com `paths:` no
+cabeçalho, e não para um documento de profundidade:
+
+```markdown
+---
+paths: ["**/*.sql", "supabase/**"]
+---
+# Regras de banco
+- ...
+```
+
+O Claude Code carrega esse arquivo **sozinho** quando a IA abre um arquivo que casa com o
+caminho, e não cobra nada nas sessões que não mexem ali. O ponteiro para `docs/SPEC.md` depende
+de a IA lembrar de ler: é pedido. A regra por caminho é mecanismo (Lei 2). Ponteiro continua
+certo para o que é **conceito** (arquitetura, regra de domínio), que não tem um tipo de arquivo
+dono. *Procedência: pesquisa de 16/10/2026 (docs oficiais de memória do Claude Code, P019).*
+
 E nunca duplicar parágrafo entre dois documentos. **Fonte única, sempre.** Duplicata é
 garantia de que um dos dois vai desatualizar sem ninguém notar.
 

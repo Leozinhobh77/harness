@@ -79,6 +79,18 @@
       "verificar": "arquivo:.claude/hooks/guarda.ps1:contem:falha-fechada",
       "tiers": "T2+",
       "automatico": true
+    },
+    {
+      "id": "estado-na-conversa",
+      "versao": "1.14.0",
+      "data": "2026-10-16",
+      "gravidade": "rotina",
+      "titulo": "O ESTADO.md entra sozinho na conversa no inicio da sessao",
+      "por_que": "O ESTADO.md ja era regenerado no inicio da sessao, mas so era lido se a IA obedecesse ao CLAUDE.md. Agora a sombra imprime o arquivo no SessionStart, e o Claude Code poe isso no contexto - inclusive o bloco de ESTRUTURA DESATUALIZADA. Ver P019.",
+      "acao": "Trocar .claude/hooks/sombra.ps1 pelo de templates/comum/ (o arquivo e byte-identico em todo projeto; se foi customizado, mostre lado a lado). No CLAUDE.md, o item 'Leia ESTADO.md' pode virar 'ja entrou pelo hook de inicio'.",
+      "verificar": "arquivo:.claude/hooks/sombra.ps1:contem:ESTADO-NA-CONVERSA",
+      "tiers": "T2+",
+      "automatico": true
     }
   ]
 }
