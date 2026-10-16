@@ -13,6 +13,7 @@
 | Central de Projetos e MCPs | `~/Desktop/Projetos/Central de Projetos e MCPs (Computador)` | T2 | 2026-08-11 | v1.3.3 (nascido) · v1.11.1 (atual) | `ativo` |
 | Vórtex | `~/Desktop/Projetos/Vórtex` | T2+ | 2026-08-12 | v1.7.0 (nascido) · v1.11.1 (atual) | `ativo` |
 | Cidade Isométrica | `~/Desktop/Projetos/cidade-isometrica` | T2 | 2026-08-16 | v1.13.0 (nascido) | `ativo` |
+| Mentor24h | `~/Desktop/Projetos/Mentor24h-V4` | T2+ | 2026-08-23 | v1.13.0 (nascido) | `ativo` |
 
 > **Varredura do `evolve` de 2026-08-12:** os 3 vivos, 0 🔴, custo entre 2.028 e 2.236
 > tokens/sessão. A convergência achada (P011) saiu de Zenith + Central. Finanças trocou a guarda
@@ -36,6 +37,17 @@
 > código**, não de erro cometido — a ficha da ideia de origem (`banco-de-ideias`, `2026-08-16#03`)
 > já trazia a seção "onde dói". Vale observar no próximo `evolve` se guarda nascida de risco
 > previsto dispara tanto quanto guarda nascida de erro real, ou se é otimismo que vira desuso.
+
+> **Mentor24h** (2026-08-23) é o primeiro caso de **migração em vez de adoção**: o projeto tinha
+> 453 arquivos, 12,6 MB e 87 commits, mas 73% do peso eram screenshots e 41 deles estavam
+> commitados — adotar o harness no lugar não tiraria os 13,6 MB já cravados na história do git.
+> Nasceu numa pasta nova, com git limpo, e a v3 ficou intacta como arquivo morto.
+> Achado que vale para o `evolve`: a v3 tinha **cinco** sistemas paralelos de rastreio, e três se
+> declaravam "a fonte única" no próprio cabeçalho. Eles colidiram de fato — "Etapa 28" era
+> *Supabase (pendente)* num arquivo e *Organização Panes (concluída)* no outro. É a primeira
+> evidência direta de que a proliferação de rastreio não é só inchaço: **produz informação
+> contraditória que uma IA não tem como desempatar**. Virou a guarda `rastreio-so-em-planos`.
+> Se um segundo projeto mostrar o mesmo, é convergência e cabe no `init` de todo mundo.
 
 ## Estados
 
